@@ -65,8 +65,9 @@
   <div id="loginScreen" class="hidden h-full flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
       <div class="p-8 text-center bg-indigo-600" id="loginHeader">
-        <div class="w-16 h-16 mx-auto bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm mb-4">
-          <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+        <div class="w-16 h-16 mx-auto bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm mb-4 overflow-hidden border border-transparent">
+          <i id="loginLogoIcon" data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+          <img id="loginLogoImage" src="" class="w-full h-full object-cover hidden" alt="Logo Login">
         </div>
         <h1 class="text-2xl font-bold text-white">Tancoy meco</h1>
         <p class="text-indigo-100 text-sm mt-1">Panel de Administración</p>
@@ -1550,11 +1551,25 @@
     }
 
     // --- 7. FUNCIONES DE GESTIÓN (VER Y BORRAR) ---
-    function abrirPerfil(id) {
-        const data = window.registrosGlobalesMemoria[id];
+    async function abrirPerfil(id) {
+        let data = window.registrosGlobalesMemoria[id];
+        
+        // SALVAVIDAS: Si el dato se borró de la memoria caché, lo rescatamos directo de Firebase
         if (!data) {
-            alert("Error: No se encontraron los datos de este registro en memoria.");
-            return;
+            try {
+                const docInfo = await db.collection('simpatizantes').doc(id).get();
+                if (docInfo.exists) {
+                    data = docInfo.data();
+                    window.registrosGlobalesMemoria[id] = data; // Lo volvemos a inyectar en la memoria RAM
+                } else {
+                    alert("Error: Este registro fue eliminado o ya no existe en la nube.");
+                    return;
+                }
+            } catch(error) {
+                console.error("Error recuperando datos: ", error);
+                alert("Error de conexión al intentar abrir el expediente.");
+                return;
+            }
         }
 
         document.getElementById('mp_id_doc').textContent = id;
@@ -1984,6 +1999,9 @@
                     const iconSidebar = document.getElementById('appLogoIcon');
                     const imgPreview = document.getElementById('previewLogo');
                     const iconPreview = document.getElementById('previewIcon');
+                    // Nuevos elementos capturados del Login
+                    const imgLogin = document.getElementById('loginLogoImage');
+                    const iconLogin = document.getElementById('loginLogoIcon');
 
                     if (imgSidebar) {
                         imgSidebar.src = data.logo_url;
@@ -1994,6 +2012,12 @@
                         imgPreview.src = data.logo_url;
                         imgPreview.classList.remove('hidden');
                         if (iconPreview) iconPreview.classList.add('hidden');
+                    }
+                    // Aplicar los cambios en el Login
+                    if (imgLogin) {
+                        imgLogin.src = data.logo_url;
+                        imgLogin.classList.remove('hidden');
+                        if (iconLogin) iconLogin.classList.add('hidden');
                     }
                 }
             }
