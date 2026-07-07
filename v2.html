@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delta Corporativo - Padrón Electoral</title>
+  <title>Tancoy meco - Padrón Electoral</title>
   
   <!-- ========================================== -->
   <!-- 1. LIBRERÍAS Y DEPENDENCIAS EXTERNAS       -->
@@ -68,7 +68,7 @@
         <div class="w-16 h-16 mx-auto bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm mb-4">
           <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
         </div>
-        <h1 class="text-2xl font-bold text-white">Delta Corporativo</h1>
+        <h1 class="text-2xl font-bold text-white">Tancoy meco</h1>
         <p class="text-indigo-100 text-sm mt-1">Panel de Administración</p>
       </div>
       
@@ -109,7 +109,7 @@
             <img id="appLogoImage" src="" class="w-full h-full object-cover hidden" alt="Logo">
           </div>
           <div>
-            <h1 class="text-sm font-bold leading-tight" id="appTitle">Dashboard Central</h1>
+            <h1 class="text-sm font-bold leading-tight" id="appTitle">Tancoy meco</h1>
             <p class="text-[10px] text-slate-500 dark:text-slate-400" id="appState">Padrón Corporativo</p>
           </div>
         </div>
@@ -622,7 +622,7 @@
                 <button id="btnGuardarExp" onclick="guardarEdicionExpediente()" class="hidden px-5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-colors shadow-sm"><i data-lucide="save" class="w-3.5 h-3.5"></i> GUARDAR CAMBIOS</button>
               </div>
               
-              <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm grid grid-cols-2 gap-x-6 gap-y-5">
+             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm grid grid-cols-2 gap-x-6 gap-y-5">
                 <div class="col-span-2">
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Nombre Completo</p>
                   <p id="mp_nombre_texto" class="text-lg font-black text-slate-800">--</p>
@@ -666,11 +666,33 @@
                   <input type="text" id="mp_direccion_input" class="hidden w-full text-xs font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
                 </div>
               </div>
+
+              <!-- NUEVO: Historial de Apoyos en el Expediente -->
+              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
+                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="gift" class="w-4 h-4 text-indigo-500"></i> Historial de Apoyos Recibidos</h4>
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                  <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-xs text-slate-500 font-bold border-b border-slate-200">
+                      <tr>
+                        <th class="px-4 py-2 w-28">Fecha</th>
+                        <th class="px-4 py-2">Programa / Apoyo</th>
+                        <th class="px-4 py-2">Observaciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="mp_tabla_historial" class="divide-y divide-slate-100">
+                      <tr><td colspan="3" class="px-4 py-4 text-center text-xs text-slate-400">Cargando datos...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
     
     <!-- ========================================== -->
     <!-- MODAL ASIGNAR APOYO (ACTUALIZADO)          -->
@@ -739,10 +761,11 @@
                       <th class="px-4 py-3 w-32">Fecha</th>
                       <th class="px-4 py-3">Apoyo</th>
                       <th class="px-4 py-3">Observaciones</th>
+                      <th class="px-4 py-3 w-16 text-center">Acción</th>
                     </tr>
                   </thead>
                   <tbody id="ma_tabla_historial" class="divide-y divide-slate-100">
-                    <tr><td colspan="3" class="px-4 py-6 text-center text-xs text-slate-400">Cargando historial...</td></tr>
+                    <tr><td colspan="4" class="px-4 py-6 text-center text-xs text-slate-400">Cargando historial...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -996,76 +1019,85 @@
     function toggleDark(){ document.documentElement.classList.toggle('dark'); }
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-    // --- 6. GESTIÓN DEL PADRÓN EN FIREBASE CON PAGINACIÓN ---
+   // --- 6. GESTIÓN DEL PADRÓN: CARGA ÚNICA Y FILTRADO LOCAL ---
+    
+    // Esta función filtra los datos en la memoria RAM del navegador. CERO LECTURAS a Firebase.
     function aplicarFiltros() {
         const tipo = document.getElementById('filtroTipo').value;
-        const texto = document.getElementById('filtroTexto').value;
-        const barrio = document.getElementById('filtroBarrio').value;
+        const textoLimpio = document.getElementById('filtroTexto').value.trim().toUpperCase();
+        const barrioLimpio = document.getElementById('filtroBarrio').value.trim().toUpperCase();
         const sexo = document.getElementById('filtroSexo').value;
-        leerRegistrosEnTiempoReal(tipo, texto, barrio, sexo);
-    }
 
-    function leerRegistrosEnTiempoReal(tipo = 'TODOS', textoBusqueda = '', barrioBusqueda = '', sexoBusqueda = 'TODOS') {
-      const tbCenso = document.getElementById('tableRegistros');
-      if (!tbCenso) return;
-      if (unsubscribeCenso) unsubscribeCenso();
-      
-      tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500"></i> Procesando datos...</td></tr>`;
-      lucide.createIcons();
+        datosFiltradosMemoriaLocal = [];
 
-      let query = db.collection('simpatizantes');
-      if (tipo !== 'TODOS') query = query.where('tipo_afiliacion', '==', tipo);
-      
-      // Limitamos a 5000 para poder leer todo el padrón al paginar o buscar
-      query = query.limit(5000); 
+        // Recorremos el diccionario que ya tenemos descargado en memoria
+        Object.keys(window.registrosGlobalesMemoria).forEach(id => {
+            const d = window.registrosGlobalesMemoria[id];
 
-      unsubscribeCenso = query.onSnapshot((querySnapshot) => {
-          window.registrosGlobalesMemoria = {}; 
-          datosFiltradosMemoriaLocal = [];
-          
-          let textoLimpio = textoBusqueda.trim().toUpperCase();
-          let barrioLimpio = barrioBusqueda.trim().toUpperCase();
+            // Filtros estrictos
+            if (tipo !== 'TODOS' && d.tipo_afiliacion !== tipo) return;
+            if (sexo !== 'TODOS' && d.sexo !== sexo) return;
 
-          querySnapshot.forEach((doc) => {
-            const d = doc.data();
-            
+            // Búsqueda global por texto
             if (textoLimpio !== '') {
                 const nom = (d.nombre || '').toUpperCase();
                 const cas = (d.casilla || '').toUpperCase();
                 const cve = (d.clave_elector || '').toUpperCase();
                 const curp = (d.curp || '').toUpperCase();
                 const dir = (d.direccion || '').toUpperCase();
-                if (!nom.includes(textoLimpio) && !cas.includes(textoLimpio) && !cve.includes(textoLimpio) && !curp.includes(textoLimpio) && !dir.includes(textoLimpio)) return; 
+                if (!nom.includes(textoLimpio) && !cas.includes(textoLimpio) && !cve.includes(textoLimpio) && !curp.includes(textoLimpio) && !dir.includes(textoLimpio)) return;
             }
 
+            // Filtro por barrio
             if (barrioLimpio !== '') {
                 const bar = (d.barrio || '').toUpperCase();
                 if (!bar.includes(barrioLimpio)) return;
             }
 
-            if (sexoBusqueda !== 'TODOS') {
-                const sex = (d.sexo || '').toUpperCase();
-                if (sex !== sexoBusqueda) return;
-            }
+            datosFiltradosMemoriaLocal.push({ id: id, ...d });
+        });
 
-            window.registrosGlobalesMemoria[doc.id] = d; 
-            datosFiltradosMemoriaLocal.push({ id: doc.id, ...d });
+        // Refrescar las vistas locales
+        paginaActual = 1;
+        renderizarPaginaPadron();
+        
+        if(!document.getElementById('page-padron-electoral').classList.contains('hidden')) renderizarPadronElectoral();
+        if(!document.getElementById('page-apoyos').classList.contains('hidden')) aplicarFiltrosCA();
+    }
+
+    // Esta función se conecta a Firebase UNA SOLA VEZ y mantiene los datos sincronizados
+    function leerRegistrosEnTiempoReal() {
+      const tbCenso = document.getElementById('tableRegistros');
+      if (!tbCenso) return;
+      if (unsubscribeCenso) return; // Si ya estamos escuchando, evitamos abrir otra conexión
+      
+      tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500"></i> Cargando Padrón Inicial...</td></tr>`;
+      lucide.createIcons();
+
+      // Hacemos la consulta global sin restricciones de where() para descargar todo a memoria
+      const query = db.collection('simpatizantes');
+
+      unsubscribeCenso = query.onSnapshot((querySnapshot) => {
+          // Nota: onSnapshot de Firebase utiliza caché. Si un documento cambia, 
+          // solo lee ESE documento nuevo, no toda la base de datos de nuevo.
+          window.registrosGlobalesMemoria = {};
+          
+          querySnapshot.forEach((doc) => {
+              window.registrosGlobalesMemoria[doc.id] = doc.data();
           });
           
-          // Actualizar KPIs de avance
-          const totalRegistrosReales = datosFiltradosMemoriaLocal.length;
+          // Actualizar KPIs de avance basados en lo que tenemos en RAM
+          const totalRegistrosReales = Object.keys(window.registrosGlobalesMemoria).length;
           document.getElementById('kpiVotosTotales').textContent = totalRegistrosReales.toLocaleString();
           const totalNominal = rawDataGlobal.reduce((acc, curr) => acc + curr.ln, 0);
           document.getElementById('kpiPartEst').textContent = totalNominal > 0 ? ((totalRegistrosReales / totalNominal) * 100).toFixed(2) + '%' : '0.00%';
 
-          paginaActual = 1;
-          renderizarPaginaPadron();
-          // Actualiza las tablas secundarias (Electoral y Asignacion)
-          if(document.getElementById('page-padron-electoral').classList.contains('hidden') === false) renderizarPadronElectoral();
-          if(document.getElementById('page-apoyos').classList.contains('hidden') === false) aplicarFiltrosCA();
+          // Una vez actualizados los datos en memoria, aplicamos los filtros locales
+          aplicarFiltros();
 
       }, (error) => {
-          tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión.</td></tr>`;
+          console.error("Error de Firebase:", error);
+          tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
       });
     }
 
@@ -1533,12 +1565,64 @@
             fotoContainer.innerHTML = `<img src="${data.foto_url}" class="w-full h-full object-cover">`;
         } else {
             fotoContainer.innerHTML = `<i data-lucide="user" class="w-16 h-16 text-slate-300"></i>`;
-            lucide.createIcons(); 
         }
 
         document.getElementById('modalPerfil').classList.remove('hidden');
+        lucide.createIcons(); 
+
+        const tbodyHistorial = document.getElementById('mp_tabla_historial');
+        tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-indigo-500"></i></td></tr>';
+        lucide.createIcons();
+
+        db.collection('entregas_apoyos')
+          .where('id_beneficiario', '==', id)
+          .get()
+          .then(snapshot => {
+              let historial = [];
+              snapshot.forEach(doc => {
+                  let docData = doc.data();
+                  docData.idEntrega = doc.id; // Guardamos el ID del documento
+                  historial.push(docData);
+              });
+              
+              historial.sort((a,b) => {
+                  let t1 = a.fecha_entrega ? (a.fecha_entrega.seconds || 0) : 0;
+                  let t2 = b.fecha_entrega ? (b.fecha_entrega.seconds || 0) : 0;
+                  return t2 - t1; 
+              });
+
+              tbodyHistorial.innerHTML = '';
+              if(historial.length === 0) {
+                  tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-5 text-center text-xs text-slate-400 font-medium">Este beneficiario no tiene apoyos registrados.</td></tr>';
+                  return;
+              }
+
+              historial.forEach(d => {
+                  let dateStr = d.fecha_asignada || (d.fecha_entrega && d.fecha_entrega.toDate ? d.fecha_entrega.toDate().toLocaleDateString('es-MX') : '--');
+                  tbodyHistorial.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="px-4 py-2.5 text-xs font-medium text-slate-600">${dateStr}</td>
+                      <td class="px-4 py-2.5 text-xs font-bold text-slate-800">${d.nombre_apoyo}</td>
+                      <td class="px-4 py-2.5 text-[11px] text-slate-500">${d.observaciones || '--'}</td>
+                      <td class="px-4 py-2.5 text-center">
+                          <button onclick="eliminarEntregaApoyo('${d.idEntrega}', '${id}', 'perfil')" class="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Borrar Entrega">
+                              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                      </td>
+                    </tr>
+                  `;
+              });
+              lucide.createIcons(); // Procesar los iconos nuevos
+          }).catch(e => {
+              console.error(e);
+              tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-xs text-red-500 font-bold">Error al cargar historial.</td></tr>';
+          });
     }
 
+    // (Aquí va el resto de tu código que sigue intacto, baja hasta encontrar la función cargarHistorialApoyos)
+
+
+    // Función para cerrar el modal del perfil
     function cerrarPerfil() {
         document.getElementById('modalPerfil').classList.add('hidden');
         document.getElementById('btnGuardarExp').classList.add('hidden');
@@ -1552,6 +1636,7 @@
         });
     }
 
+    // Función para borrar un registro de beneficiario completo
     async function eliminarRegistro(id, nombre) {
         if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el expediente de:\n${nombre}?`)) {
             return;
@@ -1561,6 +1646,82 @@
         } catch (error) {
             console.error("Error al eliminar registro:", error);
             alert("Ocurrió un error al intentar borrar el registro.");
+        }
+    }
+
+    // ... código intermedio ...
+
+    // Nueva función para traer el historial
+    window.cargarHistorialApoyos = function(idBeneficiario) {
+        const tbody = document.getElementById('ma_tabla_historial');
+        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-sky-500"></i></td></tr>';
+        lucide.createIcons();
+
+        db.collection('entregas_apoyos')
+          .where('id_beneficiario', '==', idBeneficiario)
+          .get()
+          .then(snapshot => {
+              // Extraer y guardar el ID de Firebase para poder borrarlo
+              let historial = [];
+              snapshot.forEach(doc => {
+                  let docData = doc.data();
+                  docData.idEntrega = doc.id; // ¡Esto es clave para el botón de borrar!
+                  historial.push(docData);
+              });
+              
+              historial.sort((a,b) => {
+                  let t1 = a.fecha_entrega ? (a.fecha_entrega.seconds || 0) : 0;
+                  let t2 = b.fecha_entrega ? (b.fecha_entrega.seconds || 0) : 0;
+                  return t2 - t1; // Más reciente primero
+              });
+
+              tbody.innerHTML = '';
+              if(historial.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-xs text-slate-400">No hay entregas registradas anteriormente.</td></tr>';
+                  return;
+              }
+
+              historial.forEach(d => {
+                  let dateStr = d.fecha_asignada || (d.fecha_entrega && d.fecha_entrega.toDate ? d.fecha_entrega.toDate().toLocaleDateString('es-MX') : '--');
+                  
+                  // Aquí se dibuja la fila incluyendo la CUARTA columna de Acción
+                  tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="px-4 py-3 text-xs font-medium text-slate-600">${dateStr}</td>
+                      <td class="px-4 py-3 text-xs font-bold text-slate-800">${d.nombre_apoyo}</td>
+                      <td class="px-4 py-3 text-xs text-slate-500">${d.observaciones || '--'}</td>
+                      <td class="px-4 py-3 text-center">
+                          <button onclick="eliminarEntregaApoyo('${d.idEntrega}', '${idBeneficiario}', 'asignacion')" class="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Borrar Entrega">
+                              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                      </td>
+                    </tr>
+                  `;
+              });
+              lucide.createIcons(); // Procesar los iconos nuevos para que aparezca la basura
+          }).catch(e => {
+              console.error(e);
+              tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-xs text-red-500 font-bold">Error al cargar historial.</td></tr>';
+          });
+    }
+
+    // --- NUEVA FUNCIÓN PARA BORRAR LA ENTREGA ---
+    window.eliminarEntregaApoyo = async function(idEntrega, idBeneficiario, origen) {
+        if(confirm("¿Estás seguro de que deseas borrar este registro de entrega? Esta acción no se puede deshacer.")) {
+            try {
+                // Se elimina el registro de la nube de Firebase
+                await db.collection('entregas_apoyos').doc(idEntrega).delete();
+                
+                // Actualizar la tabla de forma automática para que desaparezca al instante
+                if (origen === 'perfil') {
+                    abrirPerfil(idBeneficiario); 
+                } else if (origen === 'asignacion') {
+                    cargarHistorialApoyos(idBeneficiario);
+                }
+            } catch (error) {
+                console.error("Error al borrar entrega:", error);
+                alert("Ocurrió un error al intentar borrar el registro.");
+            }
         }
     }
 
@@ -2045,19 +2206,36 @@
         const contenedor = document.getElementById('pe_contenedorBotonesPaginas');
         contenedor.innerHTML = '';
 
+        // Botón Anterior
         const btnPrev = document.createElement('button');
-        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${pe_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${pe_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnPrev.innerHTML = '<i data-lucide="chevrons-left" class="w-4 h-4"></i>';
         btnPrev.onclick = () => { if(pe_paginaActual > 1) { pe_paginaActual--; renderizarPadronElectoral(); } };
         contenedor.appendChild(btnPrev);
 
-        const btnNum = document.createElement('span');
-        btnNum.className = "px-4 py-1 rounded-full font-bold bg-rose-50 text-rose-600 text-sm";
-        btnNum.textContent = pe_paginaActual;
-        contenedor.appendChild(btnNum);
+        // Lógica matemática para crear la ventana corrediza de hasta 5 páginas (ej. 1 2 3 4 5)
+        let inicioRango = Math.max(1, pe_paginaActual - 2);
+        let finRango = Math.min(totalPaginas, inicioRango + 4);
+        if (finRango - inicioRango < 4) inicioRango = Math.max(1, finRango - 4);
 
+        // Inyección de botones numéricos dinámicos
+        for (let i = inicioRango; i <= finRango; i++) {
+            const btnNum = document.createElement('button');
+            if (i === pe_paginaActual) {
+                // Botón de la página actualmente seleccionada (Color corporativo)
+                btnNum.className = "px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-sm focus:outline-none";
+            } else {
+                // Botones de páginas inactivas seleccionables
+                btnNum.className = "px-3 py-1.5 rounded-lg font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition focus:outline-none";
+            }
+            btnNum.textContent = i;
+            btnNum.onclick = () => { pe_paginaActual = i; renderizarPadronElectoral(); };
+            contenedor.appendChild(btnNum);
+        }
+
+        // Botón Siguiente
         const btnNext = document.createElement('button');
-        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${pe_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${pe_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnNext.innerHTML = '<i data-lucide="chevrons-right" class="w-4 h-4"></i>';
         btnNext.onclick = () => { if(pe_paginaActual < totalPaginas) { pe_paginaActual++; renderizarPadronElectoral(); } };
         contenedor.appendChild(btnNext);
@@ -2230,8 +2408,11 @@
         if(Array.from(selSec.options).some(o=>o.value===valSec)) selSec.value = valSec;
     }
 
-    function aplicarFiltrosCA() {
-        ca_paginaActual = 1;
+    function aplicarFiltrosCA(resetPage = true) {
+        // Solo reseteamos a la página 1 si estamos buscando o filtrando, NO si estamos paginando
+        if (resetPage === true) {
+            ca_paginaActual = 1;
+        }
         
         actualizarFiltrosDesplegablesCA();
 
@@ -2302,20 +2483,35 @@
         contenedor.innerHTML = '';
 
         const btnPrev = document.createElement('button');
-        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${ca_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${ca_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnPrev.innerHTML = '<i data-lucide="chevrons-left" class="w-4 h-4"></i>';
-        btnPrev.onclick = () => { if(ca_paginaActual > 1) { ca_paginaActual--; aplicarFiltrosCA(); } };
+        // Nota como aquí enviamos (false) para que no reinicie la página
+        btnPrev.onclick = () => { if(ca_paginaActual > 1) { ca_paginaActual--; aplicarFiltrosCA(false); } };
         contenedor.appendChild(btnPrev);
 
-        const btnNum = document.createElement('span');
-        btnNum.className = "px-4 py-1 rounded-full font-bold bg-indigo-50 text-indigo-600 text-sm";
-        btnNum.textContent = ca_paginaActual;
-        contenedor.appendChild(btnNum);
+        // Lógica de botones numéricos (1, 2, 3...)
+        let inicioRango = Math.max(1, ca_paginaActual - 2);
+        let finRango = Math.min(totalPaginas, inicioRango + 4);
+        if (finRango - inicioRango < 4) inicioRango = Math.max(1, finRango - 4);
+
+        for (let i = inicioRango; i <= finRango; i++) {
+            const btnNum = document.createElement('button');
+            if (i === ca_paginaActual) {
+                btnNum.className = "px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-sm focus:outline-none";
+            } else {
+                btnNum.className = "px-3 py-1.5 rounded-lg font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition focus:outline-none";
+            }
+            btnNum.textContent = i;
+            // Aquí también enviamos (false)
+            btnNum.onclick = () => { ca_paginaActual = i; aplicarFiltrosCA(false); };
+            contenedor.appendChild(btnNum);
+        }
 
         const btnNext = document.createElement('button');
-        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${ca_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${ca_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnNext.innerHTML = '<i data-lucide="chevrons-right" class="w-4 h-4"></i>';
-        btnNext.onclick = () => { if(ca_paginaActual < totalPaginas) { ca_paginaActual++; aplicarFiltrosCA(); } };
+        // Y aquí (false)
+        btnNext.onclick = () => { if(ca_paginaActual < totalPaginas) { ca_paginaActual++; aplicarFiltrosCA(false); } };
         contenedor.appendChild(btnNext);
     }
 

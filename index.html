@@ -1019,76 +1019,85 @@
     function toggleDark(){ document.documentElement.classList.toggle('dark'); }
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-    // --- 6. GESTIÓN DEL PADRÓN EN FIREBASE CON PAGINACIÓN ---
+   // --- 6. GESTIÓN DEL PADRÓN: CARGA ÚNICA Y FILTRADO LOCAL ---
+    
+    // Esta función filtra los datos en la memoria RAM del navegador. CERO LECTURAS a Firebase.
     function aplicarFiltros() {
         const tipo = document.getElementById('filtroTipo').value;
-        const texto = document.getElementById('filtroTexto').value;
-        const barrio = document.getElementById('filtroBarrio').value;
+        const textoLimpio = document.getElementById('filtroTexto').value.trim().toUpperCase();
+        const barrioLimpio = document.getElementById('filtroBarrio').value.trim().toUpperCase();
         const sexo = document.getElementById('filtroSexo').value;
-        leerRegistrosEnTiempoReal(tipo, texto, barrio, sexo);
-    }
 
-    function leerRegistrosEnTiempoReal(tipo = 'TODOS', textoBusqueda = '', barrioBusqueda = '', sexoBusqueda = 'TODOS') {
-      const tbCenso = document.getElementById('tableRegistros');
-      if (!tbCenso) return;
-      if (unsubscribeCenso) unsubscribeCenso();
-      
-      tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500"></i> Procesando datos...</td></tr>`;
-      lucide.createIcons();
+        datosFiltradosMemoriaLocal = [];
 
-      let query = db.collection('simpatizantes');
-      if (tipo !== 'TODOS') query = query.where('tipo_afiliacion', '==', tipo);
-      
-      // Limitamos a 5000 para poder leer todo el padrón al paginar o buscar
-      //query = query.limit(5000); 
+        // Recorremos el diccionario que ya tenemos descargado en memoria
+        Object.keys(window.registrosGlobalesMemoria).forEach(id => {
+            const d = window.registrosGlobalesMemoria[id];
 
-      unsubscribeCenso = query.onSnapshot((querySnapshot) => {
-          window.registrosGlobalesMemoria = {}; 
-          datosFiltradosMemoriaLocal = [];
-          
-          let textoLimpio = textoBusqueda.trim().toUpperCase();
-          let barrioLimpio = barrioBusqueda.trim().toUpperCase();
+            // Filtros estrictos
+            if (tipo !== 'TODOS' && d.tipo_afiliacion !== tipo) return;
+            if (sexo !== 'TODOS' && d.sexo !== sexo) return;
 
-          querySnapshot.forEach((doc) => {
-            const d = doc.data();
-            
+            // Búsqueda global por texto
             if (textoLimpio !== '') {
                 const nom = (d.nombre || '').toUpperCase();
                 const cas = (d.casilla || '').toUpperCase();
                 const cve = (d.clave_elector || '').toUpperCase();
                 const curp = (d.curp || '').toUpperCase();
                 const dir = (d.direccion || '').toUpperCase();
-                if (!nom.includes(textoLimpio) && !cas.includes(textoLimpio) && !cve.includes(textoLimpio) && !curp.includes(textoLimpio) && !dir.includes(textoLimpio)) return; 
+                if (!nom.includes(textoLimpio) && !cas.includes(textoLimpio) && !cve.includes(textoLimpio) && !curp.includes(textoLimpio) && !dir.includes(textoLimpio)) return;
             }
 
+            // Filtro por barrio
             if (barrioLimpio !== '') {
                 const bar = (d.barrio || '').toUpperCase();
                 if (!bar.includes(barrioLimpio)) return;
             }
 
-            if (sexoBusqueda !== 'TODOS') {
-                const sex = (d.sexo || '').toUpperCase();
-                if (sex !== sexoBusqueda) return;
-            }
+            datosFiltradosMemoriaLocal.push({ id: id, ...d });
+        });
 
-            window.registrosGlobalesMemoria[doc.id] = d; 
-            datosFiltradosMemoriaLocal.push({ id: doc.id, ...d });
+        // Refrescar las vistas locales
+        paginaActual = 1;
+        renderizarPaginaPadron();
+        
+        if(!document.getElementById('page-padron-electoral').classList.contains('hidden')) renderizarPadronElectoral();
+        if(!document.getElementById('page-apoyos').classList.contains('hidden')) aplicarFiltrosCA();
+    }
+
+    // Esta función se conecta a Firebase UNA SOLA VEZ y mantiene los datos sincronizados
+    function leerRegistrosEnTiempoReal() {
+      const tbCenso = document.getElementById('tableRegistros');
+      if (!tbCenso) return;
+      if (unsubscribeCenso) return; // Si ya estamos escuchando, evitamos abrir otra conexión
+      
+      tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500"></i> Cargando Padrón Inicial...</td></tr>`;
+      lucide.createIcons();
+
+      // Hacemos la consulta global sin restricciones de where() para descargar todo a memoria
+      const query = db.collection('simpatizantes');
+
+      unsubscribeCenso = query.onSnapshot((querySnapshot) => {
+          // Nota: onSnapshot de Firebase utiliza caché. Si un documento cambia, 
+          // solo lee ESE documento nuevo, no toda la base de datos de nuevo.
+          window.registrosGlobalesMemoria = {};
+          
+          querySnapshot.forEach((doc) => {
+              window.registrosGlobalesMemoria[doc.id] = doc.data();
           });
           
-          // Actualizar KPIs de avance
-          const totalRegistrosReales = datosFiltradosMemoriaLocal.length;
+          // Actualizar KPIs de avance basados en lo que tenemos en RAM
+          const totalRegistrosReales = Object.keys(window.registrosGlobalesMemoria).length;
           document.getElementById('kpiVotosTotales').textContent = totalRegistrosReales.toLocaleString();
           const totalNominal = rawDataGlobal.reduce((acc, curr) => acc + curr.ln, 0);
           document.getElementById('kpiPartEst').textContent = totalNominal > 0 ? ((totalRegistrosReales / totalNominal) * 100).toFixed(2) + '%' : '0.00%';
 
-          paginaActual = 1;
-          renderizarPaginaPadron();
-          // Actualiza las tablas secundarias (Electoral y Asignacion)
-          if(document.getElementById('page-padron-electoral').classList.contains('hidden') === false) renderizarPadronElectoral();
-          if(document.getElementById('page-apoyos').classList.contains('hidden') === false) aplicarFiltrosCA();
+          // Una vez actualizados los datos en memoria, aplicamos los filtros locales
+          aplicarFiltros();
 
       }, (error) => {
-          tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión.</td></tr>`;
+          console.error("Error de Firebase:", error);
+          tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
       });
     }
 
@@ -2197,19 +2206,36 @@
         const contenedor = document.getElementById('pe_contenedorBotonesPaginas');
         contenedor.innerHTML = '';
 
+        // Botón Anterior
         const btnPrev = document.createElement('button');
-        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${pe_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${pe_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnPrev.innerHTML = '<i data-lucide="chevrons-left" class="w-4 h-4"></i>';
         btnPrev.onclick = () => { if(pe_paginaActual > 1) { pe_paginaActual--; renderizarPadronElectoral(); } };
         contenedor.appendChild(btnPrev);
 
-        const btnNum = document.createElement('span');
-        btnNum.className = "px-4 py-1 rounded-full font-bold bg-rose-50 text-rose-600 text-sm";
-        btnNum.textContent = pe_paginaActual;
-        contenedor.appendChild(btnNum);
+        // Lógica matemática para crear la ventana corrediza de hasta 5 páginas (ej. 1 2 3 4 5)
+        let inicioRango = Math.max(1, pe_paginaActual - 2);
+        let finRango = Math.min(totalPaginas, inicioRango + 4);
+        if (finRango - inicioRango < 4) inicioRango = Math.max(1, finRango - 4);
 
+        // Inyección de botones numéricos dinámicos
+        for (let i = inicioRango; i <= finRango; i++) {
+            const btnNum = document.createElement('button');
+            if (i === pe_paginaActual) {
+                // Botón de la página actualmente seleccionada (Color corporativo)
+                btnNum.className = "px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-sm focus:outline-none";
+            } else {
+                // Botones de páginas inactivas seleccionables
+                btnNum.className = "px-3 py-1.5 rounded-lg font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition focus:outline-none";
+            }
+            btnNum.textContent = i;
+            btnNum.onclick = () => { pe_paginaActual = i; renderizarPadronElectoral(); };
+            contenedor.appendChild(btnNum);
+        }
+
+        // Botón Siguiente
         const btnNext = document.createElement('button');
-        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${pe_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${pe_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnNext.innerHTML = '<i data-lucide="chevrons-right" class="w-4 h-4"></i>';
         btnNext.onclick = () => { if(pe_paginaActual < totalPaginas) { pe_paginaActual++; renderizarPadronElectoral(); } };
         contenedor.appendChild(btnNext);
@@ -2382,8 +2408,11 @@
         if(Array.from(selSec.options).some(o=>o.value===valSec)) selSec.value = valSec;
     }
 
-    function aplicarFiltrosCA() {
-        ca_paginaActual = 1;
+    function aplicarFiltrosCA(resetPage = true) {
+        // Solo reseteamos a la página 1 si estamos buscando o filtrando, NO si estamos paginando
+        if (resetPage === true) {
+            ca_paginaActual = 1;
+        }
         
         actualizarFiltrosDesplegablesCA();
 
@@ -2454,20 +2483,35 @@
         contenedor.innerHTML = '';
 
         const btnPrev = document.createElement('button');
-        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${ca_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnPrev.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${ca_paginaActual === 1 ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnPrev.innerHTML = '<i data-lucide="chevrons-left" class="w-4 h-4"></i>';
-        btnPrev.onclick = () => { if(ca_paginaActual > 1) { ca_paginaActual--; aplicarFiltrosCA(); } };
+        // Nota como aquí enviamos (false) para que no reinicie la página
+        btnPrev.onclick = () => { if(ca_paginaActual > 1) { ca_paginaActual--; aplicarFiltrosCA(false); } };
         contenedor.appendChild(btnPrev);
 
-        const btnNum = document.createElement('span');
-        btnNum.className = "px-4 py-1 rounded-full font-bold bg-indigo-50 text-indigo-600 text-sm";
-        btnNum.textContent = ca_paginaActual;
-        contenedor.appendChild(btnNum);
+        // Lógica de botones numéricos (1, 2, 3...)
+        let inicioRango = Math.max(1, ca_paginaActual - 2);
+        let finRango = Math.min(totalPaginas, inicioRango + 4);
+        if (finRango - inicioRango < 4) inicioRango = Math.max(1, finRango - 4);
+
+        for (let i = inicioRango; i <= finRango; i++) {
+            const btnNum = document.createElement('button');
+            if (i === ca_paginaActual) {
+                btnNum.className = "px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-sm focus:outline-none";
+            } else {
+                btnNum.className = "px-3 py-1.5 rounded-lg font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition focus:outline-none";
+            }
+            btnNum.textContent = i;
+            // Aquí también enviamos (false)
+            btnNum.onclick = () => { ca_paginaActual = i; aplicarFiltrosCA(false); };
+            contenedor.appendChild(btnNum);
+        }
 
         const btnNext = document.createElement('button');
-        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition ${ca_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
+        btnNext.className = `p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 transition focus:outline-none ${ca_paginaActual === totalPaginas ? 'opacity-40 cursor-not-allowed' : ''}`;
         btnNext.innerHTML = '<i data-lucide="chevrons-right" class="w-4 h-4"></i>';
-        btnNext.onclick = () => { if(ca_paginaActual < totalPaginas) { ca_paginaActual++; aplicarFiltrosCA(); } };
+        // Y aquí (false)
+        btnNext.onclick = () => { if(ca_paginaActual < totalPaginas) { ca_paginaActual++; aplicarFiltrosCA(false); } };
         contenedor.appendChild(btnNext);
     }
 
