@@ -344,12 +344,18 @@
               <div class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[200px] relative">
                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-slate-400"></i></div>
-                 <input type="text" id="filtroTexto" placeholder="Búsqueda global (Nombre, Casilla, CURP, Dirección)..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
+                 <input type="text" id="filtroTexto" onkeyup="aplicarFiltros()" placeholder="Búsqueda global (Nombre, Casilla, CURP, Dirección)..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
                 </div>
-                <input type="text" id="filtroBarrio" placeholder="Barrio..." class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none uppercase">
-                <select id="filtroSexo" class="w-full md:w-28 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none"><option value="TODOS">Sexo (Todos)</option><option value="HOMBRE">Hombre</option><option value="MUJER">Mujer</option></select>
-                <select id="filtroTipo" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none"><option value="TODOS">Tipo (Todos)</option><option value="PADRON">Padrón</option><option value="SIMPATIZANTE">Simpatizante</option><option value="AFILIADO">Afiliado</option></select>
-                <button onclick="aplicarFiltros()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2"><i data-lucide="filter" class="w-3.5 h-3.5"></i> Filtrar</button>
+                <input type="text" id="filtroBarrio" onkeyup="aplicarFiltros()" placeholder="Barrio..." class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none uppercase focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                <select id="filtroSexo" onchange="aplicarFiltros()" class="w-full md:w-28 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                    <option value="TODOS">Sexo (Todos)</option><option value="HOMBRE">Hombre</option><option value="MUJER">Mujer</option>
+                </select>
+                <select id="filtroTipo" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                    <option value="TODOS">Tipo (Todos)</option><option value="PADRON">Padrón</option><option value="SIMPATIZANTE">Simpatizante</option><option value="AFILIADO">Afiliado</option>
+                </select>
+                <div class="px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2 cursor-default" title="La búsqueda en vivo está activada (Coste 0 lecturas)">
+                    <i data-lucide="zap" class="w-4 h-4"></i> En Vivo
+                </div>
               </div>
             </div>
             
@@ -800,7 +806,16 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-    const storage = firebase.storage();
+
+    // HABILITAR CACHÉ OFFLINE PARA AHORRAR LECTURAS
+    db.enablePersistence({ synchronizeTabs: true })
+      .catch((err) => {
+          if (err.code == 'failed-precondition') {
+              console.warn('Persistencia fallida: Múltiples pestañas abiertas.');
+          } else if (err.code == 'unimplemented') {
+              console.warn('El navegador no soporta persistencia.');
+          }
+      });
     lucide.createIcons();
 
     // --- 2. DATA LIMPIA MUNICIPAL DE CONTROL ---
@@ -1066,41 +1081,38 @@
     }
 
     // Esta función se conecta a Firebase UNA SOLA VEZ y mantiene los datos sincronizados
-    function leerRegistrosEnTiempoReal() {
+   async function leerRegistrosEnTiempoReal() {
       const tbCenso = document.getElementById('tableRegistros');
       if (!tbCenso) return;
-      if (unsubscribeCenso) return; // Si ya estamos escuchando, evitamos abrir otra conexión
+      
+      // PREVENCIÓN: Si ya tenemos datos, no volvemos a leer de Firebase
+      if (Object.keys(window.registrosGlobalesMemoria).length > 0) return;
       
       tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500"></i> Cargando Padrón Inicial...</td></tr>`;
       lucide.createIcons();
 
-      // Hacemos la consulta global sin restricciones de where() para descargar todo a memoria
-      const query = db.collection('simpatizantes');
-
-      unsubscribeCenso = query.onSnapshot((querySnapshot) => {
-          // Nota: onSnapshot de Firebase utiliza caché. Si un documento cambia, 
-          // solo lee ESE documento nuevo, no toda la base de datos de nuevo.
+      try {
+          // Cambiamos onSnapshot por un .get() único para frenar la sangría de lecturas
+          const querySnapshot = await db.collection('simpatizantes').get({ source: 'default' });
+          
           window.registrosGlobalesMemoria = {};
           
           querySnapshot.forEach((doc) => {
               window.registrosGlobalesMemoria[doc.id] = doc.data();
           });
           
-          // Actualizar KPIs de avance basados en lo que tenemos en RAM
           const totalRegistrosReales = Object.keys(window.registrosGlobalesMemoria).length;
           document.getElementById('kpiVotosTotales').textContent = totalRegistrosReales.toLocaleString();
           const totalNominal = rawDataGlobal.reduce((acc, curr) => acc + curr.ln, 0);
           document.getElementById('kpiPartEst').textContent = totalNominal > 0 ? ((totalRegistrosReales / totalNominal) * 100).toFixed(2) + '%' : '0.00%';
 
-          // Una vez actualizados los datos en memoria, aplicamos los filtros locales
           aplicarFiltros();
 
-      }, (error) => {
+      } catch (error) {
           console.error("Error de Firebase:", error);
           tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
-      });
+      }
     }
-
     // --- MOTOR DE PAGINACIÓN DINÁMICA ---
     function renderizarPaginaPadron() {
       const tbCenso = document.getElementById('tableRegistros');
@@ -1312,7 +1324,12 @@
               simpatizanteData.foto_url = fotoBase64;
           }
 
-          await db.collection('simpatizantes').add(simpatizanteData);
+          const nuevoDocRef = await db.collection('simpatizantes').add(simpatizanteData);
+          
+          // ACTUALIZAR MEMORIA LOCAL SIN LEER FIREBASE
+          window.registrosGlobalesMemoria[nuevoDocRef.id] = simpatizanteData;
+          aplicarFiltros(); // Refresca las tablas
+
           formSuccess.classList.remove('hidden');
           
           this.reset();
@@ -1641,8 +1658,12 @@
         if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el expediente de:\n${nombre}?`)) {
             return;
         }
-        try {
+       try {
             await db.collection('simpatizantes').doc(id).delete();
+            
+            // BORRAR DE MEMORIA Y ACTUALIZAR UI SIN LEER FIREBASE
+            delete window.registrosGlobalesMemoria[id];
+            aplicarFiltros();
         } catch (error) {
             console.error("Error al eliminar registro:", error);
             alert("Ocurrió un error al intentar borrar el registro.");
@@ -1828,8 +1849,9 @@
             btnGuardar.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> GUARDANDO...';
             lucide.createIcons();
 
-            await db.collection('simpatizantes').doc(idDoc).update(datosActualizados);
+           await db.collection('simpatizantes').doc(idDoc).update(datosActualizados);
             
+            // ACTUALIZAR TODOS LOS DATOS EN LA MEMORIA RAM LOCAL
             camposEdicion.forEach(campo => {
                 const textoEl = document.getElementById(`mp_${campo.id}_texto`);
                 const inputEl = document.getElementById(`mp_${campo.id}_input`);
@@ -1837,11 +1859,17 @@
                 textoEl.textContent = nuevoValor !== '' ? nuevoValor : '--';
                 inputEl.classList.add('hidden');
                 textoEl.classList.remove('hidden');
+                
+                // LÍNEA CLAVE PARA NO RE-LEER DE FIREBASE
+                window.registrosGlobalesMemoria[idDoc][campo.dbField] = nuevoValor; 
             });
 
             if (nuevaFotoUrl !== null) {
                 window.registrosGlobalesMemoria[idDoc].foto_url = nuevaFotoUrl;
             }
+
+            // ACTUALIZAR LAS TABLAS VISUALES
+            aplicarFiltros(); 
 
             document.getElementById('mp_foto_edit_wrapper').classList.add('hidden');
             fotoInput.value = ''; 
