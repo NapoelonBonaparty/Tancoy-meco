@@ -641,7 +641,7 @@
             <div class="col-span-1 md:col-span-2 space-y-4">
               <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-2">
                 <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Detalles del Padrón</h4>
-                <button id="btnEditarExp" onclick="activarEdicionExpediente()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg flex items-center gap-2 transition-colors"><i data-lucide="edit" class="w-3.5 h-3.5"></i> MODO EDICIÓN</button>
+                <button id="btnEditarExp" onclick="activarEdicionExpediente()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg flex items-center gap-2 transition-colors"><i data-lucide="edit" class="w-3.5 h-3.5"></i> EDITAR DATOS</button>
                 <button id="btnGuardarExp" onclick="guardarEdicionExpediente()" class="hidden px-5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-colors shadow-sm"><i data-lucide="save" class="w-3.5 h-3.5"></i> GUARDAR CAMBIOS</button>
               </div>
               
@@ -674,14 +674,23 @@
                   </select>
                 </div>
                 <div>
+                  <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Nivel de Simpatía</p>
+                  <p id="mp_simpatia_texto" class="text-sm font-bold text-slate-700">--</p>
+                  <select id="mp_simpatia_input" class="hidden w-full text-xs font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none">
+                    <option value="A FAVOR">A FAVOR</option>
+                    <option value="INDECISO">INDECISO</option>
+                    <option value="EN CONTRA">EN CONTRA</option>
+                  </select>
+                </div>
+                <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Barrio / Localidad</p>
                   <p id="mp_barrio_texto" class="text-sm font-bold text-slate-700">--</p>
                   <input type="text" id="mp_barrio_input" class="hidden w-full text-xs font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
                 </div>
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Municipio</p>
-                  <p id="mp_municipio_texto" class="text-sm font-bold text-slate-700">--</p>
-                  <input type="text" id="mp_municipio_input" class="hidden w-full text-xs font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
+                  <p id="mp_municipio_texto" class="text-sm font-bold text-slate-700">LAS ROSAS</p>
+                  <input type="text" id="mp_municipio_input" value="LAS ROSAS" readonly class="hidden w-full text-xs font-bold px-3 py-2 rounded border border-slate-300 bg-slate-100 text-slate-500 outline-none uppercase cursor-not-allowed">
                 </div>
                 <div class="col-span-2">
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Dirección Completa</p>
@@ -962,23 +971,20 @@
         const registros = Object.values(window.registrosGlobalesMemoria);
         const total = registros.length;
 
-        // Filtramos buscando cómo se escriben en tu base de datos (aquí asumimos 'AFILIADO', 'SIMPATIZANTE', 'PADRON')
-        const aFavor = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'AFILIADO').length;
-        const indecisos = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'SIMPATIZANTE').length;
-        const enContra = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'PADRON').length;
+        // Conteo corregido a "INDECISO"
+        const aFavor = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'A FAVOR').length;
+        const indecisos = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'INDECISO').length;
+        const enContra = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'EN CONTRA').length;
 
         const pctAFavor = total > 0 ? ((aFavor / total) * 100).toFixed(1) : 0;
         const pctIndecisos = total > 0 ? ((indecisos / total) * 100).toFixed(1) : 0;
         const pctEnContra = total > 0 ? ((enContra / total) * 100).toFixed(1) : 0;
 
         document.getElementById('kpiTotalPadron').textContent = total.toLocaleString('en-US');
-        
         document.getElementById('kpiAFavor').textContent = aFavor.toLocaleString('en-US');
         document.getElementById('kpiAFavorPct').textContent = `(${pctAFavor}%)`;
-        
         document.getElementById('kpiIndecisos').textContent = indecisos.toLocaleString('en-US');
         document.getElementById('kpiIndecisosPct').textContent = `(${pctIndecisos}%)`;
-        
         document.getElementById('kpiEnContra').textContent = enContra.toLocaleString('en-US');
         document.getElementById('kpiEnContraPct').textContent = `(${pctEnContra}%)`;
     }
@@ -1189,7 +1195,7 @@
         else if(tipoReal === 'PADRON') badgeStyle = 'bg-amber-100 text-amber-700 font-bold';
         
         const identificador = d.casilla || d.clave_elector || d.curp || '--';
-        const municipioMostrar = d.municipio || 'SIN MUNICIPIO';
+        const municipioMostrar = "LAS ROSAS";
         const origen = (d.registrado_por && d.registrado_por.includes('Excel')) ? 'Excel Masivo' : 'Captura Manual';
         
         const seccionMostrar = d.seccion || '--';
@@ -1618,8 +1624,9 @@
         document.getElementById('mp_clave_texto').textContent = data.clave_elector || '--';
         document.getElementById('mp_curp_texto').textContent = data.curp || '--';
         document.getElementById('mp_sexo_texto').textContent = data.sexo || '--';
+        document.getElementById('mp_simpatia_texto').textContent = data.nivel_simpatia || 'INDECISO';
         document.getElementById('mp_barrio_texto').textContent = data.barrio || '--';
-        document.getElementById('mp_municipio_texto').textContent = data.municipio || '--';
+        document.getElementById('mp_municipio_texto').textContent = "LAS ROSAS";
         document.getElementById('mp_direccion_texto').textContent = data.direccion || '--';
 
         const tipoReal = (data.tipo_afiliacion || '').toUpperCase();
@@ -1809,7 +1816,8 @@
         { id: 'sexo', dbField: 'sexo' },
         { id: 'barrio', dbField: 'barrio' },
         { id: 'municipio', dbField: 'municipio' },
-        { id: 'direccion', dbField: 'direccion' }
+        { id: 'direccion', dbField: 'direccion' },
+        { id: 'simpatia', dbField: 'nivel_simpatia' } // Control en base de datos
     ];
 
     function activarEdicionExpediente() {
@@ -1872,9 +1880,11 @@
         
         btnGuardar.disabled = true;
         
-        const datosActualizados = {};
+        const datosActualizados = {}; // <-- ¡ESTA LÍNEA ES LA QUE FALTABA!
+        
         camposEdicion.forEach(campo => {
-            const valorInput = document.getElementById(`mp_${campo.id}_input`).value.trim().toUpperCase();
+            let valorInput = document.getElementById(`mp_${campo.id}_input`).value.trim().toUpperCase();
+            if (campo.dbField === 'municipio') valorInput = "LAS ROSAS";
             datosActualizados[campo.dbField] = valorInput;
         });
 
@@ -1922,8 +1932,9 @@
                 window.registrosGlobalesMemoria[idDoc].foto_url = nuevaFotoUrl;
             }
 
-            // ACTUALIZAR LAS TABLAS VISUALES
+           // ACTUALIZAR LAS TABLAS VISUALES Y CONTADORES DEL DASHBOARD
             aplicarFiltros(); 
+            calcularYRenderizarKPIs(); 
 
             document.getElementById('mp_foto_edit_wrapper').classList.add('hidden');
             fotoInput.value = ''; 
@@ -2297,10 +2308,7 @@
                     <td class="px-4 py-3 text-xs font-medium text-slate-600">${d.seccion || '--'}</td>
                     <td class="px-4 py-3 text-xs text-slate-500">${d.barrio || '--'}</td>
                     <td class="px-4 py-3 text-xs text-slate-500">${d.casilla || '--'}</td>
-                    <td class="px-4 py-3 flex items-center justify-center gap-2">
-                        <button class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center transition cursor-not-allowed" title="Pendiente">
-                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                        </button>
+                   <td class="px-4 py-3 flex items-center justify-center gap-2">
                         <button onclick="abrirPerfil('${d.id}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md" title="Ver Información">
                             <i data-lucide="user" class="w-3.5 h-3.5"></i>
                         </button>

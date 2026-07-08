@@ -169,21 +169,42 @@
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-            <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-500">Lista nominal Registrada</span><div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center"><i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i></div></div>
-            <p class="text-xl font-bold" id="kpiVotosTotales">0</p>
+          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total de padrón</span>
+              <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i></div>
+            </div>
+            <p class="text-2xl font-black text-slate-800 dark:text-white" id="kpiTotalPadron">0</p>
           </div>
-          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-            <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-500">Lista Nominal Base</span><div class="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center"><i data-lucide="database" class="w-3.5 h-3.5 text-violet-600"></i></div></div>
-            <p class="text-xl font-bold" id="kpiNominalTotal">0</p>
+          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">A favor</span>
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i></div>
+            </div>
+            <div class="flex items-end gap-2 mt-1">
+                <p class="text-2xl font-black text-slate-800 dark:text-white leading-none" id="kpiAFavor">0</p>
+                <span class="text-sm font-bold text-emerald-500 mb-0.5" id="kpiAFavorPct">(0%)</span>
+            </div>
           </div>
-          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-            <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-500">Avance Real Est.</span><div class="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center"><i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-600"></i></div></div>
-            <p class="text-xl font-bold" id="kpiPartEst">0.00%</p>
+          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Indecisos</span>
+              <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center"><i data-lucide="minus-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i></div>
+            </div>
+            <div class="flex items-end gap-2 mt-1">
+                <p class="text-2xl font-black text-slate-800 dark:text-white leading-none" id="kpiIndecisos">0</p>
+                <span class="text-sm font-bold text-amber-500 mb-0.5" id="kpiIndecisosPct">(0%)</span>
+            </div>
           </div>
-          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-            <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-500">Municipios Analizados</span><div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center"><i data-lucide="map" class="w-3.5 h-3.5 text-amber-600"></i></div></div>
-            <p class="text-xl font-bold text-amber-600" id="kpiRiesgoTotal">110</p>
+          <div class="kpi-card bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">En contra</span>
+              <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 flex items-center justify-center"><i data-lucide="x-circle" class="w-4 h-4 text-red-600 dark:text-red-400"></i></div>
+            </div>
+            <div class="flex items-end gap-2 mt-1">
+                <p class="text-2xl font-black text-slate-800 dark:text-white leading-none" id="kpiEnContra">0</p>
+                <span class="text-sm font-bold text-red-500 mb-0.5" id="kpiEnContraPct">(0%)</span>
+            </div>
           </div>
         </div>
 
@@ -220,7 +241,7 @@
 
             <form id="formCenso" class="space-y-6">
               <div>
-                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Nombre Completo (Como aparece en INE)</label>
+                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Escribe Primero el apellido y luego el nombre (Como aparece en el INE)</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="user" class="w-4 h-4 text-slate-400"></i></div>
                   <input type="text" id="f_nombre" required class="w-full text-sm pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="EJ. MARGARITA ALVAREZ VAZQUEZ">
@@ -268,11 +289,7 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                <div>
-                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Municipio</label>
-                  <select id="cMunicipio" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"></select>
-                </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Sexo</label>
                   <select id="f_sexo" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
@@ -866,7 +883,6 @@
             });
         }
 
-        actualizarKPIsGlobales();
         initDashboardCharts();
         setTimeout(initMap, 100);
         leerRegistrosEnTiempoReal();
@@ -940,9 +956,31 @@
       }
     }
 
-    function actualizarKPIsGlobales() {
-      const totalNominal = rawDataGlobal.reduce((acc, curr) => acc + curr.ln, 0);
-      document.getElementById('kpiNominalTotal').textContent = totalNominal.toLocaleString();
+    
+    // NUEVA FUNCIÓN DE CÁLCULO DE KPIs
+    function calcularYRenderizarKPIs() {
+        const registros = Object.values(window.registrosGlobalesMemoria);
+        const total = registros.length;
+
+        // Filtramos buscando cómo se escriben en tu base de datos (aquí asumimos 'AFILIADO', 'SIMPATIZANTE', 'PADRON')
+        const aFavor = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'AFILIADO').length;
+        const indecisos = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'SIMPATIZANTE').length;
+        const enContra = registros.filter(d => (d.tipo_afiliacion || '').toUpperCase() === 'PADRON').length;
+
+        const pctAFavor = total > 0 ? ((aFavor / total) * 100).toFixed(1) : 0;
+        const pctIndecisos = total > 0 ? ((indecisos / total) * 100).toFixed(1) : 0;
+        const pctEnContra = total > 0 ? ((enContra / total) * 100).toFixed(1) : 0;
+
+        document.getElementById('kpiTotalPadron').textContent = total.toLocaleString('en-US');
+        
+        document.getElementById('kpiAFavor').textContent = aFavor.toLocaleString('en-US');
+        document.getElementById('kpiAFavorPct').textContent = `(${pctAFavor}%)`;
+        
+        document.getElementById('kpiIndecisos').textContent = indecisos.toLocaleString('en-US');
+        document.getElementById('kpiIndecisosPct').textContent = `(${pctIndecisos}%)`;
+        
+        document.getElementById('kpiEnContra').textContent = enContra.toLocaleString('en-US');
+        document.getElementById('kpiEnContraPct').textContent = `(${pctEnContra}%)`;
     }
 
     
@@ -962,8 +1000,15 @@
       const mapEl = document.getElementById('mapGrid');
       if (!mapEl) return;
       if (map) { map.invalidateSize(); return; }
-      map = L.map('mapGrid').setView([16.7569, -92.6386], 7);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+      
+      // Coordenadas exactas de Las Rosas, Chiapas con zoom 13 (vista desde arriba)
+      map = L.map('mapGrid').setView([16.3575, -92.3672], 13);
+      
+      // Capa de mapa detallada con calles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
     }
 
     function initDashboardCharts() {
@@ -1098,17 +1143,15 @@
               window.registrosGlobalesMemoria[doc.id] = doc.data();
           });
           
-          const totalRegistrosReales = Object.keys(window.registrosGlobalesMemoria).length;
-          document.getElementById('kpiVotosTotales').textContent = totalRegistrosReales.toLocaleString();
-          const totalNominal = rawDataGlobal.reduce((acc, curr) => acc + curr.ln, 0);
-          document.getElementById('kpiPartEst').textContent = totalNominal > 0 ? ((totalRegistrosReales / totalNominal) * 100).toFixed(2) + '%' : '0.00%';
-
+         calcularYRenderizarKPIs();
           aplicarFiltros();
 
       } catch (error) {
           console.error("Error de Firebase:", error);
           tbCenso.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500 font-bold">Error de conexión con la Base de Datos.</td></tr>`;
       }
+
+      
     }
     // --- MOTOR DE PAGINACIÓN DINÁMICA ---
     function renderizarPaginaPadron() {
@@ -1267,7 +1310,7 @@
       btnGuardar.disabled = true;
       lucide.createIcons();
 
-      const simpatizanteData = {
+     const simpatizanteData = {
           nombre: document.getElementById('f_nombre').value.trim().toUpperCase(),
           fecha_nacimiento: document.getElementById('f_fecha').value,
           direccion: document.getElementById('f_direccion').value.trim().toUpperCase(),
@@ -1276,7 +1319,7 @@
           clave_elector: document.getElementById('f_clave').value.trim().toUpperCase(),
           curp: document.getElementById('f_curp').value.trim().toUpperCase(),
           casilla: document.getElementById('f_casilla').value.trim().toUpperCase(),
-          municipio: document.getElementById('cMunicipio').value,
+          municipio: "LAS ROSAS", // Guardado inamovible por defecto
           tipo_afiliacion: document.getElementById('f_tipo').value,
           registrado_por: auth.currentUser.email,
           fecha_captura: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1296,7 +1339,7 @@
               if (!queryDuplicados.empty) esDuplicado = true;
           }
           if (!esDuplicado && simpatizanteData.clave_elector === '' && simpatizanteData.curp === '') {
-              queryDuplicados = await db.collection('simpatizantes').where('nombre', '==', simpatizanteData.nombre).where('municipio', '==', simpatizanteData.municipio).get();
+              queryDuplicados = await db.collection('simpatizantes').where('nombre', '==', simpatizanteData.nombre).where('municipio', '==', "LAS ROSAS").get();
               if (!queryDuplicados.empty) esDuplicado = true;
           }
 
