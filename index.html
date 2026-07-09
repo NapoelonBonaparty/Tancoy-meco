@@ -132,11 +132,11 @@
       </div>
 
       <nav class="flex-1 p-3 space-y-1">
-        <button onclick="navigate('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="dashboard"> <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Panel Principal </button>
-        <button onclick="navigate('censo')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="censo"> <i data-lucide="users" class="w-4 h-4"></i> Padrón de Beneficiarios </button>
-        <button onclick="navigate('padron-electoral'); renderizarPadronElectoral();" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="padron-electoral"> <i data-lucide="list-checks" class="w-4 h-4"></i> Padrón Electoral </button>
-        <button onclick="navigate('apoyos')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="apoyos"> <i data-lucide="gift" class="w-4 h-4"></i> Gestión de Apoyos </button>
-        <button onclick="navigate('configuracion')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
+        <button onclick="navigate('dashboard')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="dashboard"> <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Panel Principal </button>
+        <button onclick="navigate('censo')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="censo"> <i data-lucide="users" class="w-4 h-4"></i> Padrón de Beneficiarios </button>
+        <button onclick="navigate('padron-electoral'); renderizarPadronElectoral();" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="padron-electoral"> <i data-lucide="list-checks" class="w-4 h-4"></i> Padrón Electoral </button>
+        <button onclick="navigate('apoyos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="apoyos"> <i data-lucide="gift" class="w-4 h-4"></i> Gestión de Apoyos </button>
+        <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
 
       <div class="p-3 border-t border-slate-200 dark:border-slate-700">
@@ -162,7 +162,7 @@
 
     <main class="flex-1 overflow-y-auto" id="mainContent">
 
-      <section id="page-dashboard" class="p-6 space-y-6">
+      <section id="page-dashboard" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-2xl font-bold">Panel Principal</h2>
@@ -170,9 +170,6 @@
           </div>
           <div class="flex items-center gap-2">
             <span class="text-xs text-slate-500" id="currentDate"></span>
-            <button onclick="exportarExcel()" class="px-4 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2 font-medium">
-              <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar Padrón
-            </button>
           </div>
         </div>
 
@@ -652,18 +649,33 @@
           <div class="lg:col-span-1 bg-white rounded-xl p-6 border border-slate-200 shadow-sm h-fit">
             <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-indigo-500"></i> Nuevo Usuario</h3>
             <form id="formUsuario" class="space-y-4">
-              <div><label class="text-xs text-slate-500 block mb-1">Nombre Completo</label><input type="text" id="u_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none"></div>
-              <div><label class="text-xs text-slate-500 block mb-1">Correo Electrónico</label><input type="email" id="u_email" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none"></div>
-              <div><label class="text-xs text-slate-500 block mb-1">Rol</label>
-                <select id="u_rol" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none">
-                  <option value="Admin Estatal">Administrador Estatal</option>
+              <div><label class="text-xs text-slate-500 block mb-1">Nombre Completo</label><input type="text" id="u_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
+              <div><label class="text-xs text-slate-500 block mb-1">Correo Electrónico</label><input type="email" id="u_email" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
+              
+              <div><label class="text-xs text-slate-500 block mb-1">Contraseña (Mínimo 6 caracteres)</label><input type="password" id="u_password" required minlength="6" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
+              
+              <div><label class="text-xs text-slate-500 block mb-1">Rol del Sistema</label>
+                <select id="u_rol" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 transition-colors">
+                  <option value="Administrador Estatal">Administrador Estatal</option>
                   <option value="Capturista">Capturista</option>
                 </select>
               </div>
-              <button type="submit" id="btnGuardarUsuario" class="w-full px-5 py-2.5 bg-slate-800 text-white text-sm font-bold rounded-lg mt-2">Guardar Usuario</button>
+              
+              <div>
+                <label class="text-xs text-slate-500 block mb-2 font-bold">Permisos de Módulos (Menú Lateral)</label>
+                <div class="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50/50">
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="dashboard" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Panel Principal</label>
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
+                </div>
+              </div>
+
+              <button type="submit" id="btnGuardarUsuario" class="w-full px-5 py-2.5 bg-slate-800 hover:bg-slate-900 transition-colors text-white text-sm font-bold rounded-lg mt-2 shadow-sm">Crear Cuenta de Usuario</button>
             </form>
           </div>
-          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-fit">
             <div class="p-4 border-b border-slate-200 bg-slate-50"><h3 class="text-sm font-semibold">Usuarios Activos</h3></div>
             <table class="w-full text-left text-sm">
               <thead class="text-xs text-slate-500 bg-slate-50 border-b border-slate-200">
@@ -672,7 +684,7 @@
               <tbody id="tableUsuarios" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
-        </div>
+        </div>  
       </section>
 
     </main>
@@ -780,6 +792,7 @@
                         <th class="px-4 py-2 w-28">Fecha</th>
                         <th class="px-4 py-2">Programa / Apoyo</th>
                         <th class="px-4 py-2">Observaciones</th>
+                        <th class="px-4 py-2 w-16 text-center">Acción</th>
                       </tr>
                     </thead>
                     <tbody id="mp_tabla_historial" class="divide-y divide-slate-100">
@@ -930,35 +943,87 @@
     let unsubscribeCenso = null;
     let listaApoyosDisponibles = []; // Lista para el select de asignación
 
-    // --- 3. AUTENTICACIÓN ---
-    auth.onAuthStateChanged((user) => {
+    // --- 3. AUTENTICACIÓN Y PERMISOS ---
+    
+   // Nueva función para leer permisos y ocultar menús lateral
+    async function aplicarPermisosVisuales(email) {
+        try {
+            const doc = await db.collection('usuarios_acceso').doc(email).get();
+            if (doc.exists) {
+                const data = doc.data();
+                const permisos = data.permisos || []; 
+                
+                document.getElementById('userRole').textContent = data.rol || 'Usuario';
+
+                // 1. Ocultamos TODOS los items del menú lateral por seguridad
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.classList.add('hidden'); 
+                });
+
+                // 2. Mostramos SOLO los items que el usuario tiene permitidos
+                permisos.forEach(permiso => {
+                    const btn = document.querySelector(`.sidebar-item[data-nav="${permiso}"]`);
+                    if (btn) btn.classList.remove('hidden');
+                });
+
+                // 3. Forzamos a navegar al primer módulo al que tenga acceso 
+                if (permisos.length > 0) {
+                    navigate(permisos[0]);
+                } else {
+                    // Si el usuario no tiene ningún permiso, mostramos un mensaje de bloqueo.
+                    document.getElementById('mainContent').innerHTML = '<div class="p-10 text-center text-slate-500 font-bold mt-20">Tu cuenta no tiene módulos asignados. Contacta al administrador.</div>';
+                }
+            } else {
+                // Si el usuario no está en la base de datos (Ej: Tu cuenta maestra inicial)
+                // Le mostramos todo y lo forzamos a entrar al dashboard.
+                document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('hidden'));
+                document.getElementById('userRole').textContent = 'Super Admin';
+                navigate('dashboard');
+            }
+        } catch (error) {
+            console.error("Error obteniendo permisos:", error);
+        }
+    }
+    auth.onAuthStateChanged(async (user) => {
       const loader = document.getElementById('globalLoader');
-      if (loader) loader.classList.add('hidden');
 
       if (user) {
+        // 1. Mostrar pantalla principal y preparar UI básica
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         document.getElementById('userDisplay').textContent = user.email;
         generarMarcaDeAgua(user.email);
 
-        const selectMun = document.getElementById('cMunicipio');
-        if(selectMun && selectMun.options.length === 0) {
-          rawDataGlobal.sort((a,b) => a.m.localeCompare(b.m)).forEach(d => {
-            let opt = document.createElement('option'); opt.value = d.m; opt.text = d.m;
-            selectMun.add(opt);
-          });
-        }
+        // 2. PRIORIDAD MÁXIMA: Cargar permisos antes que cualquier otra cosa (Evita el cuello de botella)
+        await aplicarPermisosVisuales(user.email);
+        
+        // 3. Ocultar el loader justo cuando el menú ya está calculado y pintado
+        if (loader) loader.classList.add('hidden');
 
-        initDashboardCharts();
-        setTimeout(initMap, 100);
-        leerRegistrosEnTiempoReal();
-        escucharCatalogoApoyos(); // Inicia la escucha de catálogo de apoyos
+        // 4. DIFERIR la descarga masiva de datos (Damos 300ms de respiro al navegador para pintar la UI)
+        setTimeout(() => {
+          const selectMun = document.getElementById('cMunicipio');
+          if(selectMun && selectMun.options.length === 0) {
+            rawDataGlobal.sort((a,b) => a.m.localeCompare(b.m)).forEach(d => {
+              let opt = document.createElement('option'); opt.value = d.m; opt.text = d.m;
+              selectMun.add(opt);
+            });
+          }
+
+          initDashboardCharts();
+          initMap();
+          leerRegistrosEnTiempoReal();
+          escucharCatalogoApoyos();
+          if (typeof escucharUsuariosActivos === "function") escucharUsuariosActivos();
+        }, 300);
+
       } else {
+        // Usuario no logueado
+        if (loader) loader.classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('appScreen').classList.add('hidden');
       }
     });
-
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
       loginForm.addEventListener('submit', function(e) {
@@ -1102,7 +1167,7 @@
         document.getElementById('sidebarBackdrop').classList.add('hidden');
       }
 
-      if(page === 'dashboard') setTimeout(() => { if(map) map.invalidateSize(); }, 50);
+      if(page === 'dashboard') setTimeout(() => { if(map) map.invalidateSize(); }, 200);
       if(page === 'apoyos') aplicarFiltrosCA(); // Fuerza el renderizado si entramos a la sección
     }
 
@@ -2158,97 +2223,7 @@
       }
     }
 
-    // --- 10. EXPORTACIÓN A EXCEL CON IMÁGENES (EXCELJS) ---
-    async function exportarExcel() {
-      if (!datosFiltradosMemoriaLocal || datosFiltradosMemoriaLocal.length === 0) {
-        alert("No hay registros para exportar con los filtros actuales.");
-        return;
-      }
-
-      const btnExportar = document.querySelector('button[onclick="exportarExcel()"]');
-      const originalHtml = btnExportar.innerHTML;
-      btnExportar.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Generando...';
-      btnExportar.disabled = true;
-      lucide.createIcons();
-
-      try {
-        const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet('Padrón de Beneficiarios');
-
-        sheet.columns = [
-          { header: 'FOTOGRAFÍA', key: 'foto', width: 12 },
-          { header: 'NOMBRE COMPLETO', key: 'nombre', width: 35 },
-          { header: 'CASILLA', key: 'casilla', width: 15 },
-          { header: 'CLAVE ELECTOR', key: 'clave', width: 25 },
-          { header: 'CURP', key: 'curp', width: 25 },
-          { header: 'SEXO', key: 'sexo', width: 12 },
-          { header: 'MUNICIPIO', key: 'municipio', width: 25 },
-          { header: 'BARRIO/COLONIA', key: 'barrio', width: 25 },
-          { header: 'DIRECCIÓN', key: 'direccion', width: 40 },
-          { header: 'TIPO AFILIACIÓN', key: 'tipo', width: 20 },
-          { header: 'SECCIÓN', key: 'seccion', width: 15 }
-        ];
-
-        sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-        sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
-        sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
-
-        let rowIndex = 2;
-
-        for (const d of datosFiltradosMemoriaLocal) {
-          sheet.addRow({
-            nombre: d.nombre || '--',
-            casilla: d.casilla || '--',
-            clave: d.clave_elector || '--',
-            curp: d.curp || '--',
-            sexo: d.sexo || '--',
-            municipio: d.municipio || '--',
-            barrio: d.barrio || '--',
-            direccion: d.direccion || '--',
-            tipo: d.tipo_afiliacion || 'SIMPATIZANTE',
-            seccion: d.seccion || '--'
-          });
-
-          sheet.getRow(rowIndex).height = 70;
-          sheet.getRow(rowIndex).alignment = { vertical: 'middle' };
-
-          if (d.foto_url && d.foto_url.includes('base64,')) {
-            try {
-              const base64Data = d.foto_url.split(',')[1];
-              const mimeType = d.foto_url.substring(d.foto_url.indexOf(':') + 1, d.foto_url.indexOf(';'));
-              const extension = mimeType.includes('png') ? 'png' : 'jpeg';
-
-              const imageId = workbook.addImage({
-                base64: base64Data,
-                extension: extension,
-              });
-
-              sheet.addImage(imageId, {
-                tl: { col: 0.1, row: rowIndex - 1 + 0.1 },
-                ext: { width: 80, height: 80 }
-              });
-            } catch (err) {
-              console.error("Error al incrustar foto para:", d.nombre, err);
-            }
-          }
-          rowIndex++;
-        }
-
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-        const fechaString = new Date().toISOString().slice(0,10);
-        saveAs(blob, `Padron_Corporativo_${fechaString}.xlsx`);
-
-      } catch (error) {
-        console.error("Error crítico exportando a Excel:", error);
-        alert("Ocurrió un error al generar el archivo Excel con imágenes.");
-      } finally {
-        btnExportar.innerHTML = originalHtml;
-        btnExportar.disabled = false;
-        lucide.createIcons();
-      }
-    }
+    // --- 10. FUNCIONALIDAD EXPORTAR EXCEL REMOVIDA ---
 
     // --- 11. LÓGICA DE LA PESTAÑA: PADRÓN ELECTORAL ---
     let pe_paginaActual = 1;
@@ -2734,46 +2709,10 @@
       document.getElementById('formAsignarApoyo').reset();
     }
 
-    // Nueva función para traer el historial
-    window.cargarHistorialApoyos = function(idBeneficiario) {
-      const tbody = document.getElementById('ma_tabla_historial');
-      tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-sky-500"></i></td></tr>';
-      lucide.createIcons();
-
-      db.collection('entregas_apoyos')
-        .where('id_beneficiario', '==', idBeneficiario)
-        .get()
-        .then(snapshot => {
-          // Ordenar resultados manualmente si Firestore no tiene el índice creado aún
-          let historial = [];
-          snapshot.forEach(doc => historial.push(doc.data()));
-          historial.sort((a,b) => {
-            let t1 = a.fecha_entrega ? (a.fecha_entrega.seconds || 0) : 0;
-            let t2 = b.fecha_entrega ? (b.fecha_entrega.seconds || 0) : 0;
-            return t2 - t1; // Más reciente primero
-          });
-
-          tbody.innerHTML = '';
-          if(historial.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-xs text-slate-400">No hay entregas registradas anteriormente.</td></tr>';
-            return;
-          }
-
-          historial.forEach(d => {
-            let dateStr = d.fecha_asignada || (d.fecha_entrega && d.fecha_entrega.toDate ? d.fecha_entrega.toDate().toLocaleDateString('es-MX') : '--');
-            tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 transition-colors">
-              <td class="px-4 py-3 text-xs font-medium text-slate-600">${dateStr}</td>
-              <td class="px-4 py-3 text-xs font-bold text-slate-800">${d.nombre_apoyo}</td>
-              <td class="px-4 py-3 text-xs text-slate-500">${d.observaciones || '--'}</td>
-            </tr>
-            `;
-          });
-        }).catch(e => {
-          console.error(e);
-          tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-xs text-red-500 font-bold">Error al cargar historial.</td></tr>';
-        });
-    }
+    /* Nota DELTA: Se eliminó la función duplicada cargarHistorialApoyos.
+      La versión correcta y operativa (con 4 columnas y botón de eliminar) 
+      se mantiene activa más arriba en el código.
+    */
 
     document.getElementById('formAsignarApoyo').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -2821,6 +2760,182 @@
         lucide.createIcons();
       }
     });
+
+    
+   // --- 13. GESTIÓN DE USUARIOS Y PERMISOS ---
+    const formUsuario = document.getElementById('formUsuario');
+    if (formUsuario) {
+      formUsuario.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnGuardarUsuario');
+        const origText = btn.innerHTML;
+        
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Procesando...';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        const isEdit = document.getElementById('u_modo_edicion').value === 'true';
+        const nombre = document.getElementById('u_nombre').value.trim();
+        const email = document.getElementById('u_email').value.trim().toLowerCase();
+        const password = document.getElementById('u_password').value;
+        const rol = document.getElementById('u_rol').value;
+
+        // Recolectar módulos seleccionados en el checklist
+        const modulosPermitidos = [];
+        document.querySelectorAll('input[name="permiso_modulo"]:checked').forEach(chk => {
+          modulosPermitidos.push(chk.value);
+        });
+
+        if (modulosPermitidos.length === 0) {
+          alert("Debes seleccionar al menos un módulo de acceso para este usuario.");
+          btn.innerHTML = origText; 
+          btn.disabled = false;
+          lucide.createIcons();
+          return;
+        }
+
+        try {
+          if (isEdit) {
+            // SOLO EDITAMOS LOS DATOS Y PERMISOS EN FIRESTORE
+            await db.collection('usuarios_acceso').doc(email).update({
+              nombre: nombre,
+              rol: rol,
+              permisos: modulosPermitidos
+            });
+            alert("Permisos y datos actualizados exitosamente.");
+            cancelarEdicionUsuario();
+          } else {
+            // 1. CREAMOS CUENTA NUEVA USANDO APP SECUNDARIA (Para no cerrar la tuya)
+            const appSecundaria = firebase.initializeApp(firebaseConfig, "AppSecundaria" + Date.now());
+            await appSecundaria.auth().createUserWithEmailAndPassword(email, password);
+            await appSecundaria.auth().signOut();
+            await appSecundaria.delete();
+
+            // 2. GUARDAMOS EL REGISTRO EN FIRESTORE
+            await db.collection('usuarios_acceso').doc(email).set({
+              nombre: nombre,
+              email: email,
+              rol: rol,
+              permisos: modulosPermitidos,
+              fecha_registro: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            alert("Cuenta de usuario creada exitosamente.");
+            formUsuario.reset();
+          }
+        } catch (error) {
+          console.error("Error al gestionar usuario:", error);
+          if (error.code === 'auth/email-already-in-use') alert("Ese correo electrónico ya está registrado en el sistema.");
+          else if (error.code === 'auth/weak-password') alert("La contraseña es muy débil. Usa al menos 6 caracteres.");
+          else alert("Ocurrió un error al guardar el usuario: " + error.message);
+        } finally {
+          if (!isEdit) { btn.innerHTML = origText; }
+          btn.disabled = false;
+          lucide.createIcons();
+        }
+      });
+    }
+
+    // Funciones para la interfaz de Edición
+    window.editarUsuarioAcceso = function(email, nombre, rol, permisosString) {
+      document.getElementById('u_modo_edicion').value = 'true';
+      
+      // Bloquear el cambio de correo
+      const inputEmail = document.getElementById('u_email');
+      inputEmail.value = email;
+      inputEmail.readOnly = true; 
+      inputEmail.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+      
+      document.getElementById('u_nombre').value = nombre;
+      document.getElementById('u_rol').value = rol;
+      
+      // Ocultar contraseña en edición
+      document.getElementById('div_password').classList.add('hidden');
+      document.getElementById('u_password').required = false;
+
+      // Marcar permisos existentes
+      const permisosArr = permisosString.split(',');
+      document.querySelectorAll('input[name="permiso_modulo"]').forEach(chk => {
+         chk.checked = permisosArr.includes(chk.value);
+      });
+
+      // Cambiar diseño visual a Modo Edición
+      document.getElementById('tituloFormUsuario').innerHTML = '<i data-lucide="user-cog" class="w-5 h-5 text-amber-500"></i> <span class="text-amber-600">Editar Usuario</span>';
+      document.getElementById('btnGuardarUsuario').textContent = 'Guardar Cambios';
+      document.getElementById('btnGuardarUsuario').className = 'w-2/3 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 transition-colors text-white text-sm font-bold rounded-lg mt-2 shadow-sm';
+      document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.cancelarEdicionUsuario = function() {
+      document.getElementById('u_modo_edicion').value = 'false';
+      document.getElementById('formUsuario').reset();
+      
+      // Restaurar campo de correo
+      const inputEmail = document.getElementById('u_email');
+      inputEmail.readOnly = false;
+      inputEmail.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+      
+      // Restaurar contraseña
+      document.getElementById('div_password').classList.remove('hidden');
+      document.getElementById('u_password').required = true;
+
+      // Restaurar diseño visual a Modo Creación
+      document.getElementById('tituloFormUsuario').innerHTML = '<i data-lucide="user-plus" class="w-4 h-4 text-indigo-500"></i> <span>Nuevo Usuario</span>';
+      document.getElementById('btnGuardarUsuario').textContent = 'Crear Cuenta';
+      document.getElementById('btnGuardarUsuario').className = 'w-full px-5 py-2.5 bg-slate-800 hover:bg-slate-900 transition-colors text-white text-sm font-bold rounded-lg mt-2 shadow-sm';
+      document.getElementById('btnCancelarEdicion').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    // Renderizar la tabla de Usuarios Activos
+    window.escucharUsuariosActivos = function() {
+      const tbody = document.getElementById('tableUsuarios');
+      if (!tbody) return;
+
+      db.collection('usuarios_acceso').orderBy('fecha_registro', 'desc').onSnapshot(snap => {
+        tbody.innerHTML = '';
+        if (snap.empty) {
+          tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500">No hay usuarios registrados.</td></tr>';
+          return;
+        }
+
+        snap.forEach(doc => {
+          const data = doc.data();
+          const permisosStr = data.permisos ? data.permisos.join(',') : '';
+          
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+              <td class="px-4 py-3 font-bold text-slate-700 text-xs">${data.nombre}</td>
+              <td class="px-4 py-3 text-slate-500 text-xs">${data.email}</td>
+              <td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded text-[10px] font-bold uppercase tracking-wider">${data.rol}</span></td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}')" class="p-1.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Editar Permisos">
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Revocar Acceso">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        lucide.createIcons();
+      });
+    }
+
+    window.eliminarUsuarioAcceso = async function(emailDoc) {
+      if(confirm(`¿Estás seguro de revocar y eliminar el acceso para el usuario:\n${emailDoc}?`)) {
+        try {
+          await db.collection('usuarios_acceso').doc(emailDoc).delete();
+        } catch(e) {
+          console.error(e);
+          alert("Error al intentar eliminar el usuario.");
+        }
+      }
+    }
 
     // Disparador inicial (Global)
     activarSincronizacionTemaRealtime();
