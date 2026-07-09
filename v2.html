@@ -136,6 +136,7 @@
         <button onclick="navigate('censo')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="censo"> <i data-lucide="users" class="w-4 h-4"></i> Padrón de Beneficiarios </button>
         <button onclick="navigate('padron-electoral'); renderizarPadronElectoral();" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="padron-electoral"> <i data-lucide="list-checks" class="w-4 h-4"></i> Padrón Electoral </button>
         <button onclick="navigate('apoyos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="apoyos"> <i data-lucide="gift" class="w-4 h-4"></i> Gestión de Apoyos </button>
+        <button onclick="navigate('seguridad')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="seguridad"> <i data-lucide="shield" class="w-4 h-4"></i> Seguridad </button>
         <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
 
@@ -235,13 +236,159 @@
           </div>
         </div>
 
-        <div class="flex gap-4 border-b border-slate-200 dark:border-slate-700">
-          <button class="tab-btn active pb-2 text-sm px-1" onclick="switchCensoTab('captura')">Nuevo Registro</button>
+        <div class="flex gap-4 border-b border-slate-200 dark:border-slate-700 mb-4">
+          <button class="tab-btn active pb-2 text-sm px-1" onclick="switchCensoTab('registros')">Base de Datos</button>
           <button class="tab-btn pb-2 text-sm px-1" onclick="switchCensoTab('carga')">Importación Masiva (Excel)</button>
-          <button class="tab-btn pb-2 text-sm px-1" onclick="switchCensoTab('registros')">Base de Datos</button>
         </div>
 
-        <div id="censo-captura">
+        <div id="censo-carga" class="hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-10 border border-slate-200 dark:border-slate-700 text-center max-w-3xl mx-auto">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-indigo-50 flex items-center justify-center mb-5">
+              <i data-lucide="file-spreadsheet" class="w-10 h-10 text-indigo-600"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Importación Masiva (Excel)</h3>
+            <p class="text-sm text-slate-500 mb-6">Sube tu archivo de Excel (.xlsx, .xls) o CSV con las columnas correspondientes (Nombre, Casilla, Clave, Municipio).</p>
+
+            <div class="border-2 border-dashed border-indigo-300 rounded-xl p-6 bg-indigo-50/30 cursor-pointer mb-6" onclick="document.getElementById('excelUpload').click()">
+              <p class="text-sm font-bold text-indigo-600" id="lblExcel">1. Seleccionar archivo Excel</p>
+            </div>
+
+            <button id="btnProcesarExcel" class="w-full hidden px-5 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md mt-4">
+              Procesar Base de Datos
+            </button>
+
+            <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls, .csv">
+            <div id="uploadStatus" class="mt-4"></div>
+          </div>
+        </div>
+
+        <div id="censo-registros">
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50">
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="flex-1 min-w-[200px] relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                  </div>
+                  <input type="text" id="filtroTexto" onkeyup="aplicarFiltros()" placeholder="Búsqueda global (Nombre, Casilla, CURP, Dirección)..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                </div>
+                <input type="text" id="filtroBarrio" onkeyup="aplicarFiltros()" placeholder="Barrio..." class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none uppercase focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                <select id="filtroSexo" onchange="aplicarFiltros()" class="w-full md:w-28 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                  <option value="TODOS">Sexo (Todos)</option>
+                  <option value="HOMBRE">Hombre</option>
+                  <option value="MUJER">Mujer</option>
+                </select>
+                <select id="filtroTipo" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                  <option value="TODOS">Tipo (Todos)</option>
+                  <option value="PADRON">Padrón</option>
+                  <option value="SIMPATIZANTE">Simpatizante</option>
+                  <option value="AFILIADO">Afiliado</option>
+                </select>
+                <select id="filtroSimpatia" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
+                  <option value="TODAS">Simpatía (Todas)</option>
+                  <option value="A FAVOR">A Favor</option>
+                  <option value="INDECISO">Indeciso</option>
+                  <option value="EN CONTRA">En Contra</option>
+                </select>
+                <div class="px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2 cursor-default" title="La búsqueda en vivo está activada (Coste 0 lecturas)">
+                  <i data-lucide="zap" class="w-4 h-4"></i> En Vivo
+                </div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-black text-white">
+                  <tr>
+                    <th class="px-4 py-3 font-bold">Nombre del Beneficiario</th>
+                    <th class="px-4 py-3 font-bold">Casilla / Clave</th>
+                    <th class="px-4 py-3 font-bold text-center">Sección</th>
+                    <th class="px-4 py-3 font-bold">Ubicación / Origen</th>
+                    <th class="px-4 py-3 font-bold text-center">Tipo</th>
+                    <th class="px-4 py-3 font-bold text-center">Gestión</th>
+                  </tr>
+                </thead>
+                <tbody id="tableRegistros" class="divide-y divide-slate-100 bg-white"></tbody>
+              </table>
+            </div>
+            
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/20 text-xs">
+              <div class="text-slate-500 dark:text-slate-400 font-medium">
+                Mostrando <span id="pag-desde" class="font-bold text-slate-800 dark:text-slate-100">0</span> a
+                <span id="pag-hasta" class="font-bold text-slate-800 dark:text-slate-100">0</span> de
+                <span id="pag-total" class="font-bold text-slate-800 dark:text-slate-100">0</span> registros
+              </div>
+              <div class="flex items-center gap-1" id="contenedorBotonesPaginas"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-padron-electoral" class="p-6 space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Padrón Electoral</h2>
+            <p class="text-sm text-slate-500">Consulta de base de datos y captura de nuevos registros.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 border-b border-slate-200 dark:border-slate-700 mb-4">
+          <button id="btn-tab-pe-consulta" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all" onclick="switchPETab('consulta')">Consultas y Edición</button>
+          <button id="btn-tab-pe-captura" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all" onclick="switchPETab('captura')">Nuevo Registro</button>
+        </div>
+
+        <div id="pe-consulta" class="space-y-6">
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div><h3 class="text-sm font-bold">Filtro rápido</h3></div>
+            <div class="w-full md:w-64">
+              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Buscar por Sección</label>
+              <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 transition-colors">
+                <option value="TODAS">Todas las secciones</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-slate-200 bg-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-800">Resultados de Búsqueda</h3>
+            <span id="pe_total_resultados" class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-white border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nombre Completo</th>
+                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-32">Sección</th>
+                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Barrio / Localidad</th>
+                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-40">Casilla</th>
+                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-32">Acción</th>
+                </tr>
+                <tr class="bg-slate-50/50 border-b border-slate-200">
+                  <td class="px-4 py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
+                  <td class="px-4 py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
+                  <td class="px-4 py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODOS">Filtrar Barrio...</option></select></td>
+                  <td class="px-4 py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODAS">Todas</option></select></td>
+                  <td class="px-4 py-2 text-center">
+                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white">
+                      <option value="TODAS">Simpatía</option>
+                      <option value="A FAVOR">A Favor</option>
+                      <option value="INDECISO">Indeciso</option>
+                      <option value="EN CONTRA">En Contra</option>
+                    </select>
+                  </td>
+                </tr>
+              </thead>
+              <tbody id="tablePadronElectoral" class="divide-y divide-slate-100 bg-white">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs">
+            <div class="flex items-center gap-1" id="pe_contenedorBotonesPaginas"></div>
+          </div>
+        </div>
+        </div> <div id="pe-captura" class="hidden">
           <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm max-w-4xl mx-auto">
             <div class="flex items-center gap-3 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
               <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -363,163 +510,85 @@
           </div>
         </div>
 
-        <div id="censo-carga" class="hidden">
-          <div class="bg-white dark:bg-slate-800 rounded-xl p-10 border border-slate-200 dark:border-slate-700 text-center max-w-3xl mx-auto">
-            <div class="w-20 h-20 mx-auto rounded-2xl bg-indigo-50 flex items-center justify-center mb-5">
-              <i data-lucide="file-spreadsheet" class="w-10 h-10 text-indigo-600"></i>
-            </div>
-            <h3 class="text-xl font-bold mb-2">Importación Masiva (Excel)</h3>
-            <p class="text-sm text-slate-500 mb-6">Sube tu archivo de Excel (.xlsx, .xls) o CSV con las columnas correspondientes (Nombre, Casilla, Clave, Municipio).</p>
-
-            <div class="border-2 border-dashed border-indigo-300 rounded-xl p-6 bg-indigo-50/30 cursor-pointer mb-6" onclick="document.getElementById('excelUpload').click()">
-              <p class="text-sm font-bold text-indigo-600" id="lblExcel">1. Seleccionar archivo Excel</p>
-            </div>
-
-            <button id="btnProcesarExcel" class="w-full hidden px-5 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md mt-4">
-              Procesar Base de Datos
-            </button>
-
-            <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls, .csv">
-            <div id="uploadStatus" class="mt-4"></div>
-          </div>
-        </div>
-
-        <div id="censo-registros" class="hidden">
-          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div class="p-4 border-b border-slate-200 bg-slate-50/50">
-              <div class="flex flex-wrap items-center gap-3">
-                <div class="flex-1 min-w-[200px] relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                  </div>
-                  <input type="text" id="filtroTexto" onkeyup="aplicarFiltros()" placeholder="Búsqueda global (Nombre, Casilla, CURP, Dirección)..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                </div>
-                <input type="text" id="filtroBarrio" onkeyup="aplicarFiltros()" placeholder="Barrio..." class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none uppercase focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                <select id="filtroSexo" onchange="aplicarFiltros()" class="w-full md:w-28 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                  <option value="TODOS">Sexo (Todos)</option>
-                  <option value="HOMBRE">Hombre</option>
-                  <option value="MUJER">Mujer</option>
-                </select>
-                <select id="filtroTipo" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                  <option value="TODOS">Tipo (Todos)</option>
-                  <option value="PADRON">Padrón</option>
-                  <option value="SIMPATIZANTE">Simpatizante</option>
-                  <option value="AFILIADO">Afiliado</option>
-                </select>
-                <select id="filtroSimpatia" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                  <option value="TODAS">Simpatía (Todas)</option>
-                  <option value="A FAVOR">A Favor</option>
-                  <option value="INDECISO">Indeciso</option>
-                  <option value="EN CONTRA">En Contra</option>
-                </select>
-                <div class="px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2 cursor-default" title="La búsqueda en vivo está activada (Coste 0 lecturas)">
-                  <i data-lucide="zap" class="w-4 h-4"></i> En Vivo
-                </div>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left">
-                <thead class="bg-black text-white">
-                  <tr>
-                    <th class="px-4 py-3 font-bold">Nombre del Beneficiario</th>
-                    <th class="px-4 py-3 font-bold">Casilla / Clave</th>
-                    <th class="px-4 py-3 font-bold text-center">Sección</th>
-                    <th class="px-4 py-3 font-bold">Ubicación / Origen</th>
-                    <th class="px-4 py-3 font-bold text-center">Tipo</th>
-                    <th class="px-4 py-3 font-bold text-center">Gestión</th>
-                  </tr>
-                </thead>
-                <tbody id="tableRegistros" class="divide-y divide-slate-100 bg-white"></tbody>
-              </table>
-            </div>
-            
-            <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/20 text-xs">
-              <div class="text-slate-500 dark:text-slate-400 font-medium">
-                Mostrando <span id="pag-desde" class="font-bold text-slate-800 dark:text-slate-100">0</span> a
-                <span id="pag-hasta" class="font-bold text-slate-800 dark:text-slate-100">0</span> de
-                <span id="pag-total" class="font-bold text-slate-800 dark:text-slate-100">0</span> registros
-              </div>
-              <div class="flex items-center gap-1" id="contenedorBotonesPaginas"></div>
-            </div>
-            <div class="mt-10 p-6 border-t border-red-100 bg-red-50/50">
-              <h4 class="text-red-700 font-bold mb-2">Zona de Peligro</h4>
-              <p class="text-xs text-red-600 mb-4">Esta acción eliminará permanentemente TODO el padrón.</p>
-              <button onclick="eliminarTodaLaBaseDeDatos()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg flex items-center gap-2">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar todos los registros
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="page-padron-electoral" class="p-6 space-y-6 hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Padrón Electoral</h2>
-            <p class="text-sm text-slate-500">Consulta y gestión de simpatías.</p>
-          </div>
-          <div class="w-full md:w-64">
-            <label class="text-xs font-bold text-slate-500 mb-1.5 block">Buscar por Sección</label>
-            <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 transition-colors">
-              <option value="TODAS">Todas las secciones</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-slate-200 bg-white flex items-center gap-2">
-            <h3 class="text-sm font-bold text-slate-800">Resultados de Búsqueda</h3>
-            <span id="pe_total_resultados" class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-white border-b border-slate-200">
-                <tr>
-                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nombre Completo</th>
-                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-32">Sección</th>
-                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Barrio / Localidad</th>
-                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-40">Casilla</th>
-                  <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-32">Acción</th>
-                </tr>
-                <tr class="bg-slate-50/50 border-b border-slate-200">
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODOS">Filtrar Barrio...</option></select></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODAS">Todas</option></select></td>
-                  <td class="px-4 py-2 text-center">
-                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white">
-                      <option value="TODAS">Simpatía</option>
-                      <option value="A FAVOR">A Favor</option>
-                      <option value="INDECISO">Indeciso</option>
-                      <option value="EN CONTRA">En Contra</option>
-                    </select>
-                  </td>
-                </tr>
-              </thead>
-              <tbody id="tablePadronElectoral" class="divide-y divide-slate-100 bg-white">
-              </tbody>
-            </table>
-          </div>
-
-          <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs">
-            <div class="flex items-center gap-1" id="pe_contenedorBotonesPaginas"></div>
-          </div>
-        </div>
       </section>
 
       <section id="page-apoyos" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
-          <div><h2 class="text-2xl font-bold">Gestión de Apoyos</h2><p class="text-sm text-slate-500">Administración y asignación de programas</p></div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Gestión de Apoyos Sociales</h2>
+            <p class="text-sm text-slate-500">Administración y control de programas</p>
+          </div>
         </div>
 
-        <div class="flex gap-4 border-b border-slate-200 dark:border-slate-700 mb-4">
-          <button id="btn-tab-catalogo" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all" onclick="switchApoyosTab('catalogo')">Catálogo de Apoyos</button>
-          <button id="btn-tab-asignacion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all" onclick="switchApoyosTab('asignacion')">Captura / Asignación</button>
+        <div class="flex gap-6 border-b border-slate-200 dark:border-slate-700 mb-4">
+          <button id="btn-tab-apoyos-estadisticas" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2" onclick="switchApoyosTab('estadisticas')">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estadísticas
+          </button>
+          <button id="btn-tab-apoyos-catalogo" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchApoyosTab('catalogo')">
+            <i data-lucide="list" class="w-4 h-4"></i> Catálogo de Programas
+          </button>
+          <button id="btn-tab-apoyos-asignacion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchApoyosTab('asignacion')">
+            <i data-lucide="user-check" class="w-4 h-4"></i> Asignación
+          </button>
         </div>
 
-        <div id="tab-apoyos-catalogo" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div id="tab-apoyos-estadisticas" class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div class="xl:col-span-3 flex flex-col gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div onclick="switchApoyosTab('asignacion')" class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 hover:shadow-md hover:-translate-y-1 transition-all group">
+                <div>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-3 h-3 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i> Total Entregas</p>
+                  <p class="text-3xl font-black text-slate-800 dark:text-white leading-none mt-2" id="stat-total-entregas">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <i data-lucide="package" class="w-6 h-6 text-blue-500"></i>
+                </div>
+              </div>
+
+              <div onclick="abrirModalBeneficiariosUnicos()" class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md hover:-translate-y-1 transition-all group">
+                <div>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="external-link" class="w-3 h-3 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"></i> Beneficiarios Únicos</p>
+                  <p class="text-3xl font-black text-slate-800 dark:text-white leading-none mt-2" id="stat-beneficiarios-unicos">0</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <i data-lucide="users" class="w-6 h-6 text-emerald-500"></i>
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center opacity-50">
+                  <i data-lucide="star" class="w-8 h-8 text-amber-200"></i>
+                </div>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2 relative z-10">Programa más popular</p>
+                <div class="flex items-center gap-2 relative z-10">
+                  <div class="p-1.5 bg-amber-100 text-amber-600 rounded-lg shrink-0 shadow-sm">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                  </div>
+                  <p class="text-sm font-black text-slate-800 dark:text-white truncate" id="stat-prog-popular">Cargando...</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex-1">
+              <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-500"></i> Entregas por Mes (Ciclo Anual)</h3>
+              <div class="chart-container" style="height: 300px;">
+                <canvas id="chartApoyosMensuales"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-[500px] xl:h-auto">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
+              <i data-lucide="clock-4" class="w-4 h-4 text-indigo-600"></i>
+              <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Últimas Entregas</h4>
+            </div>
+            <div id="feedUltimasEntregas" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/30 dark:bg-slate-900/10">
+              <div class="text-center py-10 text-slate-400 text-sm"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-400"></i> Sincronizando datos...</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-apoyos-catalogo" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm h-fit">
             <h3 class="text-sm font-semibold mb-5 flex items-center gap-2 text-slate-800 dark:text-white">
               <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-lg"><i data-lucide="gift" class="w-4 h-4"></i></div>
@@ -571,7 +640,7 @@
                   </div>
                   <input type="text" id="ca_filtro_nombre" onkeyup="aplicarFiltrosCA()" placeholder="Buscar beneficiario por nombre..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
                 </div>
-                <select id="ca_filtro_seccion" onchange="aplicarFiltrosCA()" class="w-full md:w-48 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
+                <select id="ca_filtro_seccion" onchange="aplicarFiltrosCA()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
                   <option value="TODAS">Sección (Todas)</option>
                 </select>
                 <select id="ca_filtro_simpatia" onchange="aplicarFiltrosCA()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
@@ -579,6 +648,9 @@
                   <option value="A FAVOR">A Favor</option>
                   <option value="INDECISO">Indeciso</option>
                   <option value="EN CONTRA">En Contra</option>
+                </select>
+                <select id="ca_filtro_apoyo" onchange="aplicarFiltrosCA()" class="w-full md:w-48 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500">
+                  <option value="TODOS">Apoyo (Todos)</option>
                 </select>
               </div>
             </div>
@@ -590,7 +662,6 @@
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nombre Completo</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-24 text-center">Sección</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Casilla</th>
-                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Municipio</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-36">Acción</th>
                   </tr>
                 </thead>
@@ -605,13 +676,30 @@
         </div>
       </section>
 
+      <section id="page-seguridad" class="p-6 space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Auditoría de Usuarios</h2>
+            <p class="text-sm text-slate-500">Selecciona una cuenta para auditar sus accesos, registros y operaciones en el sistema.</p>
+          </div>
+          <button onclick="cargarTarjetasSeguridad()" class="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold text-xs rounded-lg flex items-center gap-2 transition-colors">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar
+          </button>
+        </div>
+
+        <div id="seguridad-usuarios-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="col-span-full py-10 text-center text-slate-500"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i> Cargando usuarios...</div>
+        </div>
+      </section>
+
       <section id="page-configuracion" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
           <div><h2 class="text-2xl font-bold">Configuración Corporativa</h2><p class="text-sm text-slate-500">Marca visual y control de usuarios</p></div>
         </div>
         <div class="flex gap-6 border-b border-slate-200">
           <button id="btn-tab-apariencia" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600" onclick="switchConfigTab('apariencia')">Marca Institucional</button>
-          <button id="btn-tab-usuarios" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent" onclick="switchConfigTab('usuarios')">Gestión de Accesos</button>
+          <button id="btn-tab-usuarios" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all" onclick="switchConfigTab('usuarios')">Gestión de Accesos</button>
+          <button id="btn-tab-peligro" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1" onclick="switchConfigTab('peligro')"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i> Zona de Peligro</button>
         </div>
 
         <div id="config-apariencia" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -668,6 +756,7 @@
                   <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
                   <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
                   <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                   <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                 </div>
               </div>
@@ -694,6 +783,29 @@
             </div>
           </div>
         </div>  
+
+        <div id="config-peligro" class="hidden bg-white rounded-xl p-8 border border-slate-200 shadow-sm max-w-4xl">
+          <div class="flex items-start gap-4">
+            <div class="p-3 bg-red-100/80 rounded-full shrink-0">
+              <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-base font-bold text-red-700 mb-1">Mantenimiento Crítico del Sistema</h4>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">Esta acción eliminará de forma irreversible y permanente <strong>TODOS</strong> los ciudadanos registrados en el Padrón de Beneficiarios, así como sus bitácoras e historiales de apoyos sociales vinculados en la nube. Esta operación no se puede deshacer.</p>
+              
+              <div class="max-w-md space-y-2 bg-red-50/50 p-4 border border-red-100 rounded-xl">
+                <label class="block text-[10px] font-bold text-red-700 uppercase tracking-wider">Escriba "ELIMINAR TODO" para desbloquear la acción</label>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <input type="text" id="inputConfirmarBorrado" onkeyup="validarBorradoMasivo()" class="w-full text-sm px-4 py-2.5 rounded-lg border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none bg-white text-slate-800 transition-colors uppercase font-bold tracking-wide placeholder:font-normal" placeholder="ELIMINAR TODO">
+                  <button id="btnBorrarTodo" onclick="eliminarTodaLaBaseDeDatos()" disabled class="px-6 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm opacity-50 cursor-not-allowed flex items-center justify-center gap-2 transition-all whitespace-nowrap">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Purgar Base de Datos
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </main>
@@ -817,11 +929,46 @@
       </div>
     </div>
 
-    <div id="modalAsignarApoyo" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[95vh]">
+    <div id="modalBeneficiariosUnicos" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh]">
+        <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shadow-inner border border-emerald-200">
+              <i data-lucide="users" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-black text-slate-800 leading-none">Beneficiarios Verificados</h3>
+              <p class="text-[11px] text-slate-500 mt-1 font-medium">Ciudadanos que han recibido al menos 1 apoyo oficial</p>
+            </div>
+          </div>
+          <button onclick="cerrarModalBeneficiariosUnicos()" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-100 text-slate-500 rounded-full transition-colors shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
 
-        <div class="p-4 flex items-center justify-between">
-          <h3 class="text-sm font-bold text-slate-700">Gestión de Apoyos Sociales</h3>
+        <div class="p-4 bg-white border-b border-slate-100 flex items-center gap-3">
+          <div class="flex-1 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <input type="text" id="busquedaBeneficiariosUnicos" onkeyup="filtrarBeneficiariosUnicos()" placeholder="Buscar ciudadano por nombre o apellido..." class="w-full text-sm pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+          </div>
+          <div class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm whitespace-nowrap">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400"></i> Total: <span id="contadorModalUnicos" class="text-emerald-400 text-sm">0</span>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto bg-slate-50/50 p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gridBeneficiariosUnicos">
+            <div class="col-span-full text-center py-10 text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-500"></i> Procesando cruce de datos...</div>
+       </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="modalAsignarApoyo" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[95vh]">
+
+            <div class="p-4 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-700">Gestión de Apoyos Sociales</h3>
           <button onclick="cerrarModalAsignarApoyo()" class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 hover:bg-slate-100 transition-colors">
             <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
           </button>
@@ -890,6 +1037,101 @@
       </div>
     </div>
 
+    <div id="modalPerfilSeguridad" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl overflow-hidden flex flex-col max-h-[95vh]">
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 leading-tight">Auditoría de Usuario</h3>
+              <p class="text-[10px] text-slate-500">Centro de seguridad y rastreo</p>
+            </div>
+          </div>
+          <button onclick="cerrarPerfilSeguridad()" class="p-1.5 hover:bg-slate-200 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50">
+          <div class="flex flex-col lg:flex-row gap-6">
+            <div class="w-full lg:w-1/3 space-y-4">
+              <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center text-center shadow-sm">
+                <div class="w-24 h-24 rounded-full bg-indigo-50 border-4 border-white shadow-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                  <i data-lucide="user-check" class="w-10 h-10 text-indigo-400"></i>
+                  <div class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+                </div>
+                <h4 id="ms_nombre_display" class="text-lg font-black text-slate-800 tracking-tight leading-none mb-1">--</h4>
+                <p id="ms_email_display" class="text-xs font-bold text-slate-400">--</p>
+                <span id="ms_rol_display" class="mt-4 px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">--</span>
+              </div>
+              
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h5 class="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">Resumen Operativo</h5>
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="log-in" class="w-3.5 h-3.5"></i> Accesos (Logins)</span>
+                    <span id="ms_total_logins" class="font-bold text-indigo-600 text-sm bg-indigo-50 px-2 py-0.5 rounded">0</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i> Acciones en Sistema</span>
+                    <span id="ms_total_acciones" class="font-bold text-emerald-600 text-sm bg-emerald-50 px-2 py-0.5 rounded">0</span>
+                  </div>
+                  <div class="flex flex-col gap-1 pt-3 mt-1 border-t border-slate-100">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Última IP Detectada</span>
+                    <span id="ms_ultima_ip" class="font-mono font-bold text-slate-700 text-xs">--</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-full lg:w-2/3 flex flex-col gap-6">
+              
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                <div class="p-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+                  <i data-lucide="shield" class="w-4 h-4 text-blue-500"></i>
+                  <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Historial de Accesos (Logins)</h4>
+                </div>
+                <div class="overflow-x-auto max-h-[250px] overflow-y-auto">
+                  <table class="w-full text-left text-sm">
+                    <thead class="text-[10px] text-slate-500 bg-white border-b border-slate-100 sticky top-0 z-10 uppercase tracking-wider">
+                      <tr>
+                        <th class="px-4 py-2 font-bold w-32">Fecha / Hora</th>
+                        <th class="px-4 py-2 font-bold">Dirección IP</th>
+                        <th class="px-4 py-2 font-bold">Navegador / Dispositivo</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ms_tabla_accesos" class="divide-y divide-slate-50 bg-white">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                <div class="p-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+                  <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-emerald-500"></i>
+                  <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Actividad de Registros y Apoyos</h4>
+                </div>
+                <div class="overflow-x-auto max-h-[300px] overflow-y-auto">
+                  <table class="w-full text-left text-sm">
+                    <thead class="text-[10px] text-slate-500 bg-white border-b border-slate-100 sticky top-0 z-10 uppercase tracking-wider">
+                      <tr>
+                        <th class="px-4 py-2 font-bold w-32">Fecha / Hora</th>
+                        <th class="px-4 py-2 font-bold text-center">Tipo</th>
+                        <th class="px-4 py-2 font-bold">Acción Realizada</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ms_tabla_actividad" class="divide-y divide-slate-50 bg-white">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="modalEditarUsuario" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -941,6 +1183,7 @@
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500"> Padrón de Beneficiarios</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500"> Padrón Electoral</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500"> Gestión de Apoyos</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                   </div>
                 </div>
@@ -1113,7 +1356,11 @@
         btn.disabled = true;
         errorBox.classList.add('hidden');
 
-        auth.signInWithEmailAndPassword(email, password).catch((error) => {
+        auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          if(typeof registrarAuditoria === 'function') registrarAuditoria('LOGIN', 'Inicio de sesión en el portal');
+        })
+        .catch((error) => {
           errorBox.classList.remove('hidden');
           btn.innerHTML = origText;
           btn.disabled = false;
@@ -1243,32 +1490,258 @@
       }
 
       if(page === 'dashboard') setTimeout(() => { if(map) map.invalidateSize(); }, 200);
-      if(page === 'apoyos') aplicarFiltrosCA(); // Fuerza el renderizado si entramos a la sección
+      if(page === 'apoyos') switchApoyosTab('estadisticas');
+      if(page === 'seguridad') cargarTarjetasSeguridad();
     }
 
     function switchCensoTab(tab){
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      if(event && event.target) event.target.classList.add('active');
-      document.getElementById('censo-captura').classList.toggle('hidden',tab!=='captura');
-      document.getElementById('censo-carga').classList.toggle('hidden',tab!=='carga');
-      document.getElementById('censo-registros').classList.toggle('hidden',tab!=='registros');
+      const buttons = document.querySelectorAll('#page-censo .tab-btn');
+      buttons.forEach(b => b.classList.remove('active'));
+      if(event && event.target && event.target.classList.contains('tab-btn')) event.target.classList.add('active');
+      
+      document.getElementById('censo-carga').classList.toggle('hidden', tab !== 'carga');
+      document.getElementById('censo-registros').classList.toggle('hidden', tab !== 'registros');
     }
 
-    function switchApoyosTab(tab) {
-      document.getElementById('tab-apoyos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
-      document.getElementById('tab-apoyos-asignacion').classList.toggle('hidden', tab !== 'asignacion');
+    function switchPETab(tab) {
+      document.getElementById('pe-consulta').classList.toggle('hidden', tab !== 'consulta');
+      document.getElementById('pe-captura').classList.toggle('hidden', tab !== 'captura');
 
-      const btnCatalogo = document.getElementById('btn-tab-catalogo');
-      const btnAsignacion = document.getElementById('btn-tab-asignacion');
+      const btnConsulta = document.getElementById('btn-tab-pe-consulta');
+      const btnCaptura = document.getElementById('btn-tab-pe-captura');
 
-      if (tab === 'catalogo') {
-        btnCatalogo.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all";
-        btnAsignacion.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
+      if (tab === 'consulta') {
+        btnConsulta.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all";
+        btnCaptura.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
       } else {
-        btnAsignacion.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all";
-        btnCatalogo.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
-        aplicarFiltrosCA(); // Renderiza la tabla de asignación al entrar a la pestaña
+        btnCaptura.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all";
+        btnConsulta.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
       }
+    }
+
+            // 🔥 LA FUNCIÓN DE LAS PESTAÑAS QUE SE HABÍA BORRADO POR ACCIDENTE
+            function switchApoyosTab(tab) {
+              document.getElementById('tab-apoyos-estadisticas').classList.toggle('hidden', tab !== 'estadisticas');
+              document.getElementById('tab-apoyos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
+              document.getElementById('tab-apoyos-asignacion').classList.toggle('hidden', tab !== 'asignacion');
+
+              const btnEstadisticas = document.getElementById('btn-tab-apoyos-estadisticas');
+              const btnCatalogo = document.getElementById('btn-tab-apoyos-catalogo');
+              const btnAsignacion = document.getElementById('btn-tab-apoyos-asignacion');
+
+              const activeClass = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
+              const inactiveClass = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2";
+
+              if(btnEstadisticas) btnEstadisticas.className = tab === 'estadisticas' ? activeClass : inactiveClass;
+              if(btnCatalogo) btnCatalogo.className = tab === 'catalogo' ? activeClass : inactiveClass;
+              if(btnAsignacion) btnAsignacion.className = tab === 'asignacion' ? activeClass : inactiveClass;
+
+              if (tab === 'asignacion') aplicarFiltrosCA();
+              if (tab === 'estadisticas') cargarEstadisticasApoyos();
+              lucide.createIcons();
+            }
+
+            // --- LÓGICA DEL MODAL DE BENEFICIARIOS ÚNICOS ---
+            window.abrirModalBeneficiariosUnicos = function() {
+      document.getElementById('modalBeneficiariosUnicos').classList.remove('hidden');
+      document.getElementById('busquedaBeneficiariosUnicos').value = '';
+      pintarGridBeneficiariosUnicos(window.dataBeneficiariosUnicos);
+    }
+
+    window.cerrarModalBeneficiariosUnicos = function() {
+      document.getElementById('modalBeneficiariosUnicos').classList.add('hidden');
+    }
+
+    window.filtrarBeneficiariosUnicos = function() {
+      const texto = document.getElementById('busquedaBeneficiariosUnicos').value.trim().toUpperCase();
+      if (texto === '') {
+        pintarGridBeneficiariosUnicos(window.dataBeneficiariosUnicos);
+        return;
+      }
+
+      // Filtrar el objeto
+      const dataFiltrada = {};
+      for (const id in window.dataBeneficiariosUnicos) {
+        if (window.dataBeneficiariosUnicos[id].nombre.toUpperCase().includes(texto)) {
+          dataFiltrada[id] = window.dataBeneficiariosUnicos[id];
+        }
+      }
+      pintarGridBeneficiariosUnicos(dataFiltrada);
+    }
+
+    function pintarGridBeneficiariosUnicos(datos) {
+      const grid = document.getElementById('gridBeneficiariosUnicos');
+      grid.innerHTML = '';
+      
+      const keys = Object.keys(datos);
+      document.getElementById('contadorModalUnicos').textContent = keys.length;
+
+      if (keys.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 font-bold">No se encontraron ciudadanos con apoyos.</div>';
+        return;
+      }
+
+      // Ordenar alfabéticamente por nombre
+      keys.sort((a, b) => datos[a].nombre.localeCompare(datos[b].nombre));
+
+      keys.forEach(id => {
+        const d = datos[id];
+        let badgesApoyos = '';
+        Array.from(d.apoyosRecibidos).forEach(apoyo => {
+           badgesApoyos += `<span class="inline-block px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-black uppercase tracking-widest shadow-sm">${apoyo}</span>`;
+        });
+
+        grid.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between hover:border-emerald-300 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
+                <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-black text-slate-800 leading-tight truncate">${d.nombre}</p>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">Entregas totales: <strong class="text-slate-600">${d.total}</strong></p>
+              </div>
+              <button onclick="switchApoyosTab('asignacion'); cerrarModalBeneficiariosUnicos();" class="w-8 h-8 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors" title="Asignar Nuevo">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-1">
+              ${badgesApoyos}
+            </div>
+          </div>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    // LÓGICA DE ESTADÍSTICAS Y GRÁFICAS DE APOYOS
+    let chartApoyosInst = null;
+    window.dataBeneficiariosUnicos = {}; // Almacenará la data mapeada para el modal
+
+    function cargarEstadisticasApoyos() {
+      db.collection('entregas_apoyos').get().then(snapshot => {
+        let totalEntregas = snapshot.size;
+        let conteoProgramas = {};
+        let listaEntregasParaFeed = [];
+        
+        window.dataBeneficiariosUnicos = {}; // Resetear
+        let conteoMeses = { 'Ene':0, 'Feb':0, 'Mar':0, 'Abr':0, 'May':0, 'Jun':0, 'Jul':0, 'Ago':0, 'Sep':0, 'Oct':0, 'Nov':0, 'Dic':0 };
+        const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        snapshot.forEach(doc => {
+          let data = doc.data();
+          let prog = data.nombre_apoyo || 'Desconocido';
+          let nombreBene = data.nombre_beneficiario || 'Usuario Desconocido';
+          let idBene = data.id_beneficiario;
+          
+          conteoProgramas[prog] = (conteoProgramas[prog] || 0) + 1;
+
+          // Extraer tiempo real para el sort
+          let timestampSort = 0;
+          let dateStr = '--';
+          if(data.fecha_entrega && data.fecha_entrega.toDate) {
+             timestampSort = data.fecha_entrega.toDate().getTime();
+             dateStr = data.fecha_entrega.toDate().toLocaleDateString('es-MX', {day: '2-digit', month: 'short', year: 'numeric'});
+          } else if(data.fecha_asignada) {
+             dateStr = data.fecha_asignada;
+          }
+
+          // Extraer mes para gráfica
+          let mes = null;
+          if(data.fecha_asignada) {
+             let parts = data.fecha_asignada.split('/');
+             if(parts.length >= 2) mes = parseInt(parts[1]) - 1;
+          } else if(data.fecha_entrega && data.fecha_entrega.toDate) {
+             mes = data.fecha_entrega.toDate().getMonth();
+          }
+          if(mes !== null && mes >= 0 && mes <= 11) conteoMeses[mesesNombres[mes]]++;
+
+          // Alimentar arreglo del Feed (Guardar solo data necesaria)
+          listaEntregasParaFeed.push({
+            nombre: nombreBene,
+            apoyo: prog,
+            fechaTexto: dateStr,
+            timeMs: timestampSort
+          });
+
+          // Alimentar Mapa de Beneficiarios Únicos para el Modal
+          if (idBene) {
+            if (!window.dataBeneficiariosUnicos[idBene]) {
+              window.dataBeneficiariosUnicos[idBene] = {
+                nombre: nombreBene,
+                apoyosRecibidos: new Set(),
+                total: 0
+              };
+            }
+            window.dataBeneficiariosUnicos[idBene].apoyosRecibidos.add(prog);
+            window.dataBeneficiariosUnicos[idBene].total++;
+          }
+        });
+
+        // 1. Escribir KPIs Numéricos
+        const numBeneficiariosUnicos = Object.keys(window.dataBeneficiariosUnicos).length;
+        document.getElementById('stat-total-entregas').textContent = totalEntregas;
+        document.getElementById('stat-beneficiarios-unicos').textContent = numBeneficiariosUnicos;
+
+        // 2. Calcular Programa Más Popular
+        let maxProg = 'N/A';
+        let maxCount = 0;
+        for(let p in conteoProgramas) {
+           if(conteoProgramas[p] > maxCount) { maxCount = conteoProgramas[p]; maxProg = p; }
+        }
+        document.getElementById('stat-prog-popular').textContent = maxProg;
+
+        // 3. Pintar Feed de Últimas Entregas (Lado Derecho)
+        listaEntregasParaFeed.sort((a, b) => b.timeMs - a.timeMs); // Descendente (más reciente arriba)
+        const feedContainer = document.getElementById('feedUltimasEntregas');
+        feedContainer.innerHTML = '';
+        if(listaEntregasParaFeed.length === 0) {
+           feedContainer.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">Aún no hay entregas registradas.</div>';
+        } else {
+           const topFeed = listaEntregasParaFeed.slice(0, 50); // Mostrar las últimas 50 para no saturar
+           topFeed.forEach(e => {
+             feedContainer.innerHTML += `
+               <div class="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-start gap-3 relative overflow-hidden group hover:border-indigo-200 transition-colors">
+                 <div class="absolute top-0 bottom-0 left-0 w-1 bg-indigo-500"></div>
+                 <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 border border-indigo-200 text-indigo-600 mt-1">
+                   <i data-lucide="check-circle" class="w-4 h-4"></i>
+                 </div>
+                 <div class="flex-1 min-w-0">
+                   <p class="text-xs font-bold text-indigo-600 truncate">${e.apoyo}</p>
+                   <p class="text-sm font-black text-slate-800 dark:text-white leading-tight truncate">${e.nombre}</p>
+                   <p class="text-[10px] text-slate-500 font-medium mt-1 flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${e.fechaTexto}</p>
+                 </div>
+               </div>
+             `;
+           });
+           lucide.createIcons();
+        }
+
+        // 4. Renderizar Gráfica Principal
+        const ctx = document.getElementById('chartApoyosMensuales');
+        if(!ctx) return;
+        if(chartApoyosInst) chartApoyosInst.destroy();
+        
+        chartApoyosInst = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: mesesNombres,
+            datasets: [{
+              label: 'Entregas Registradas',
+              data: mesesNombres.map(m => conteoMeses[m]),
+              backgroundColor: '#4f46e5',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+
+      }).catch(e => console.error("Error al procesar estadísticas de apoyos:", e));
     }
 
     function toggleDark(){ document.documentElement.classList.toggle('dark'); }
@@ -1565,6 +2038,9 @@
 
         const nuevoDocRef = await db.collection('simpatizantes').add(simpatizanteData);
 
+        // AUDITORÍA
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('CAPTURA', `Registró a nuevo beneficiario: ${simpatizanteData.nombre}`);
+
         // ACTUALIZAR MEMORIA LOCAL SIN LEER FIREBASE
         window.registrosGlobalesMemoria[nuevoDocRef.id] = simpatizanteData;
         aplicarFiltros(); // Refresca las tablas
@@ -1746,8 +2222,38 @@
       });
     }
 
+    window.validarBorradoMasivo = function() {
+      const input = document.getElementById('inputConfirmarBorrado').value;
+      const btn = document.getElementById('btnBorrarTodo');
+      
+      if (input === 'ELIMINAR TODO') {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('hover:bg-red-700');
+      } else {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.classList.remove('hover:bg-red-700');
+      }
+    }
+
+    window.validarBorradoMasivo = function() {
+      const input = document.getElementById('inputConfirmarBorrado').value;
+      const btn = document.getElementById('btnBorrarTodo');
+      
+      if (input === 'ELIMINAR TODO') {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('hover:bg-red-700');
+      } else {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.classList.remove('hover:bg-red-700');
+      }
+    }
+
     async function eliminarTodaLaBaseDeDatos() {
-      if (!confirm("⚠️ ¿ESTÁS SEGURO? Esta acción borrará TODO el padrón de beneficiarios y no se puede deshacer.")) {
+      if (!confirm("⚠️ ALERTA CRÍTICA: Estás a punto de borrar permanentemente toda la información guardada en la base de datos de Firebase. ¿Estás completamente seguro de realizar la purga?")) {
         return;
       }
 
@@ -1912,6 +2418,11 @@
       try {
         await db.collection('simpatizantes').doc(id).delete();
 
+        // 🔥 NUEVO: REGISTRO DE AUDITORÍA AL BORRAR BENEFICIARIO
+        if(typeof registrarAuditoria === 'function') {
+          registrarAuditoria('SISTEMA', `Eliminó del padrón permanentemente a: ${nombre}`);
+        }
+
         // BORRAR DE MEMORIA Y ACTUALIZAR UI SIN LEER FIREBASE
         delete window.registrosGlobalesMemoria[id];
         aplicarFiltros();
@@ -1975,12 +2486,17 @@
         });
     }
 
-    // --- NUEVA FUNCIÓN PARA BORRAR LA ENTREGA ---
+   // --- NUEVA FUNCIÓN PARA BORRAR LA ENTREGA ---
     window.eliminarEntregaApoyo = async function(idEntrega, idBeneficiario, origen) {
       if(confirm("¿Estás seguro de que deseas borrar este registro de entrega? Esta acción no se puede deshacer.")) {
         try {
           // Se elimina el registro de la nube de Firebase
           await db.collection('entregas_apoyos').doc(idEntrega).delete();
+
+          // 🔥 NUEVO: REGISTRO DE AUDITORÍA AL BORRAR APOYO
+          if(typeof registrarAuditoria === 'function') {
+            registrarAuditoria('SISTEMA', `Eliminó un historial de entrega de apoyo`);
+          }
 
           // Actualizar la tabla de forma automática para que desaparezca al instante
           if (origen === 'perfil') {
@@ -2283,19 +2799,33 @@
     }
 
     function switchConfigTab(tab) {
+      // 1. Alternar contenedores HTML
       document.getElementById('config-apariencia').classList.toggle('hidden', tab !== 'apariencia');
       document.getElementById('config-usuarios').classList.toggle('hidden', tab !== 'usuarios');
+      document.getElementById('config-peligro').classList.toggle('hidden', tab !== 'peligro');
 
+      // 2. Obtener botones de las pestañas
       const btnApariencia = document.getElementById('btn-tab-apariencia');
       const btnUsuarios = document.getElementById('btn-tab-usuarios');
+      const btnPeligro = document.getElementById('btn-tab-peligro');
 
+      // 3. Resetear estilos a Inactivos
+      btnApariencia.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
+      btnUsuarios.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
+      btnPeligro.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1";
+
+      // 4. Asignar estilos activos según la pestaña seleccionada
       if (tab === 'apariencia') {
         btnApariencia.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600";
-        btnUsuarios.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent";
-      } else {
+      } else if (tab === 'usuarios') {
         btnUsuarios.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600";
-        btnApariencia.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent";
+      } else if (tab === 'peligro') {
+        btnPeligro.className = "pb-2 text-sm px-1 font-semibold text-red-600 border-b-2 border-red-600 flex items-center gap-1";
+        // Limpiar input de confirmación al entrar a la pestaña por seguridad
+        const inputB = document.getElementById('inputConfirmarBorrado');
+        if(inputB) { inputB.value = ''; validarBorradoMasivo(); }
       }
+      lucide.createIcons();
     }
 
     // --- 10. FUNCIONALIDAD EXPORTAR EXCEL REMOVIDA ---
@@ -2484,6 +3014,10 @@
               descripcion: desc,
               fecha_ultima_modificacion: firebase.firestore.FieldValue.serverTimestamp()
             });
+            
+            // 🔥 NUEVO: Registrar auditoría al EDITAR
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Editó el apoyo del catálogo: ${nombre}`);
+
             alert("Apoyo actualizado correctamente.");
             cancelarEdicionApoyo();
           } else {
@@ -2498,6 +3032,10 @@
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp(),
               creado_por: auth.currentUser ? auth.currentUser.email : 'Admin'
             });
+
+            // 🔥 NUEVO: Registrar auditoría al CREAR
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('CAPTURA', `Registró un nuevo apoyo en el catálogo: ${nombre}`);
+
             this.reset();
           }
         } catch (error) {
@@ -2591,6 +3129,18 @@
           `;
         });
         lucide.createIcons();
+
+        // 🔥 NUEVO: Llenar el filtro de asignaciones con los apoyos
+        const filtroApoyo = document.getElementById('ca_filtro_apoyo');
+        if(filtroApoyo) {
+          const valorActual = filtroApoyo.value;
+          filtroApoyo.innerHTML = '<option value="TODOS">Apoyo (Todos)</option>';
+          listaApoyosDisponibles.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(ap => {
+            filtroApoyo.add(new Option(ap.nombre, ap.nombre));
+          });
+          if(Array.from(filtroApoyo.options).some(o=>o.value===valorActual)) filtroApoyo.value = valorActual;
+        }
+
       });
     }
 
@@ -2599,6 +3149,11 @@
         try {
           if (idApoyoEditando === id) cancelarEdicionApoyo();
           await db.collection('catalogo_apoyos').doc(id).delete();
+
+          // 🔥 NUEVO: Registrar auditoría al BORRAR
+          if(typeof registrarAuditoria === 'function') {
+            registrarAuditoria('SISTEMA', `Eliminó del catálogo el apoyo: ${nombre}`);
+          }
         } catch(error) {
           console.error("Error al borrar apoyo", error);
           alert("Error al intentar eliminar el apoyo.");
@@ -2610,6 +3165,25 @@
     let ca_paginaActual = 1;
     const ca_registrosPorPagina = 10;
     let ca_datosFiltrados = [];
+    window.entregasGlobalesMemoria = {}; // <-- NUEVO: Mapa de entregas
+
+    // 🔥 NUEVO: Escuchar todas las entregas de apoyos en segundo plano para filtrado ultra rápido
+    db.collection('entregas_apoyos').onSnapshot(snap => {
+      window.entregasGlobalesMemoria = {};
+      snap.forEach(doc => {
+        const data = doc.data();
+        if(!window.entregasGlobalesMemoria[data.id_beneficiario]) {
+          window.entregasGlobalesMemoria[data.id_beneficiario] = [];
+        }
+        window.entregasGlobalesMemoria[data.id_beneficiario].push(data.nombre_apoyo);
+      });
+      
+      // Refrescar la tabla en vivo si el usuario está en la pestaña de asignación
+      const tabAsignacion = document.getElementById('tab-apoyos-asignacion');
+      if(tabAsignacion && !tabAsignacion.classList.contains('hidden')) {
+        aplicarFiltrosCA(false);
+      }
+    });
 
     function actualizarFiltrosDesplegablesCA() {
       const secciones = new Set();
@@ -2636,17 +3210,22 @@
 
       const f_nom = document.getElementById('ca_filtro_nombre').value.toUpperCase();
       const f_sec = document.getElementById('ca_filtro_seccion').value;
-      const f_simpatia = document.getElementById('ca_filtro_simpatia').value; // <-- LÍNEA NUEVA
+      const f_simpatia = document.getElementById('ca_filtro_simpatia').value;
+      const f_apoyo = document.getElementById('ca_filtro_apoyo').value; // 🔥 NUEVO FILTRO
 
       const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
 
       ca_datosFiltrados = allData.filter(d => {
         const nom = (d.nombre || '').toUpperCase();
         const sec = (d.seccion || '').toUpperCase();
+        const apoyosDelBeneficiario = window.entregasGlobalesMemoria[d.id] || [];
 
         if (f_nom && !nom.includes(f_nom)) return false;
         if (f_sec !== 'TODAS' && sec !== f_sec) return false;
-        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false; // <-- LÍNEA NUEVA
+        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false;
+        
+        // 🔥 NUEVA LÓGICA: Si seleccionó un apoyo específico, y el usuario no lo tiene, se oculta
+        if (f_apoyo !== 'TODOS' && !apoyosDelBeneficiario.includes(f_apoyo)) return false;
 
         return true;
       });
@@ -2684,7 +3263,6 @@
           </td>
           <td class="px-4 py-3 text-xs font-bold text-center text-slate-600">${d.seccion || '--'}</td>
           <td class="px-4 py-3 text-xs text-slate-500">${d.casilla || '--'}</td>
-          <td class="px-4 py-3 text-xs text-slate-500">${d.municipio || '--'}</td>
           <td class="px-4 py-3 text-center">
             <button onclick="abrirModalAsignarApoyo('${d.id}', '${d.nombre}')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1 mx-auto">
               <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Asignar
@@ -2818,6 +3396,9 @@
           fecha_entrega: firebase.firestore.FieldValue.serverTimestamp(), // Marca de tiempo real del servidor
           capturista: auth.currentUser ? auth.currentUser.email : 'Admin'
         });
+        
+        // AUDITORÍA
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Otorgó [${nombreApoyo}] a ${nombreBeneficiario}`);
 
         // Limpiamos los campos para poder meter otro si quiere
         document.getElementById('ma_select_apoyo').value = '';
@@ -3018,6 +3599,236 @@
           alert("Error al intentar eliminar el usuario.");
         }
       }
+    }
+
+    // --- 14. MÓDULO DE SEGURIDAD Y AUDITORÍA ---
+    window.userIP = null; // Almacenamos la IP globalmente
+
+    async function obtenerIP() {
+      if (window.userIP) return window.userIP;
+      try {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const d = await r.json();
+        window.userIP = d.ip;
+        return d.ip;
+      } catch(e) {
+        return 'IP_Desconocida';
+      }
+    }
+
+    function getBrowserInfo() {
+      const ua = navigator.userAgent;
+      let browser = "Desconocido";
+      if (ua.includes("Firefox")) browser = "Firefox";
+      else if (ua.includes("SamsungBrowser")) browser = "Samsung Browser";
+      else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+      else if (ua.includes("Trident") || ua.includes("MSIE")) browser = "Internet Explorer";
+      else if (ua.includes("Edge")) browser = "Edge";
+      else if (ua.includes("Chrome")) browser = "Chrome";
+      else if (ua.includes("Safari")) browser = "Safari";
+
+      let os = "Desconocido";
+      if (ua.indexOf("Win") !== -1) os = "Windows";
+      if (ua.indexOf("Mac") !== -1) os = "MacOS/iOS";
+      if (ua.indexOf("X11") !== -1) os = "UNIX";
+      if (ua.indexOf("Linux") !== -1) os = "Linux";
+      if (ua.indexOf("Android") !== -1) os = "Android";
+
+      return `${browser} en ${os}`;
+    }
+
+    window.registrarAuditoria = async function(tipo, accion) {
+      if (!auth.currentUser) return; // Solo si está logueado
+      const ip = await obtenerIP();
+      const navegador = getBrowserInfo();
+
+      db.collection('auditoria_logs').add({
+        email: auth.currentUser.email,
+        tipo: tipo, // EJ: LOGIN, CAPTURA, ASIGNACIÓN, EDICIÓN
+        accion: accion,
+        ip_publica: ip,
+        navegador_os: navegador,
+        fecha_hora: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(e => console.warn("Log silencioso falló:", e));
+    }
+
+    window.cargarTarjetasSeguridad = function() {
+      const grid = document.getElementById('seguridad-usuarios-grid');
+      if (!grid) return;
+
+      grid.innerHTML = '<div class="col-span-full py-10 text-center text-indigo-500"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-3"></i> Cargando usuarios...</div>';
+      lucide.createIcons();
+
+      db.collection('usuarios_acceso').orderBy('fecha_registro', 'desc').onSnapshot(snap => {
+        grid.innerHTML = '';
+
+        if (snap.empty) {
+          grid.innerHTML = '<div class="col-span-full py-10 text-center text-slate-500">No hay usuarios registrados en el sistema.</div>';
+          return;
+        }
+
+        snap.forEach(doc => {
+          const data = doc.data();
+          const email = data.email;
+          const nombre = data.nombre || 'Usuario';
+          const rol = data.rol || 'Sin Rol';
+
+          // Asignar colores según el rol (como en el diseño)
+          let roleColor = 'text-slate-600 border-slate-200';
+          if(rol.toUpperCase().includes('ADMIN')) roleColor = 'text-indigo-600 border-indigo-200';
+          else if(rol.toUpperCase().includes('CAPTURISTA')) roleColor = 'text-emerald-600 border-emerald-200';
+
+          grid.innerHTML += `
+            <div class="bg-[#fcfcfb] rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col relative group">
+              <div class="flex items-center gap-4 mb-5 cursor-pointer" onclick="abrirPerfilSeguridad('${email}')" title="Ver Auditoría del Usuario">
+                <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border-4 border-white shadow-sm group-hover:scale-105 transition-transform">
+                  <i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-black text-slate-800 truncate group-hover:text-indigo-600 transition-colors">${nombre}</h4>
+                  <p class="text-[11px] font-bold text-blue-500 truncate mt-0.5">@${email.split('@')[0]}</p>
+                </div>
+              </div>
+              
+              <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
+                <span class="px-3 py-1 rounded bg-white text-[10px] font-bold uppercase tracking-wide border shadow-sm ${roleColor}">${rol}</span>
+                
+                <div class="flex items-center gap-2">
+                  <button onclick="abrirPerfilSeguridad('${email}')" class="p-1.5 text-orange-400 hover:bg-orange-50 rounded transition-colors" title="Auditar Usuario">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Revocar Acceso">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                  <div class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm ml-1" title="Activo"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        lucide.createIcons();
+      }, error => {
+         console.error(error);
+         grid.innerHTML = '<div class="col-span-full py-10 text-center text-red-500 font-bold">Error cargando usuarios. Revisa tus permisos.</div>';
+      });
+    }
+
+    window.abrirPerfilSeguridad = async function(email) {
+      if(!email || email === 'Desconocido') return;
+      
+      document.getElementById('modalPerfilSeguridad').classList.remove('hidden');
+      document.getElementById('ms_email_display').textContent = email;
+      
+      const tbAccesos = document.getElementById('ms_tabla_accesos');
+      const tbActividad = document.getElementById('ms_tabla_actividad');
+      
+      tbAccesos.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center"><i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto text-indigo-500"></i></td></tr>';
+      tbActividad.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center"><i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto text-indigo-500"></i></td></tr>';
+      lucide.createIcons();
+
+      try {
+        const userDoc = await db.collection('usuarios_acceso').doc(email).get();
+        if(userDoc.exists) {
+          const ud = userDoc.data();
+          document.getElementById('ms_nombre_display').textContent = ud.nombre || 'Sin Nombre';
+          document.getElementById('ms_rol_display').textContent = ud.rol || 'USUARIO';
+        } else {
+          document.getElementById('ms_nombre_display').textContent = 'Usuario Eliminado';
+          document.getElementById('ms_rol_display').textContent = 'INACTIVO';
+        }
+      } catch(e) { console.error(e); }
+
+      // Traer historial específico (Solución sin Índice Compuesto)
+      db.collection('auditoria_logs')
+        .where('email', '==', email)
+        .get()
+        .then(snap => {
+          tbAccesos.innerHTML = '';
+          tbActividad.innerHTML = '';
+
+          let totalLogins = 0;
+          let totalAcciones = 0;
+          let ultimaIP = '--';
+
+          if(snap.empty) {
+            tbAccesos.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-slate-500">No hay accesos recientes.</td></tr>';
+            tbActividad.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-slate-500">No hay actividad reciente.</td></tr>';
+            document.getElementById('ms_total_logins').textContent = '0';
+            document.getElementById('ms_total_acciones').textContent = '0';
+            document.getElementById('ms_ultima_ip').textContent = '--';
+            return;
+          }
+
+          let firstLogin = true;
+
+          // 1. Extraer los datos a un arreglo
+          let logs = [];
+          snap.forEach(doc => logs.push(doc.data()));
+
+          // 2. Ordenar en memoria con JS (descendente, más reciente primero)
+          logs.sort((a, b) => {
+            let t1 = a.fecha_hora ? (a.fecha_hora.seconds || 0) : 0;
+            let t2 = b.fecha_hora ? (b.fecha_hora.seconds || 0) : 0;
+            return t2 - t1;
+          });
+
+          // 3. Limitar a los 200 más recientes
+          logs = logs.slice(0, 200);
+
+          // 4. Iterar sobre el arreglo ordenado
+          logs.forEach(d => {
+            const fechaStr = d.fecha_hora && d.fecha_hora.toDate ? d.fecha_hora.toDate().toLocaleString('es-MX', {dateStyle:'short', timeStyle:'short'}) : 'Reciente';
+            
+            // Si el Log es de tipo LOGIN...
+            if (d.tipo === 'LOGIN') {
+              totalLogins++;
+              if (firstLogin) {
+                ultimaIP = d.ip_publica || 'Desconocida';
+                firstLogin = false;
+              }
+              tbAccesos.innerHTML += `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-4 py-2 text-[10px] font-bold text-slate-500">${fechaStr}</td>
+                  <td class="px-4 py-2 text-[10px] font-mono font-bold text-indigo-600">${d.ip_publica || 'Local'}</td>
+                  <td class="px-4 py-2 text-[10px] text-slate-500 truncate max-w-[200px]" title="${d.navegador_os || ''}">${d.navegador_os || '--'}</td>
+                </tr>
+              `;
+            } else {
+              totalAcciones++;
+              let colorTipo = 'text-slate-600 bg-slate-100';
+              if (d.tipo === 'CAPTURA') colorTipo = 'text-emerald-700 bg-emerald-100 border border-emerald-200';
+              else if (d.tipo === 'ASIGNACIÓN') colorTipo = 'text-amber-700 bg-amber-100 border border-amber-200';
+              else if (d.tipo === 'SISTEMA') colorTipo = 'text-red-700 bg-red-100 border border-red-200';
+
+              tbActividad.innerHTML += `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-4 py-2.5 text-[10px] font-bold text-slate-500 whitespace-nowrap">${fechaStr}</td>
+                  <td class="px-4 py-2.5 text-center">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black tracking-wider uppercase ${colorTipo}">${d.tipo || 'ACCIÓN'}</span>
+                  </td>
+                  <td class="px-4 py-2.5 text-xs text-slate-700 font-medium">${d.accion}</td>
+                </tr>
+              `;
+            }
+          });
+
+          if(totalLogins === 0) tbAccesos.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-slate-500">No hay accesos recientes.</td></tr>';
+          if(totalAcciones === 0) tbActividad.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-slate-500">No hay actividad reciente.</td></tr>';
+
+          // Actualizar KPIs
+          document.getElementById('ms_total_logins').textContent = totalLogins;
+          document.getElementById('ms_total_acciones').textContent = totalAcciones;
+          document.getElementById('ms_ultima_ip').textContent = ultimaIP;
+
+        }).catch(err => {
+          console.error(err);
+          tbAccesos.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-red-500 font-bold">Error de lectura.</td></tr>';
+          tbActividad.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-[10px] text-red-500 font-bold">Error de lectura.</td></tr>';
+        });
+    }
+
+    window.cerrarPerfilSeguridad = function() {
+      document.getElementById('modalPerfilSeguridad').classList.add('hidden');
     }
 
     // Disparador inicial (Global)
