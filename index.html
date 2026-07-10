@@ -1102,6 +1102,15 @@
               </div>
 
               <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
+                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="network" class="w-4 h-4 text-indigo-500"></i> Grupos de este ciudadano</h4>
+                <div id="mp_grupos_contenedor" class="flex flex-wrap gap-2">
+                  <span class="text-xs text-slate-400 italic">Cargando...</span>
+                </div>
+              </div>
+
+              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
+                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="gift" class="w-4 h-4 text-indigo-500"></i> Historial de Apoyos Recibidos</h4>
+              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
                 <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="gift" class="w-4 h-4 text-indigo-500"></i> Historial de Apoyos Recibidos</h4>
                 <div class="border border-slate-200 rounded-lg overflow-hidden">
                   <table class="w-full text-left text-sm">
@@ -2635,6 +2644,23 @@
 
       document.getElementById('modalPerfil').classList.remove('hidden');
       lucide.createIcons();
+
+      // --- NUEVO: CARGAR LOS GRUPOS DEL CIUDADANO DESDE LA MEMORIA ---
+      const gruposContenedor = document.getElementById('mp_grupos_contenedor');
+      if (gruposContenedor) {
+        const misGrupos = window.miembrosGruposMemoria[id] || [];
+        if (misGrupos.length === 0) {
+          gruposContenedor.innerHTML = '<span class="text-xs text-slate-400 italic bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-center w-full">No pertenece a ninguna estructura o grupo aún.</span>';
+        } else {
+          gruposContenedor.innerHTML = misGrupos.map(g => 
+            `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg text-[11px] font-bold shadow-sm">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-indigo-500"></i> ${g.nombre_grupo}
+            </span>`
+          ).join('');
+          lucide.createIcons();
+        }
+      }
+      // ---------------------------------------------------------------
 
       const tbodyHistorial = document.getElementById('mp_tabla_historial');
       tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-indigo-500"></i></td></tr>';
