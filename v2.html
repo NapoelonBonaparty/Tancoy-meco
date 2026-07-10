@@ -136,6 +136,7 @@
         <button onclick="navigate('censo')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="censo"> <i data-lucide="users" class="w-4 h-4"></i> Padrón de Beneficiarios </button>
         <button onclick="navigate('padron-electoral'); renderizarPadronElectoral();" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="padron-electoral"> <i data-lucide="list-checks" class="w-4 h-4"></i> Padrón Electoral </button>
         <button onclick="navigate('apoyos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="apoyos"> <i data-lucide="gift" class="w-4 h-4"></i> Gestión de Apoyos </button>
+        <button onclick="navigate('grupos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="grupos"> <i data-lucide="network" class="w-4 h-4"></i> Gestión de Grupos </button>
         <button onclick="navigate('seguridad')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="seguridad"> <i data-lucide="shield" class="w-4 h-4"></i> Seguridad </button>
         <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
@@ -676,6 +677,103 @@
           </div>
         </div>
       </section>
+      
+
+
+      <section id="page-grupos" class="p-6 space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Gestión de Grupos</h2>
+            <p class="text-sm text-slate-500">Creación de grupos ciudadanos y asignación de miembros.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-6 border-b border-slate-200 dark:border-slate-700 mb-4">
+          <button id="btn-tab-grupos-catalogo" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2" onclick="switchGruposTab('catalogo')">
+            <i data-lucide="folder-tree" class="w-4 h-4"></i> Catálogo de Grupos
+          </button>
+          <button id="btn-tab-grupos-asignacion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchGruposTab('asignacion')">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Asignación de Miembros
+          </button>
+        </div>
+
+        <div id="tab-grupos-catalogo" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm h-fit">
+            <h3 class="text-sm font-semibold mb-5 flex items-center gap-2 text-slate-800 dark:text-white">
+              <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-lg"><i data-lucide="network" class="w-4 h-4"></i></div>
+              <span>Nuevo Grupo</span>
+            </h3>
+
+            <form id="formNuevoGrupo" class="space-y-4">
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-1">Nombre del Grupo</label>
+                <input type="text" id="grupo_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 uppercase" placeholder="Ej. LÍDERES ZONA SUR">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-1">Descripción / Propósito</label>
+                <textarea id="grupo_desc" rows="3" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Detalles del grupo..."></textarea>
+              </div>
+              <button type="submit" id="btnGuardarGrupo" class="w-full px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-lg mt-2 transition-colors flex justify-center items-center gap-2 shadow-sm">
+                Crear Grupo
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-800">Grupos Activos</h3>
+              <span id="totalGruposBadge" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">0</span>
+            </div>
+            <div class="overflow-x-auto max-h-[500px]">
+              <table class="w-full text-left text-sm">
+                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 py-3 font-semibold">Grupo</th>
+                    <th class="px-4 py-3 text-center font-semibold w-28">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaGrupos" class="divide-y divide-slate-100 bg-white">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-grupos-asignacion" class="hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50">
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="flex-1 min-w-[200px] relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                  </div>
+                  <input type="text" id="gr_filtro_nombre" onkeyup="aplicarFiltrosGrAsignacion()" placeholder="Buscar ciudadano..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:border-indigo-500">
+                </div>
+                <select id="gr_filtro_grupo" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-64 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:border-indigo-500">
+                  <option value="TODOS">Todos los Grupos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="bg-white border-b border-slate-200">
+                  <tr>
+                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Beneficiario</th>
+                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center">Grupos Actuales</th>
+                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-36">Asignar</th>
+                  </tr>
+                </thead>
+                <tbody id="tableAsignacionGrupos" class="divide-y divide-slate-100 bg-white">
+                </tbody>
+              </table>
+            </div>
+            <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs border-t border-slate-100">
+              <div class="flex items-center gap-1" id="gr_contenedorBotonesPaginas"></div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section id="page-seguridad" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
@@ -727,6 +825,7 @@
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="grupos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Grupos</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                   </div>
@@ -1063,6 +1162,46 @@
         </div>
       </div>
     </div>
+    <div id="modalAsignarGrupo" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50">
+          <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2"><i data-lucide="network" class="w-4 h-4 text-indigo-600"></i> Integrar a Grupo</h3>
+          <button onclick="cerrarModalAsignarGrupo()" class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 hover:bg-slate-100 transition-colors">
+            <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
+          </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto">
+          <div class="text-center mb-6">
+            <h2 id="mg_nombre_display" class="text-lg font-black text-slate-800 uppercase tracking-wide">--</h2>
+            <p class="text-xs text-slate-500 mt-1">Selecciona el grupo al que deseas añadir a este ciudadano.</p>
+          </div>
+
+          <form id="formAsignarGrupo" class="space-y-4">
+            <input type="hidden" id="mg_id_beneficiario">
+            <input type="hidden" id="mg_nombre_beneficiario">
+            
+            <div>
+              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Grupo Disponible</label>
+              <select id="mg_select_grupo" required class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                <option value="">Selecciona un grupo</option>
+              </select>
+            </div>
+            
+            <button type="submit" id="btnConfirmarAsignacionGrupo" class="w-full px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm mt-4">
+              <i data-lucide="plus" class="w-4 h-4"></i> Añadir al Grupo
+            </button>
+          </form>
+
+          <div class="mt-8 pt-4 border-t border-slate-100">
+            <h4 class="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Grupos a los que ya pertenece</h4>
+            <ul id="mg_lista_grupos_actuales" class="space-y-2">
+              <li class="text-xs text-slate-400 italic">Cargando...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div id="modalPerfilSeguridad" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl overflow-hidden flex flex-col max-h-[95vh]">
@@ -1221,6 +1360,7 @@
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500"> Padrón de Beneficiarios</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500"> Padrón Electoral</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500"> Gestión de Apoyos</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="grupos" class="rounded text-indigo-600 focus:ring-indigo-500"> Gestión de Grupos</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                   </div>
@@ -1382,6 +1522,7 @@
           initMap();
           leerRegistrosEnTiempoReal();
           escucharCatalogoApoyos();
+          if (typeof escucharCatalogoGrupos === "function") escucharCatalogoGrupos();
           if (typeof escucharUsuariosActivos === "function") escucharUsuariosActivos();
         }, 300);
 
@@ -4034,6 +4175,257 @@
 
     window.cerrarPerfilSeguridad = function() {
       document.getElementById('modalPerfilSeguridad').classList.add('hidden');
+    }
+    // --- MÓDULO DE GRUPOS (LÓGICA) ---
+    let gr_paginaActual = 1;
+    const gr_registrosPorPagina = 10;
+    let gr_datosFiltrados = [];
+    let listaGruposCatalogo = [];
+    window.miembrosGruposMemoria = {}; // Mapa: id_beneficiario -> arreglo de objetos con grupo
+
+    // 1. Escuchar membresías en tiempo real
+    db.collection('miembros_grupos').onSnapshot(snap => {
+      window.miembrosGruposMemoria = {};
+      snap.forEach(doc => {
+        const data = doc.data();
+        if(!window.miembrosGruposMemoria[data.id_beneficiario]) {
+          window.miembrosGruposMemoria[data.id_beneficiario] = [];
+        }
+        window.miembrosGruposMemoria[data.id_beneficiario].push({ idRelacion: doc.id, nombre_grupo: data.nombre_grupo });
+      });
+      // Refrescar tabla si estamos en la vista
+      const tabAsignacion = document.getElementById('tab-grupos-asignacion');
+      if(tabAsignacion && !tabAsignacion.classList.contains('hidden')) aplicarFiltrosGrAsignacion(false);
+    });
+
+    // 2. Control de Pestañas
+    window.switchGruposTab = function(tab) {
+      document.getElementById('tab-grupos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
+      document.getElementById('tab-grupos-asignacion').classList.toggle('hidden', tab !== 'asignacion');
+
+      const btnCat = document.getElementById('btn-tab-grupos-catalogo');
+      const btnAsig = document.getElementById('btn-tab-grupos-asignacion');
+      const activeClass = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
+      const inactiveClass = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2";
+
+      if(btnCat) btnCat.className = tab === 'catalogo' ? activeClass : inactiveClass;
+      if(btnAsig) btnAsig.className = tab === 'asignacion' ? activeClass : inactiveClass;
+
+      if(tab === 'asignacion') aplicarFiltrosGrAsignacion(true);
+      lucide.createIcons();
+    }
+
+    // 3. Crear/Editar Grupo en Catálogo
+    let idGrupoEditando = null;
+    const formNuevoGrupo = document.getElementById('formNuevoGrupo');
+    if(formNuevoGrupo) {
+      formNuevoGrupo.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnGuardarGrupo');
+        const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
+        const desc = document.getElementById('grupo_desc').value.trim();
+
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+        btn.disabled = true;
+
+        try {
+          if(idGrupoEditando) {
+            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ nombre, descripcion: desc });
+            alert("Grupo actualizado.");
+            idGrupoEditando = null;
+            btn.textContent = 'Crear Grupo';
+          } else {
+            await db.collection('catalogo_grupos').add({
+              nombre, descripcion: desc, 
+              fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
+          }
+          this.reset();
+        } catch(e) {
+          alert("Error al guardar grupo.");
+        } finally {
+          btn.innerHTML = 'Crear Grupo';
+          btn.disabled = false;
+          lucide.createIcons();
+        }
+      });
+    }
+
+    // 4. Leer Catálogo de Grupos
+    window.escucharCatalogoGrupos = function() {
+      db.collection('catalogo_grupos').orderBy('nombre').onSnapshot(snap => {
+        document.getElementById('totalGruposBadge').textContent = snap.size;
+        const tbody = document.getElementById('tablaGrupos');
+        tbody.innerHTML = '';
+        listaGruposCatalogo = [];
+
+        if(snap.empty) {
+          tbody.innerHTML = '<tr><td colspan="2" class="px-4 py-8 text-center text-sm text-slate-400">No hay grupos.</td></tr>';
+        } else {
+          snap.forEach(doc => {
+            const d = doc.data();
+            listaGruposCatalogo.push({id: doc.id, nombre: d.nombre});
+            tbody.innerHTML += `
+              <tr class="hover:bg-slate-50 border-b border-slate-100">
+                <td class="px-4 py-3"><p class="font-bold text-slate-800 text-xs">${d.nombre}</p><p class="text-[10px] text-slate-500">${d.descripcion || ''}</p></td>
+                <td class="px-4 py-3 text-center">
+                  <button onclick="borrarGrupoCatalogo('${doc.id}', '${d.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </td>
+              </tr>`;
+          });
+        }
+        
+        // Alimentar selectores
+        const selFiltro = document.getElementById('gr_filtro_grupo');
+        const valSel = selFiltro ? selFiltro.value : 'TODOS';
+        if(selFiltro) {
+          selFiltro.innerHTML = '<option value="TODOS">Todos los Grupos</option>';
+          listaGruposCatalogo.forEach(g => selFiltro.add(new Option(g.nombre, g.nombre)));
+          selFiltro.value = valSel;
+        }
+        lucide.createIcons();
+      });
+    }
+
+    window.borrarGrupoCatalogo = async function(id, nombre) {
+      if(confirm(`¿Borrar el grupo ${nombre}?\nLos usuarios seguirán con la asignación histórica, pero el grupo desaparecerá del catálogo.`)){
+        await db.collection('catalogo_grupos').doc(id).delete();
+      }
+    }
+
+    // 5. Asignación y Filtrado
+    window.aplicarFiltrosGrAsignacion = function(resetPage = true) {
+      if(resetPage) gr_paginaActual = 1;
+      const f_nom = document.getElementById('gr_filtro_nombre').value.toUpperCase();
+      const f_grupo = document.getElementById('gr_filtro_grupo').value;
+      
+      const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
+      
+      gr_datosFiltrados = allData.filter(d => {
+        const nom = (d.nombre || '').toUpperCase();
+        const userGroups = window.miembrosGruposMemoria[d.id] || [];
+        const groupNames = userGroups.map(g => g.nombre_grupo);
+
+        if(f_nom && !nom.includes(f_nom)) return false;
+        if(f_grupo !== 'TODOS' && !groupNames.includes(f_grupo)) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('tableAsignacionGrupos');
+      tbody.innerHTML = '';
+      if(gr_datosFiltrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-slate-500">Sin resultados.</td></tr>';
+        document.getElementById('gr_contenedorBotonesPaginas').innerHTML = '';
+        return;
+      }
+
+      const totalPag = Math.ceil(gr_datosFiltrados.length / gr_registrosPorPagina);
+      if (gr_paginaActual > totalPag) gr_paginaActual = totalPag;
+      const inicio = (gr_paginaActual - 1) * gr_registrosPorPagina;
+      const segmento = gr_datosFiltrados.slice(inicio, inicio + gr_registrosPorPagina);
+
+      segmento.forEach(d => {
+        const userGroups = window.miembrosGruposMemoria[d.id] || [];
+        let badgesHtml = userGroups.map(g => `<span class="inline-block px-1.5 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded text-[9px] font-bold mx-0.5 mb-1">${g.nombre_grupo}</span>`).join('');
+        if(badgesHtml === '') badgesHtml = '<span class="text-[10px] text-slate-400">Sin grupo</span>';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="px-4 py-3 text-xs font-bold text-slate-800">${d.nombre || '--'}</td>
+            <td class="px-4 py-3 text-center max-w-[200px] flex-wrap justify-center">${badgesHtml}</td>
+            <td class="px-4 py-3 text-center">
+              <button onclick="abrirModalAsignarGrupo('${d.id}', '${d.nombre}')" class="px-3 py-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg text-xs font-bold transition-colors">
+                 Gestionar
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      renderizarBotonesPagGr(totalPag);
+    }
+
+    function renderizarBotonesPagGr(totalPag) {
+      const cont = document.getElementById('gr_contenedorBotonesPaginas');
+      cont.innerHTML = '';
+      const bPrev = document.createElement('button');
+      bPrev.className = `p-1.5 border rounded-lg hover:bg-slate-50 ${gr_paginaActual===1?'opacity-50':''}`;
+      bPrev.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>';
+      bPrev.onclick = () => { if(gr_paginaActual>1){ gr_paginaActual--; aplicarFiltrosGrAsignacion(false); }};
+      cont.appendChild(bPrev);
+
+      let bNext = document.createElement('button');
+      bNext.className = `p-1.5 border rounded-lg hover:bg-slate-50 ${gr_paginaActual===totalPag?'opacity-50':''}`;
+      bNext.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>';
+      bNext.onclick = () => { if(gr_paginaActual<totalPag){ gr_paginaActual++; aplicarFiltrosGrAsignacion(false); }};
+      cont.appendChild(bNext);
+      lucide.createIcons();
+    }
+
+    // 6. Lógica Modal
+    window.abrirModalAsignarGrupo = function(idBeneficiario, nombre) {
+      document.getElementById('mg_id_beneficiario').value = idBeneficiario;
+      document.getElementById('mg_nombre_display').textContent = nombre;
+      
+      const sel = document.getElementById('mg_select_grupo');
+      sel.innerHTML = '<option value="">Selecciona un grupo</option>';
+      listaGruposCatalogo.forEach(g => sel.add(new Option(g.nombre, g.nombre)));
+
+      actualizarListaGruposActuales(idBeneficiario);
+      document.getElementById('modalAsignarGrupo').classList.remove('hidden');
+    }
+
+    window.cerrarModalAsignarGrupo = function() {
+      document.getElementById('modalAsignarGrupo').classList.add('hidden');
+      document.getElementById('formAsignarGrupo').reset();
+    }
+
+    function actualizarListaGruposActuales(idBeneficiario) {
+      const listaUl = document.getElementById('mg_lista_grupos_actuales');
+      const misGrupos = window.miembrosGruposMemoria[idBeneficiario] || [];
+      listaUl.innerHTML = '';
+      if(misGrupos.length === 0) {
+        listaUl.innerHTML = '<li class="text-xs text-slate-400">No pertenece a ningún grupo.</li>';
+        return;
+      }
+      misGrupos.forEach(g => {
+        listaUl.innerHTML += `
+          <li class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
+            <span class="text-xs font-bold text-slate-700">${g.nombre_grupo}</span>
+            <button type="button" onclick="quitarDeGrupo('${g.idRelacion}')" class="text-red-500 hover:text-red-700 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </li>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('formAsignarGrupo').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const idBen = document.getElementById('mg_id_beneficiario').value;
+      const nombreGrp = document.getElementById('mg_select_grupo').value;
+      
+      // Validar si ya está en el grupo
+      const misGrupos = window.miembrosGruposMemoria[idBen] || [];
+      if(misGrupos.some(g => g.nombre_grupo === nombreGrp)) {
+        alert("El ciudadano ya pertenece a este grupo."); return;
+      }
+
+      try {
+        await db.collection('miembros_grupos').add({
+          id_beneficiario: idBen,
+          nombre_grupo: nombreGrp,
+          fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        setTimeout(() => actualizarListaGruposActuales(idBen), 500); // Dar tiempo al snapshot
+      } catch(error) { alert("Error al asignar."); }
+    });
+
+    window.quitarDeGrupo = async function(idRelacion) {
+      if(confirm("¿Quitar al ciudadano de este grupo?")) {
+        await db.collection('miembros_grupos').doc(idRelacion).delete();
+        const idBen = document.getElementById('mg_id_beneficiario').value;
+        setTimeout(() => actualizarListaGruposActuales(idBen), 500);
+      }
     }
 
     // Disparador inicial (Global)
