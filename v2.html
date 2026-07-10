@@ -142,8 +142,9 @@
 
       <div class="p-3 border-t border-slate-200 dark:border-slate-700">
         <div class="flex items-center gap-2 px-2 py-2">
-          <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0">
-            <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+          <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 overflow-hidden" id="sidebarAvatarContainer">
+            <i data-lucide="user" id="sidebarAvatarIcon" class="w-4 h-4 text-indigo-600"></i>
+            <img id="sidebarAvatarImage" src="" class="w-full h-full object-cover hidden" alt="Mi Perfil">
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-xs font-medium truncate" id="userDisplay">Cargando...</p>
@@ -733,52 +734,70 @@
           </div>
         </div>
 
-        <div id="config-usuarios" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-1 bg-white rounded-xl p-6 border border-slate-200 shadow-sm h-fit">
-            <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-indigo-500"></i> Nuevo Usuario</h3>
-            <form id="formUsuario" class="space-y-4">
-              <div><label class="text-xs text-slate-500 block mb-1">Nombre Completo</label><input type="text" id="u_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
-              <div><label class="text-xs text-slate-500 block mb-1">Correo Electrónico</label><input type="email" id="u_email" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
-              
-              <div><label class="text-xs text-slate-500 block mb-1">Contraseña (Mínimo 6 caracteres)</label><input type="password" id="u_password" required minlength="6" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></div>
-              
-              <div><label class="text-xs text-slate-500 block mb-1">Rol del Sistema</label>
-                <select id="u_rol" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 transition-colors">
-                  <option value="Administrador Estatal">Administrador Estatal</option>
-                  <option value="Capturista">Capturista</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="text-xs text-slate-500 block mb-2 font-bold">Permisos de Módulos (Menú Lateral)</label>
-                <div class="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50/50">
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="dashboard" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Panel Principal</label>
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
-                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
+        <div id="config-usuarios" class="hidden flex flex-col gap-6 w-full">
+          
+                    <div id="panelNuevoUsuario" class="hidden bg-white rounded-xl p-6 border border-slate-200 shadow-sm relative transition-all">
+            <button onclick="togglePanelUsuario()" class="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="Cerrar Panel">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-sm font-semibold mb-6 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="user-plus" class="w-5 h-5 text-indigo-500"></i> Registro de Nuevo Usuario
+            </h3>
+            
+            <form id="formUsuario" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-5">
+                <div><label class="text-xs font-bold text-slate-500 block mb-1">Nombre Completo</label><input type="text" id="u_nombre" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Ej. Carlos Mendoza"></div>
+                <div><label class="text-xs font-bold text-slate-500 block mb-1">Correo Electrónico</label><input type="email" id="u_email" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="usuario@delta.com"></div>
+                <div><label class="text-xs font-bold text-slate-500 block mb-1">Contraseña (Mínimo 6 caracteres)</label><input type="password" id="u_password" required minlength="6" class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="••••••••"></div>
+                <div><label class="text-xs font-bold text-slate-500 block mb-1">Rol del Sistema</label>
+                  <select id="u_rol" class="w-full text-sm font-bold text-slate-700 px-4 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
+                    <option value="Administrador Estatal">Administrador Estatal</option>
+                    <option value="Capturista">Capturista</option>
+                  </select>
                 </div>
               </div>
-
-              <button type="submit" id="btnGuardarUsuario" class="w-full px-5 py-2.5 bg-slate-800 hover:bg-slate-900 transition-colors text-white text-sm font-bold rounded-lg mt-2 shadow-sm">Crear Cuenta de Usuario</button>
+              
+              <div class="space-y-4 flex flex-col justify-between bg-slate-50/50 p-5 rounded-xl border border-slate-200">
+                <div>
+                  <label class="text-xs font-bold text-slate-500 block mb-3 uppercase tracking-wider">Permisos de Módulos (Menú Lateral)</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="dashboard" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Panel Principal</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
+                  </div>
+                </div>
+                <div class="flex justify-end pt-4 mt-4 border-t border-slate-200">
+                  <button type="submit" id="btnGuardarUsuario" class="w-full md:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 transition-colors text-white text-sm font-bold rounded-lg shadow-sm flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i> Crear Cuenta
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
-          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-fit">
-            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-slate-800">Usuarios Activos</h3>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden w-full">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+              <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-indigo-500"></i> Directorio de Accesos
+              </h3>
+              <button onclick="togglePanelUsuario()" class="px-5 py-2 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Nuevo Usuario
+              </button>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-sm">
-                <thead class="text-xs text-slate-500 bg-slate-50 border-b border-slate-200">
+                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200">
                   <tr>
-                    <th class="px-4 py-3">Nombre</th>
-                    <th class="px-4 py-3">Correo</th>
-                    <th class="px-4 py-3 text-center">Rol</th>
-                    <th class="px-4 py-3 text-center flex items-center justify-center gap-1.5"><i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i> Gestión</th>
+                    <th class="px-4 py-3 font-semibold">Nombre Completo</th>
+                    <th class="px-4 py-3 font-semibold">Correo Electrónico</th>
+                    <th class="px-4 py-3 text-center font-semibold">Rol Asignado</th>
+                    <th class="px-4 py-3 text-center flex items-center justify-center gap-1.5 font-semibold"><i data-lucide="settings" class="w-4 h-4 text-slate-400"></i> Gestión</th>
                   </tr>
                 </thead>
-                <tbody id="tableUsuarios" class="divide-y divide-slate-100"></tbody>
+                <tbody id="tableUsuarios" class="divide-y divide-slate-100 bg-white"></tbody>
               </table>
             </div>
           </div>
@@ -1148,9 +1167,13 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <div class="col-span-1 bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center text-center shadow-sm h-fit">
-              <div class="w-24 h-24 rounded-full bg-indigo-50 border-4 border-white shadow-lg mb-4 flex items-center justify-center overflow-hidden">
-                <i data-lucide="user" class="w-10 h-10 text-indigo-400"></i>
+              <div class="w-24 h-24 rounded-full bg-indigo-50 border-4 border-white shadow-lg mb-4 flex items-center justify-center overflow-hidden relative group" id="mu_foto_container">
+                <i data-lucide="user" id="mu_foto_icon" class="w-10 h-10 text-indigo-400"></i>
+                <img id="mu_foto_preview" src="" class="w-full h-full object-cover hidden">
               </div>
+              
+              <input type="file" id="mu_foto_input" accept="image/png, image/jpeg" class="w-full text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700 cursor-pointer mx-auto mb-4">
+              
               <h4 id="mu_nombre_display" class="text-lg font-black text-slate-800 uppercase tracking-wide">--</h4>
               <p id="mu_email_display" class="text-xs font-bold text-slate-400 mt-1">--</p>
               <span id="mu_rol_display" class="mt-4 px-4 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">--</span>
@@ -1161,8 +1184,9 @@
                 <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3"><i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i> Editar Información y Accesos</h4>
                 
                 <input type="hidden" id="mu_id_doc">
+                <input type="hidden" id="mu_foto_url_actual">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label class="text-[10px] text-slate-400 uppercase font-bold mb-1.5 block">Nombre Completo</label>
                     <input type="text" id="mu_nombre_input" class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all">
@@ -1173,6 +1197,12 @@
                       <option value="Administrador Estatal">Administrador Estatal</option>
                       <option value="Capturista">Capturista</option>
                     </select>
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1.5 block">Nueva Contraseña</label>
+                    <div class="relative">
+                      <input type="password" id="mu_password_input" placeholder="Dejar en blanco..." class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all">
+                    </div>
                   </div>
                 </div>
 
@@ -1263,17 +1293,29 @@
 
     // --- 3. AUTENTICACIÓN Y PERMISOS ---
     
-   // Nueva función para leer permisos y ocultar menús lateral
-    async function aplicarPermisosVisuales(email) {
-        try {
-            const doc = await db.collection('usuarios_acceso').doc(email).get();
-            if (doc.exists) {
-                const data = doc.data();
-                const permisos = data.permisos || []; 
-                
-                document.getElementById('userRole').textContent = data.rol || 'Usuario';
+   // Nueva función para leer permisos, foto de perfil y ocultar menús lateral
+   async function aplicarPermisosVisuales(email) {
+       try {
+           const doc = await db.collection('usuarios_acceso').doc(email).get();
+           if (doc.exists) {
+               const data = doc.data();
+               const permisos = data.permisos || []; 
+               
+               document.getElementById('userRole').textContent = data.rol || 'Usuario';
 
-                // 1. Ocultamos TODOS los items del menú lateral por seguridad
+               // --- NUEVO: Cargar la foto de perfil en la barra lateral ---
+               const sidebarImg = document.getElementById('sidebarAvatarImage');
+               const sidebarIcon = document.getElementById('sidebarAvatarIcon');
+               if (data.foto_url && data.foto_url.trim() !== "") {
+                   sidebarImg.src = data.foto_url;
+                   sidebarImg.classList.remove('hidden');
+                   sidebarIcon.classList.add('hidden');
+               } else {
+                   sidebarImg.classList.add('hidden');
+                   sidebarIcon.classList.remove('hidden');
+               }
+
+               // 1. Ocultamos TODOS los items del menú lateral por seguridad
                 document.querySelectorAll('.sidebar-item').forEach(item => {
                     item.classList.add('hidden'); 
                 });
@@ -1369,7 +1411,33 @@
       });
     }
 
-    document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
+    // --- SISTEMA DE PRESENCIA (ONLINE/OFFLINE) ---
+    async function setEstadoUsuario(estado) {
+      if (auth.currentUser) {
+        try {
+          await db.collection('usuarios_acceso').doc(auth.currentUser.email).update({
+            estado_conexion: estado,
+            ultimo_acceso: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (e) { console.warn("No se pudo actualizar estado:", e); }
+      }
+    }
+
+    // Cambiar a ONLINE cuando detecta que la sesión inició
+    auth.onAuthStateChanged((user) => {
+      if (user) setEstadoUsuario('online');
+    });
+
+    // Cambiar a OFFLINE si el usuario cierra la pestaña o el navegador de golpe
+    window.addEventListener('beforeunload', () => {
+      setEstadoUsuario('offline');
+    });
+
+    // Cambiar a OFFLINE al cerrar sesión explícitamente
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      await setEstadoUsuario('offline');
+      auth.signOut();
+    });
 
     function togglePasswordVisibility() {
       const passInput = document.getElementById('password');
@@ -3420,6 +3488,12 @@
     
   // --- 13. GESTIÓN DE USUARIOS Y PERMISOS ---
     
+    // Función para desplegar/ocultar el formulario nuevo
+    window.togglePanelUsuario = function() {
+      document.getElementById('panelNuevoUsuario').classList.toggle('hidden');
+      lucide.createIcons();
+    };
+
     // A) Lógica exclusiva para CREAR un nuevo usuario
     const formUsuario = document.getElementById('formUsuario');
     if (formUsuario) {
@@ -3468,6 +3542,7 @@
           
           alert("Cuenta de usuario creada exitosamente.");
           formUsuario.reset();
+          togglePanelUsuario(); // <-- Oculta el panel automáticamente al terminar
         } catch (error) {
           console.error("Error al crear usuario:", error);
           if (error.code === 'auth/email-already-in-use') alert("Ese correo electrónico ya está registrado en el sistema.");
@@ -3481,17 +3556,45 @@
       });
     }
 
+    // Evento para previsualizar la foto de perfil seleccionada
+    document.getElementById('mu_foto_input').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('mu_foto_preview').src = event.target.result;
+          document.getElementById('mu_foto_preview').classList.remove('hidden');
+          document.getElementById('mu_foto_icon').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     // B) Lógica del NUEVO MODAL DASHBOARD para EDITAR usuarios
-    window.editarUsuarioAcceso = function(email, nombre, rol, permisosString) {
+    window.editarUsuarioAcceso = function(email, nombre, rol, permisosString, fotoUrl) {
       // 1. Llenar la columna visual del perfil
       document.getElementById('mu_id_doc').value = email;
       document.getElementById('mu_nombre_display').textContent = nombre;
       document.getElementById('mu_email_display').textContent = email;
       document.getElementById('mu_rol_display').textContent = rol;
       
+      // Configurar Foto de Perfil
+      document.getElementById('mu_foto_input').value = '';
+      document.getElementById('mu_foto_url_actual').value = fotoUrl || '';
+      
+      if (fotoUrl && fotoUrl !== 'undefined' && fotoUrl !== '') {
+        document.getElementById('mu_foto_preview').src = fotoUrl;
+        document.getElementById('mu_foto_preview').classList.remove('hidden');
+        document.getElementById('mu_foto_icon').classList.add('hidden');
+      } else {
+        document.getElementById('mu_foto_preview').classList.add('hidden');
+        document.getElementById('mu_foto_icon').classList.remove('hidden');
+      }
+      
       // 2. Llenar los inputs de edición
       document.getElementById('mu_nombre_input').value = nombre;
       document.getElementById('mu_rol_input').value = rol;
+      document.getElementById('mu_password_input').value = ''; // Limpiar contraseña por seguridad
 
       // 3. Marcar los checkboxes de permisos existentes
       const permisosArr = permisosString.split(',');
@@ -3518,6 +3621,8 @@
       const email = document.getElementById('mu_id_doc').value;
       const nombre = document.getElementById('mu_nombre_input').value.trim();
       const rol = document.getElementById('mu_rol_input').value;
+      const password = document.getElementById('mu_password_input').value.trim();
+      const fotoInput = document.getElementById('mu_foto_input');
       
       const modulosPermitidos = [];
       document.querySelectorAll('input[name="mu_permiso"]:checked').forEach(chk => {
@@ -3533,12 +3638,58 @@
       }
 
       try {
-        await db.collection('usuarios_acceso').doc(email).update({
+        let fotoUrlUpdate = document.getElementById('mu_foto_url_actual').value;
+
+        // Si hay una nueva imagen, se comprime a Base64 para guardado local seguro (sin bloqueos de Storage)
+        if (fotoInput.files.length > 0) {
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Procesando imagen...';
+          lucide.createIcons();
+          
+          const blobComprimido = await comprimirImagenApp(fotoInput.files[0], 250, 250, 0.60);
+          
+          fotoUrlUpdate = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error("Error al convertir la foto."));
+            reader.readAsDataURL(blobComprimido);
+          });
+        }
+
+        const datosActualizados = {
           nombre: nombre,
           rol: rol,
-          permisos: modulosPermitidos
-        });
-        alert("Configuración de usuario actualizada correctamente.");
+          permisos: modulosPermitidos,
+          foto_url: fotoUrlUpdate
+        };
+
+        // Realidad sobre Firebase Auth:
+        // Client-side no puedes actualizar la contraseña de OTRO usuario directamente a menos 
+        // que uses Cloud Functions (Admin SDK) o la appSecundaria en un flujo complejo.
+        // Por ahora, lo guardamos en Firestore para tu control interno.
+        if (password !== '') {
+            datosActualizados.password_temp = password; 
+            // Opcional: registrar en tu tabla si manejas un flujo de contraseñas temporal
+        }
+
+        await db.collection('usuarios_acceso').doc(email).update(datosActualizados);
+        
+        // --- NUEVO: Si el usuario se editó a sí mismo, actualizar la miniatura de la barra lateral al instante ---
+        if (auth.currentUser && email === auth.currentUser.email) {
+            const sidebarImg = document.getElementById('sidebarAvatarImage');
+            const sidebarIcon = document.getElementById('sidebarAvatarIcon');
+            if (fotoUrlUpdate && fotoUrlUpdate.trim() !== "") {
+                sidebarImg.src = fotoUrlUpdate;
+                sidebarImg.classList.remove('hidden');
+                sidebarIcon.classList.add('hidden');
+            }
+        }
+        
+        if (password !== '') {
+            alert("Configuración actualizada. NOTA: Para que el cambio de contraseña sea efectivo a nivel de acceso, el usuario debe resetearla o se requiere implementación de Cloud Functions.");
+        } else {
+            alert("Configuración de usuario actualizada correctamente.");
+        }
+        
         cerrarModalUsuario();
       } catch (error) {
         console.error("Error al actualizar usuario:", error);
@@ -3566,16 +3717,41 @@
           const data = doc.data();
           const permisosStr = data.permisos ? data.permisos.join(',') : '';
           
+          // Renderizar miniatura si existe foto, sino el icono por defecto
+          const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
+            ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
+            : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
+          
+          // --- LÓGICA VISUAL DE PRESENCIA ---
+          const isOnline = data.estado_conexion === 'online';
+          const colorEstado = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
+          const textoEstado = isOnline ? 'En línea ahora' : (data.ultimo_acceso ? 'Últ. vez: ' + data.ultimo_acceso.toDate().toLocaleString('es-MX', {dateStyle: 'short', timeStyle: 'short'}) : 'Desconectado');
+          const anilloEstado = isOnline ? 'ring-2 ring-emerald-200' : '';
+          // ----------------------------------
+
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-              <td class="px-4 py-3 font-bold text-slate-800 text-xs">${data.nombre}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${anilloEstado}">
+                      ${miniaturaUsuario}
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${colorEstado}" title="${textoEstado}"></div>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-800 text-xs leading-tight">${data.nombre}</span>
+                    <span class="text-[9px] font-bold ${isOnline ? 'text-emerald-500' : 'text-slate-400'}">${textoEstado}</span>
+                  </div>
+                </div>
+              </td>
               <td class="px-4 py-3 text-slate-500 text-xs font-medium">${data.email}</td>
               <td class="px-4 py-3 text-center">
                 <span class="px-2 py-1 bg-slate-100 text-slate-600 border border-slate-200 rounded text-[10px] font-black uppercase tracking-wider">${data.rol}</span>
               </td>
               <td class="px-4 py-3 text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
+                  <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}', '${data.foto_url || ''}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
                   </button>
                   <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario">
@@ -3589,7 +3765,6 @@
         lucide.createIcons(); // Se asegura de que se pinten los iconos nuevos
       });
     }
-
     window.eliminarUsuarioAcceso = async function(emailDoc) {
       if(confirm(`¿Estás seguro de revocar y eliminar el acceso para el usuario:\n${emailDoc}?`)) {
         try {
@@ -3678,11 +3853,22 @@
           if(rol.toUpperCase().includes('ADMIN')) roleColor = 'text-indigo-600 border-indigo-200';
           else if(rol.toUpperCase().includes('CAPTURISTA')) roleColor = 'text-emerald-600 border-emerald-200';
 
+          const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
+            ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
+            : `<i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>`;
+
+          // --- LÓGICA DE PRESENCIA PARA TARJETAS ---
+          const isOnline = data.estado_conexion === 'online';
+          const dotColor = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
+          const dotTitle = isOnline ? 'Conectado ahora' : 'Desconectado';
+          const fechaUltima = data.ultimo_acceso ? data.ultimo_acceso.toDate().toLocaleDateString('es-MX', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Sin registro';
+          // -----------------------------------------
+
           grid.innerHTML += `
             <div class="bg-[#fcfcfb] rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col relative group">
               <div class="flex items-center gap-4 mb-5 cursor-pointer" onclick="abrirPerfilSeguridad('${email}')" title="Ver Auditoría del Usuario">
-                <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border-4 border-white shadow-sm group-hover:scale-105 transition-transform">
-                  <i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+                <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-4 border-white shadow-sm group-hover:scale-105 transition-transform">
+                  ${miniaturaUsuario}
                 </div>
                 <div class="flex-1 min-w-0">
                   <h4 class="text-sm font-black text-slate-800 truncate group-hover:text-indigo-600 transition-colors">${nombre}</h4>
@@ -3700,7 +3886,10 @@
                   <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Revocar Acceso">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                   </button>
-                  <div class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm ml-1" title="Activo"></div>
+                  <div class="flex flex-col items-end ml-2">
+                    <div class="w-3 h-3 rounded-full ${dotColor} shadow-sm" title="${dotTitle}"></div>
+                    ${!isOnline ? `<span class="text-[8px] text-slate-400 font-bold mt-1 tracking-wider whitespace-nowrap">${fechaUltima}</span>` : ''}
+                  </div>
                 </div>
               </div>
             </div>
