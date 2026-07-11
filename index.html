@@ -850,10 +850,13 @@
                   </div>
                   <input type="text" id="gr_filtro_nombre" onkeyup="aplicarFiltrosGrAsignacion()" placeholder="Buscar ciudadano..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 </div>
-                <select id="gr_filtro_grupo" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-56 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                <select id="gr_filtro_grupo" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-48 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                   <option value="TODOS">Todos los Grupos</option>
                 </select>
-                <select id="gr_filtro_casilla" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-48 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                <select id="gr_filtro_seccion" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-40 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                  <option value="TODAS">Todas las Secciones</option>
+                </select>
+                <select id="gr_filtro_casilla" onchange="aplicarFiltrosGrAsignacion()" class="w-full md:w-40 text-xs px-3 py-2.5 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                   <option value="TODAS">Todas las Casillas</option>
                 </select>
               </div>
@@ -864,6 +867,7 @@
                 <thead class="bg-white border-b border-slate-200">
                   <tr>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Beneficiario</th>
+                    <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-24">Sección</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-28">Casilla</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-64">Grupos Pertenecientes</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-36">Gestionar</th>
@@ -4695,11 +4699,20 @@
     window.aplicarFiltrosGrAsignacion = function(resetPage = true) {
       if(resetPage) gr_paginaActual = 1;
 
-      // Actualizar menú dinámico de casillas
+      // Actualizar menú dinámico de secciones y casillas
+      const secciones = new Set();
       const casillas = new Set();
       Object.values(window.registrosGlobalesMemoria).forEach(d => {
+        if(d.seccion && d.seccion !== '--' && d.seccion !== 'N/A') secciones.add(d.seccion.trim().toUpperCase());
         if(d.casilla && d.casilla !== '--' && d.casilla !== 'N/A') casillas.add(d.casilla.trim().toUpperCase());
       });
+
+      const selSeccion = document.getElementById('gr_filtro_seccion');
+      const valSec = selSeccion.value;
+      selSeccion.innerHTML = '<option value="TODAS">Todas las Secciones</option>';
+      Array.from(secciones).sort().forEach(s => selSeccion.add(new Option(s, s)));
+      if(Array.from(selSeccion.options).some(o=>o.value===valSec)) selSeccion.value = valSec;
+
       const selCasilla = document.getElementById('gr_filtro_casilla');
       const valCas = selCasilla.value;
       selCasilla.innerHTML = '<option value="TODAS">Todas las Casillas</option>';
@@ -4709,18 +4722,21 @@
       // Leer filtros
       const f_nom = document.getElementById('gr_filtro_nombre').value.toUpperCase();
       const f_grupo = document.getElementById('gr_filtro_grupo').value;
+      const f_sec = selSeccion.value;
       const f_cas = selCasilla.value;
       
       const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
       
       gr_datosFiltrados = allData.filter(d => {
         const nom = (d.nombre || '').toUpperCase();
+        const sec = (d.seccion || '').toUpperCase();
         const cas = (d.casilla || '').toUpperCase();
         const userGroups = window.miembrosGruposMemoria[d.id] || [];
         const groupNames = userGroups.map(g => g.nombre_grupo);
 
         if(f_nom && !nom.includes(f_nom)) return false;
         if(f_grupo !== 'TODOS' && !groupNames.includes(f_grupo)) return false;
+        if(f_sec !== 'TODAS' && sec !== f_sec) return false;
         if(f_cas !== 'TODAS' && cas !== f_cas) return false;
         return true;
       });
@@ -4728,7 +4744,7 @@
       const tbody = document.getElementById('tableAsignacionGrupos');
       tbody.innerHTML = '';
       if(gr_datosFiltrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Sin resultados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">Sin resultados.</td></tr>';
         document.getElementById('gr_contenedorBotonesPaginas').innerHTML = '';
         return;
       }
@@ -4757,6 +4773,7 @@
                 <span class="font-bold text-slate-800 text-xs">${d.nombre || '--'}</span>
               </div>
             </td>
+            <td class="px-4 py-3 text-center text-xs font-bold text-slate-600">${d.seccion || '--'}</td>
             <td class="px-4 py-3 text-center text-xs font-mono font-bold text-slate-500">${d.casilla || '--'}</td>
             <td class="px-4 py-3 text-center max-w-[250px] flex-wrap justify-center">${badgesHtml}</td>
             <td class="px-4 py-3 text-center">
