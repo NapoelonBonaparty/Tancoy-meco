@@ -770,6 +770,40 @@
                 <input type="text" id="grupo_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 uppercase" placeholder="Ej. LÍDERES ZONA SUR">
               </div>
               <div>
+                <label class="text-xs font-bold text-slate-500 block mb-1">Coordinador del Grupo</label>
+                <div class="flex items-center gap-2">
+                  <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <input type="text" id="grupo_coordinador" readonly class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none bg-slate-50 text-slate-600 font-bold uppercase cursor-not-allowed" placeholder="Selecciona en el padrón...">
+                  </div>
+                  <button type="button" onclick="abrirModalBusquedaCiudadano('coordinador')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-1 border border-indigo-100" title="Buscar Ciudadano">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                  </button>
+                  <button type="button" onclick="limpiarCampoCiudadano('coordinador')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-sm font-bold transition-colors shadow-sm border border-red-100" title="Limpiar">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-1">Representante</label>
+                <div class="flex items-center gap-2">
+                  <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <input type="text" id="grupo_representante" readonly class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none bg-slate-50 text-slate-600 font-bold uppercase cursor-not-allowed" placeholder="Selecciona en el padrón...">
+                  </div>
+                  <button type="button" onclick="abrirModalBusquedaCiudadano('representante')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-1 border border-indigo-100" title="Buscar Ciudadano">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                  </button>
+                  <button type="button" onclick="limpiarCampoCiudadano('representante')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-sm font-bold transition-colors shadow-sm border border-red-100" title="Limpiar">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
                 <label class="text-xs font-bold text-slate-500 block mb-1">Descripción / Propósito</label>
                 <textarea id="grupo_desc" rows="3" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Detalles del grupo..."></textarea>
               </div>
@@ -1035,7 +1069,16 @@
 
               <span id="mp_tipo" class="px-5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest mb-2 border shadow-sm">--</span>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">Expediente ID</p>
-              <p id="mp_id_doc" class="text-[10px] font-mono text-slate-300 mt-1 break-all">--</p>
+              <p id="mp_id_doc" class="text-[10px] font-mono text-slate-300 mt-1 break-all mb-5">--</p>
+              
+              <!-- SECCIÓN DE GRUPOS INTEGRADA EN LA TARJETA IZQUIERDA -->
+              <div class="w-full pt-4 border-t border-slate-100 flex flex-col items-center">
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i data-lucide="network" class="w-3.5 h-3.5 text-indigo-400"></i> Grupos y Gremios</h4>
+                <div id="mp_lista_grupos" class="flex flex-wrap justify-center gap-1.5 w-full">
+                  <span class="text-[10px] text-slate-400 italic">Cargando...</span>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-span-1 md:col-span-2 space-y-4">
@@ -1102,15 +1145,6 @@
               </div>
 
               <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
-                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="network" class="w-4 h-4 text-indigo-500"></i> Grupos de este ciudadano</h4>
-                <div id="mp_grupos_contenedor" class="flex flex-wrap gap-2">
-                  <span class="text-xs text-slate-400 italic">Cargando...</span>
-                </div>
-              </div>
-
-              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
-                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="gift" class="w-4 h-4 text-indigo-500"></i> Historial de Apoyos Recibidos</h4>
-              <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-4">
                 <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3"><i data-lucide="gift" class="w-4 h-4 text-indigo-500"></i> Historial de Apoyos Recibidos</h4>
                 <div class="border border-slate-200 rounded-lg overflow-hidden">
                   <table class="w-full text-left text-sm">
@@ -1123,11 +1157,18 @@
                       </tr>
                     </thead>
                     <tbody id="mp_tabla_historial" class="divide-y divide-slate-100">
-                      <tr><td colspan="3" class="px-4 py-4 text-center text-xs text-slate-400">Cargando datos...</td></tr>
+                      <tr><td colspan="4" class="px-4 py-4 text-center text-xs text-slate-400">Cargando datos...</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
+
+              <span id="mp_tipo" class="px-5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest mb-2 border shadow-sm">--</span>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">Expediente ID</p>
+              <p id="mp_id_doc" class="text-[10px] font-mono text-slate-300 mt-1 break-all">--</p>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 space-y-4">
 
             </div>
           </div>
@@ -1455,6 +1496,29 @@
             </div>
 
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- NUEVO MODAL: BUSCADOR DE CIUDADANOS PARA GRUPOS -->
+    <div id="modalBuscarCiudadano" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="search" class="w-5 h-5 text-indigo-500"></i> Buscar en Padrón Electoral</h3>
+          <button onclick="cerrarModalBusquedaCiudadano()" class="p-1.5 hover:bg-slate-200 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+        </div>
+        
+        <div class="p-4 border-b border-slate-100">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <input type="text" id="inputBuscarCiudadanoModal" onkeyup="filtrarCiudadanosModal()" placeholder="Escribe un nombre, clave o sección..." class="w-full text-sm pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all shadow-sm">
+          </div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-2" id="listaCiudadanosModal">
+          <!-- Los resultados se inyectan aquí -->
+          <div class="text-center py-10 text-slate-400 text-sm font-medium">Escriba para empezar a buscar...</div>
         </div>
       </div>
     </div>
@@ -2645,23 +2709,6 @@
       document.getElementById('modalPerfil').classList.remove('hidden');
       lucide.createIcons();
 
-      // --- NUEVO: CARGAR LOS GRUPOS DEL CIUDADANO DESDE LA MEMORIA ---
-      const gruposContenedor = document.getElementById('mp_grupos_contenedor');
-      if (gruposContenedor) {
-        const misGrupos = window.miembrosGruposMemoria[id] || [];
-        if (misGrupos.length === 0) {
-          gruposContenedor.innerHTML = '<span class="text-xs text-slate-400 italic bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-center w-full">No pertenece a ninguna estructura o grupo aún.</span>';
-        } else {
-          gruposContenedor.innerHTML = misGrupos.map(g => 
-            `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg text-[11px] font-bold shadow-sm">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-indigo-500"></i> ${g.nombre_grupo}
-            </span>`
-          ).join('');
-          lucide.createIcons();
-        }
-      }
-      // ---------------------------------------------------------------
-
       const tbodyHistorial = document.getElementById('mp_tabla_historial');
       tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-indigo-500"></i></td></tr>';
       lucide.createIcons();
@@ -2709,6 +2756,24 @@
           console.error(e);
           tbodyHistorial.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-xs text-red-500 font-bold">Error al cargar historial.</td></tr>';
         });
+
+      // --- NUEVO: Cargar Grupos del Beneficiario en el Perfil ---
+      const contenedorGrupos = document.getElementById('mp_lista_grupos');
+      const gruposDelUsuario = window.miembrosGruposMemoria[id] || [];
+      
+      contenedorGrupos.innerHTML = '';
+      if (gruposDelUsuario.length === 0) {
+        contenedorGrupos.innerHTML = '<span class="text-[10px] text-slate-400 italic font-medium text-center">No afiliado a ningún grupo.</span>';
+      } else {
+        gruposDelUsuario.forEach(g => {
+          contenedorGrupos.innerHTML += `
+            <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm text-center">
+              <i data-lucide="network" class="w-3 h-3 text-indigo-500"></i> ${g.nombre_grupo}
+            </span>
+          `;
+        });
+        lucide.createIcons();
+      }
     }
 
     // Función para cerrar el modal del perfil
@@ -4448,18 +4513,28 @@
         const btn = document.getElementById('btnGuardarGrupo');
         const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
         const desc = document.getElementById('grupo_desc').value.trim();
+        const coordinador = document.getElementById('grupo_coordinador').value.trim().toUpperCase();
+        const representante = document.getElementById('grupo_representante').value.trim().toUpperCase();
 
         btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
         btn.disabled = true;
 
         try {
           if(idGrupoEditando) {
-            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ nombre, descripcion: desc });
+            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
+              nombre, 
+              descripcion: desc,
+              coordinador: coordinador,
+              representante: representante
+            });
             alert("Grupo actualizado.");
             cancelarEdicionGrupo();
           } else {
             await db.collection('catalogo_grupos').add({
-              nombre, descripcion: desc, 
+              nombre, 
+              descripcion: desc, 
+              coordinador: coordinador,
+              representante: representante,
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
             });
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
@@ -4482,7 +4557,13 @@
 
         snap.forEach(doc => {
           const d = doc.data();
-          listaGruposCatalogo.push({id: doc.id, nombre: d.nombre, descripcion: d.descripcion});
+          listaGruposCatalogo.push({
+            id: doc.id, 
+            nombre: d.nombre, 
+            descripcion: d.descripcion,
+            coordinador: d.coordinador || '',
+            representante: d.representante || ''
+          });
         });
         
         renderizarTablaCatGrupos();
@@ -4510,7 +4591,13 @@
         const tbody = document.getElementById('tablaGrupos');
         tbody.innerHTML = '';
 
-        const gruposFiltrados = listaGruposCatalogo.filter(g => g.nombre.toUpperCase().includes(query) || (g.descripcion && g.descripcion.toUpperCase().includes(query)));
+        // Filtro de búsqueda extendido al nombre, descripción, coordinador y representante
+        const gruposFiltrados = listaGruposCatalogo.filter(g => 
+          g.nombre.toUpperCase().includes(query) || 
+          (g.descripcion && g.descripcion.toUpperCase().includes(query)) ||
+          (g.coordinador && g.coordinador.toUpperCase().includes(query)) ||
+          (g.representante && g.representante.toUpperCase().includes(query))
+        );
 
         if(gruposFiltrados.length === 0) {
           tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No se encontraron grupos.</td></tr>';
@@ -4518,6 +4605,17 @@
           gruposFiltrados.forEach(d => {
             const conteo = conteoMiembrosPorGrupo[d.nombre] || 0;
             const descLimpia = d.descripcion ? d.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
+            const coordLimpio = d.coordinador ? d.coordinador.replace(/`/g, '\\`') : '';
+            const repLimpio = d.representante ? d.representante.replace(/`/g, '\\`') : '';
+
+            // Generación de insignias para los roles si existen
+            let rolesHtml = '';
+            if (d.coordinador || d.representante) {
+              rolesHtml = '<div class="mt-2.5 flex flex-wrap gap-2">';
+              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
+              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
+              rolesHtml += '</div>';
+            }
 
             tbody.innerHTML += `
               <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
@@ -4529,6 +4627,7 @@
                     <div>
                       <p class="font-bold text-slate-800 text-xs">${d.nombre}</p>
                       <p class="text-[10px] text-slate-500 mt-0.5 leading-tight">${d.descripcion || 'Sin descripción.'}</p>
+                      ${rolesHtml}
                     </div>
                   </div>
                 </td>
@@ -4537,7 +4636,7 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="flex items-center justify-center gap-2">
-                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`)" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors shadow-sm" title="Editar Grupo">
+                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, \`${coordLimpio}\`, \`${repLimpio}\`)" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors shadow-sm" title="Editar Grupo">
                       <i data-lucide="edit" class="w-3.5 h-3.5"></i>
                     </button>
                     <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm" title="Eliminar Grupo">
@@ -4551,10 +4650,12 @@
         }
     }
 
-    window.editarGrupoCatalogo = function(id, nombre, descripcion) {
+    window.editarGrupoCatalogo = function(id, nombre, descripcion, coordinador = '', representante = '') {
       idGrupoEditando = id;
       document.getElementById('grupo_nombre').value = nombre;
       document.getElementById('grupo_desc').value = descripcion;
+      document.getElementById('grupo_coordinador').value = coordinador;
+      document.getElementById('grupo_representante').value = representante;
 
       const tituloForm = document.getElementById('tituloFormGrupo');
       tituloForm.innerHTML = `
@@ -4776,6 +4877,93 @@
         const idBen = document.getElementById('mg_id_beneficiario').value;
         setTimeout(() => actualizarListaGruposActuales(idBen), 500);
       }
+    }
+
+    // --- NUEVO: LÓGICA DEL BUSCADOR MODAL PARA GRUPOS ---
+    let campoDestinoBusqueda = ''; // Guardará 'coordinador' o 'representante'
+
+    window.abrirModalBusquedaCiudadano = function(campo) {
+      campoDestinoBusqueda = campo;
+      const modal = document.getElementById('modalBuscarCiudadano');
+      const input = document.getElementById('inputBuscarCiudadanoModal');
+      const lista = document.getElementById('listaCiudadanosModal');
+      
+      modal.classList.remove('hidden');
+      input.value = '';
+      lista.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">Escriba para empezar a buscar...</div>';
+      
+      // Dar enfoque al input automáticamente
+      setTimeout(() => input.focus(), 100);
+      lucide.createIcons();
+    }
+
+    window.cerrarModalBusquedaCiudadano = function() {
+      document.getElementById('modalBuscarCiudadano').classList.add('hidden');
+    }
+
+    window.limpiarCampoCiudadano = function(campo) {
+      document.getElementById(`grupo_${campo}`).value = '';
+    }
+
+    window.filtrarCiudadanosModal = function() {
+      const query = document.getElementById('inputBuscarCiudadanoModal').value.trim().toUpperCase();
+      const contenedor = document.getElementById('listaCiudadanosModal');
+
+      if (query.length < 2) {
+        contenedor.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">Escriba al menos 2 letras...</div>';
+        return;
+      }
+
+      // Aprovechamos los datos que ya están en memoria (0 lecturas a Firebase)
+      const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
+      
+      // Filtramos coincidencias
+      const filtrados = allData.filter(d => {
+        const nom = (d.nombre || '').toUpperCase();
+        const cve = (d.clave_elector || '').toUpperCase();
+        const sec = (d.seccion || '').toUpperCase();
+        return nom.includes(query) || cve.includes(query) || sec.includes(query);
+      }).slice(0, 15); // Mostrar máximo los primeros 15
+
+      if (filtrados.length === 0) {
+        contenedor.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">No se encontró a nadie con esos datos.</div>';
+        return;
+      }
+
+      contenedor.innerHTML = '';
+      filtrados.forEach(d => {
+        const miniaturaHtml = (d.foto_url && d.foto_url.trim() !== "")
+          ? `<img src="${d.foto_url}" class="w-full h-full object-cover">`
+          : `<i data-lucide="user" class="w-5 h-5 text-slate-400"></i>`;
+
+        // Pasamos el nombre con un escape para evitar errores si tiene comillas
+        const nombreSafe = d.nombre ? d.nombre.replace(/'/g, "\\'") : '';
+
+        contenedor.innerHTML += `
+          <div onclick="seleccionarCiudadanoModal('${nombreSafe}')" class="flex items-center justify-between p-3 hover:bg-indigo-50 rounded-xl cursor-pointer transition-colors border-b border-slate-100 last:border-0 group">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                ${miniaturaHtml}
+              </div>
+              <div>
+                <p class="font-black text-slate-800 text-sm group-hover:text-indigo-700 transition-colors uppercase">${d.nombre}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Sección: <span class="text-slate-700">${d.seccion || '--'}</span> | Casilla: <span class="text-slate-700">${d.casilla || '--'}</span></p>
+              </div>
+            </div>
+            <button class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">Elegir</button>
+          </div>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    window.seleccionarCiudadanoModal = function(nombre) {
+      if (campoDestinoBusqueda === 'coordinador') {
+        document.getElementById('grupo_coordinador').value = nombre;
+      } else if (campoDestinoBusqueda === 'representante') {
+        document.getElementById('grupo_representante').value = nombre;
+      }
+      cerrarModalBusquedaCiudadano();
     }
 
     // Disparador inicial (Global)
