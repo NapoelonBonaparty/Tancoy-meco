@@ -698,65 +698,107 @@
           <button id="btn-tab-grupos-asignacion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchGruposTab('asignacion')">
             <i data-lucide="users" class="w-4 h-4"></i> Asignación y Directorio
           </button>
+          <button id="btn-tab-grupos-estructura" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchGruposTab('estructura')">
+            <i data-lucide="contact" class="w-4 h-4"></i> Integrantes por Grupo
+          </button>
         </div>
 
-        <div id="tab-grupos-estadisticas" class="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          <div class="xl:col-span-3 flex flex-col gap-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between group hover:border-indigo-300 transition-all">
+        <!-- 1. DASHBOARD / ESTADÍSTICAS -->
+        <div id="tab-grupos-estadisticas" class="space-y-6">
+          <!-- Top KPIs interactivos -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div onclick="switchGruposTab('catalogo')" class="bg-gradient-to-br from-white to-indigo-50/50 rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+              <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-100/50 rounded-full blur-2xl group-hover:bg-indigo-200/50 transition-colors"></div>
+              <div class="flex items-start justify-between relative z-10">
                 <div>
-                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total de Grupos</p>
-                  <p class="text-3xl font-black text-slate-800 dark:text-white leading-none mt-2" id="kpi-total-grupos">0</p>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Total de Grupos</p>
+                  <p class="text-4xl font-black text-slate-800 leading-none" id="kpi-total-grupos">0</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <i data-lucide="network" class="w-6 h-6 text-indigo-500"></i>
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <i data-lucide="folder-tree" class="w-5 h-5"></i>
                 </div>
               </div>
+              <p class="text-[10px] text-indigo-600 font-bold mt-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="arrow-right" class="w-3 h-3"></i> Ver Catálogo</p>
+            </div>
 
-              <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between group hover:border-emerald-300 transition-all">
+            <div onclick="switchGruposTab('asignacion')" class="bg-gradient-to-br from-white to-emerald-50/50 rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden">
+              <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-100/50 rounded-full blur-2xl group-hover:bg-emerald-200/50 transition-colors"></div>
+              <div class="flex items-start justify-between relative z-10">
                 <div>
-                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ciudadanos Enrolados</p>
-                  <p class="text-3xl font-black text-slate-800 dark:text-white leading-none mt-2" id="kpi-total-miembros">0</p>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Ciudadanos Afiliados</p>
+                  <p class="text-4xl font-black text-slate-800 leading-none" id="kpi-total-miembros">0</p>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <i data-lucide="users" class="w-6 h-6 text-emerald-500"></i>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <i data-lucide="users" class="w-5 h-5"></i>
                 </div>
               </div>
+              <p class="text-[10px] text-emerald-600 font-bold mt-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="arrow-right" class="w-3 h-3"></i> Asignar Ciudadano</p>
+            </div>
 
-              <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center opacity-50">
-                  <i data-lucide="crown" class="w-8 h-8 text-amber-200"></i>
-                </div>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2 relative z-10">Grupo con Mayor Fuerza</p>
-                <div class="flex items-center gap-2 relative z-10">
-                  <div class="p-1.5 bg-amber-100 text-amber-600 rounded-lg shrink-0 shadow-sm"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
-                  <div class="min-w-0">
-                    <p class="text-sm font-black text-slate-800 dark:text-white truncate" id="kpi-grupo-top">--</p>
-                    <p class="text-[10px] text-slate-500" id="kpi-grupo-top-count">0 miembros</p>
+            <div class="bg-gradient-to-br from-white to-amber-50/50 rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-amber-300 transition-colors">
+              <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-100/50 rounded-full blur-2xl"></div>
+              <div class="relative z-10">
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 flex items-center gap-1"><i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i> Grupo Líder (Mayor Fuerza)</p>
+                <div class="flex items-end gap-3 mt-1">
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xl font-black text-slate-800 truncate" id="kpi-grupo-top">--</p>
+                    <p class="text-xs font-bold text-amber-600 mt-0.5 bg-amber-100 px-2 py-0.5 rounded-md inline-block" id="kpi-grupo-top-count">0 miembros</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex-1">
-              <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="bar-chart" class="w-4 h-4 text-indigo-500"></i> Top 5 Grupos Activos</h3>
-              <div class="chart-container" style="height: 300px;">
-                <canvas id="chartTopGrupos"></canvas>
+            <div class="bg-gradient-to-br from-white to-blue-50/50 rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-300 transition-colors">
+              <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-100/50 rounded-full blur-2xl"></div>
+              <div class="flex items-start justify-between relative z-10">
+                <div>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Estructura Activa</p>
+                  <p class="text-4xl font-black text-slate-800 leading-none" id="kpi-coordinadores">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
+                  <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
               </div>
+              <p class="text-[10px] text-slate-500 font-medium mt-4">Grupos con Coordinador Asignado</p>
             </div>
           </div>
 
-          <div class="xl:col-span-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-[500px] xl:h-auto">
-            <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-2">
-              <i data-lucide="history" class="w-4 h-4 text-indigo-600"></i>
-              <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Últimas Integraciones</h4>
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div class="xl:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+              <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <i data-lucide="bar-chart-2" class="w-40 h-40 text-indigo-900"></i>
+              </div>
+              <div class="flex justify-between items-center mb-6 relative z-10 border-b border-slate-100 pb-4">
+                <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                  <div class="p-1.5 bg-indigo-600 text-white rounded-lg shadow-md"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+                  Top 5 Grupos Activos
+                </h3>
+                <span class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-full border border-slate-200">Por número de afiliados</span>
+              </div>
+              <div class="chart-container relative z-10" style="height: 320px;">
+                <canvas id="chartTopGrupos"></canvas>
+              </div>
             </div>
-            <div id="feedUltimosMiembros" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30 dark:bg-slate-900/10">
-              <div class="text-center py-10 text-slate-400 text-sm"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-400"></i> Procesando datos...</div>
+
+            <div class="xl:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[450px]">
+              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                  <i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i> Live Feed
+                </h4>
+                <span class="flex h-2.5 w-2.5 relative">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+              </div>
+              <div id="feedUltimosMiembros" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30 scroll-smooth">
+                <div class="text-center py-10 text-slate-400 text-sm"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-400"></i> Sincronizando...</div>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- 2. CATÁLOGO DE GRUPOS -->
         <div id="tab-grupos-catalogo" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm h-fit">
             <h3 class="text-sm font-semibold mb-5 flex items-center gap-2 text-slate-800 dark:text-white" id="tituloFormGrupo">
@@ -777,6 +819,7 @@
                       <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
                     </div>
                     <input type="text" id="grupo_coordinador" readonly class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none bg-slate-50 text-slate-600 font-bold uppercase cursor-not-allowed" placeholder="Selecciona en el padrón...">
+                    <input type="hidden" id="grupo_coordinador_id">
                   </div>
                   <button type="button" onclick="abrirModalBusquedaCiudadano('coordinador')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-1 border border-indigo-100" title="Buscar Ciudadano">
                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -794,6 +837,7 @@
                       <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
                     </div>
                     <input type="text" id="grupo_representante" readonly class="w-full text-sm pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none bg-slate-50 text-slate-600 font-bold uppercase cursor-not-allowed" placeholder="Selecciona en el padrón...">
+                    <input type="hidden" id="grupo_representante_id">
                   </div>
                   <button type="button" onclick="abrirModalBusquedaCiudadano('representante')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-1 border border-indigo-100" title="Buscar Ciudadano">
                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -840,6 +884,7 @@
           </div>
         </div>
 
+        <!-- 3. ASIGNACIÓN Y DIRECTORIO -->
         <div id="tab-grupos-asignacion" class="hidden">
           <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
             <div class="p-4 border-b border-slate-200 bg-slate-50/50">
@@ -879,6 +924,45 @@
             </div>
             <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs border-t border-slate-100">
               <div class="flex items-center gap-1" id="gr_contenedorBotonesPaginas"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-grupos-estructura" class="hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center gap-4">
+            <div class="flex-1 w-full relative">
+              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Selecciona un Grupo Activo</label>
+              <select id="selectEstructuraGrupo" onchange="mostrarIntegrantesGrupo(this.value)" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900">
+                <option value="">Selecciona un grupo...</option>
+              </select>
+            </div>
+            <div class="mt-5 md:mt-6">
+              <button onclick="abrirModalAgregarIntegranteEstructura()" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Añadir Integrante
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros del Grupo</h3>
+              <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+            </div>
+            <div class="overflow-x-auto max-h-[500px]">
+              <table class="w-full text-left text-sm">
+                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 py-3 font-semibold">Ciudadano</th>
+                    <th class="px-4 py-3 font-semibold text-center w-32">Jerarquía / Rol</th>
+                    <th class="px-4 py-3 font-semibold text-center w-28">Sección</th>
+                    <th class="px-4 py-3 font-semibold text-center w-28">F. Ingreso</th>
+                    <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
+                  <tr><td colspan="5" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -2770,9 +2854,20 @@
         contenedorGrupos.innerHTML = '<span class="text-[10px] text-slate-400 italic font-medium text-center">No afiliado a ningún grupo.</span>';
       } else {
         gruposDelUsuario.forEach(g => {
+          // Extraemos el rol jerárquico guardado en la memoria local
+          const rolTexto = g.rol || 'INTEGRANTE';
+          
+          // Asignamos una paleta de color dinámica según su estatus de cabecilla
+          let badgeColor = 'bg-slate-50 text-slate-600 border-slate-200';
+          if (rolTexto === 'COORDINADOR') {
+              badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200 font-black ring-1 ring-indigo-100';
+          } else if (rolTexto === 'REPRESENTANTE') {
+              badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-extrabold ring-1 ring-emerald-100';
+          }
+
           contenedorGrupos.innerHTML += `
-            <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm text-center">
-              <i data-lucide="network" class="w-3 h-3 text-indigo-500"></i> ${g.nombre_grupo}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm text-center border ${badgeColor}">
+              <i data-lucide="network" class="w-3 h-3"></i> ${g.nombre_grupo} (${rolTexto})
             </span>
           `;
         });
@@ -4370,10 +4465,11 @@
           window.miembrosGruposMemoria[data.id_beneficiario] = [];
         }
         
-        // Guardamos fecha si existe para el feed
+        // Guardamos rol y fecha para el feed
         window.miembrosGruposMemoria[data.id_beneficiario].push({ 
             idRelacion: doc.id, 
             nombre_grupo: data.nombre_grupo, 
+            rol: data.rol_grupo || 'INTEGRANTE',
             fecha: data.fecha_ingreso 
         });
 
@@ -4387,6 +4483,11 @@
       const tabStats = document.getElementById('tab-grupos-estadisticas');
       if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
       
+      const tabEstructura = document.getElementById('tab-grupos-estructura');
+      if (tabEstructura && !tabEstructura.classList.contains('hidden')) {
+          cargarEstructuraGrupo(false); 
+      }
+      
       renderizarTablaCatGrupos();
     });
 
@@ -4395,19 +4496,24 @@
       document.getElementById('tab-grupos-estadisticas').classList.toggle('hidden', tab !== 'estadisticas');
       document.getElementById('tab-grupos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
       document.getElementById('tab-grupos-asignacion').classList.toggle('hidden', tab !== 'asignacion');
+      document.getElementById('tab-grupos-estructura').classList.toggle('hidden', tab !== 'estructura');
 
       const btnEst = document.getElementById('btn-tab-grupos-estadisticas');
       const btnCat = document.getElementById('btn-tab-grupos-catalogo');
       const btnAsig = document.getElementById('btn-tab-grupos-asignacion');
+      const btnEstruc = document.getElementById('btn-tab-grupos-estructura');
+      
       const activeClass = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
       const inactiveClass = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2";
 
       if(btnEst) btnEst.className = tab === 'estadisticas' ? activeClass : inactiveClass;
       if(btnCat) btnCat.className = tab === 'catalogo' ? activeClass : inactiveClass;
       if(btnAsig) btnAsig.className = tab === 'asignacion' ? activeClass : inactiveClass;
+      if(btnEstruc) btnEstruc.className = tab === 'estructura' ? activeClass : inactiveClass;
 
       if(tab === 'asignacion') aplicarFiltrosGrAsignacion(true);
       if(tab === 'estadisticas') calcularEstadisticasGrupos();
+      if(tab === 'estructura') cargarEstructuraGrupo(true);
       lucide.createIcons();
     }
 
@@ -4416,8 +4522,12 @@
         const totalGrupos = listaGruposCatalogo.length;
         const personasUnicas = Object.keys(window.miembrosGruposMemoria).length;
 
+        // Calcular cuántos grupos tienen coordinador asignado
+        const gruposConCoordinador = listaGruposCatalogo.filter(g => g.coordinador && g.coordinador.trim() !== '').length;
+
         document.getElementById('kpi-total-grupos').textContent = totalGrupos;
         document.getElementById('kpi-total-miembros').textContent = personasUnicas;
+        document.getElementById('kpi-coordinadores').textContent = gruposConCoordinador;
 
         let maxGrupo = '--';
         let maxCount = 0;
@@ -4434,12 +4544,19 @@
         document.getElementById('kpi-grupo-top').textContent = maxGrupo;
         document.getElementById('kpi-grupo-top-count').textContent = maxCount + ' miembros';
 
-        // Procesar Gráfica
+        // Procesar Gráfica Mejorada (Barras Horizontales con Color Moderno)
         chartData.sort((a, b) => b.count - a.count);
         const top5 = chartData.slice(0, 5);
 
-        const ctx = document.getElementById('chartTopGrupos');
-        if(!ctx) return;
+        const canvasEl = document.getElementById('chartTopGrupos');
+        if(!canvasEl) return;
+        
+        // Crear gradiente para las barras
+        const ctx = canvasEl.getContext('2d');
+        let gradient = ctx.createLinearGradient(0, 0, 400, 0);
+        gradient.addColorStop(0, '#818cf8'); // Indigo-400
+        gradient.addColorStop(1, '#4f46e5'); // Indigo-600
+
         if(chartGruposInst) chartGruposInst.destroy();
         
         chartGruposInst = new Chart(ctx, {
@@ -4447,23 +4564,35 @@
             data: {
                 labels: top5.map(d => d.nombre),
                 datasets: [{
-                    label: 'Miembros',
+                    label: 'Afiliados',
                     data: top5.map(d => d.count),
-                    backgroundColor: '#6366f1',
-                    borderRadius: 6
+                    backgroundColor: gradient,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barPercentage: 0.6
                 }]
             },
             options: {
+                indexAxis: 'y', // La vuelve horizontal
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13, weight: 'bold' }
+                    }
+                },
                 scales: { 
-                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { display: true, color: '#f1f5f9' }, border: {display: false} },
+                    y: { grid: { display: false }, border: {display: false}, ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' } }
                 }
             }
         });
 
-        // Feed Últimas Asignaciones
+        // Feed Últimas Asignaciones (Live Feed)
         const feedContainer = document.getElementById('feedUltimosMiembros');
         feedContainer.innerHTML = '';
         
@@ -4485,20 +4614,24 @@
         const latestAssignments = allAssignments.slice(0, 50);
 
         if (latestAssignments.length === 0) {
-            feedContainer.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">No hay asignaciones recientes.</div>';
+            feedContainer.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">No hay actividad reciente.</div>';
         } else {
             latestAssignments.forEach(a => {
                 const dateStr = a.fechaObj.toLocaleDateString('es-MX', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+                // Sacar iniciales para el avatar falso
+                const initials = a.nombre.split(' ').slice(0, 2).map(n => n[0]).join('').substring(0, 2) || 'U';
+
                 feedContainer.innerHTML += `
-                    <div class="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-start gap-3 relative overflow-hidden group hover:border-indigo-200 transition-colors">
-                        <div class="absolute top-0 bottom-0 left-0 w-1 bg-indigo-500"></div>
-                        <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center shrink-0 text-indigo-600 mt-1 border border-indigo-100">
-                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 hover:border-emerald-300 shadow-sm flex items-center gap-3 transition-colors group cursor-default">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 text-slate-500 font-black text-xs group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                            ${initials}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold text-indigo-600 truncate">${a.grupo}</p>
-                            <p class="text-sm font-black text-slate-800 dark:text-white leading-tight truncate">${a.nombre}</p>
-                            <p class="text-[10px] text-slate-500 font-medium mt-1 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${dateStr}</p>
+                            <p class="text-xs font-bold text-slate-400 mb-0.5 flex items-center gap-1.5"><i data-lucide="network" class="w-3 h-3 text-emerald-500"></i> ${a.grupo}</p>
+                            <p class="text-sm font-black text-slate-800 leading-tight truncate">${a.nombre}</p>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                            ${dateStr}
                         </div>
                     </div>
                 `;
@@ -4511,6 +4644,24 @@
     let idGrupoEditando = null;
     const formNuevoGrupo = document.getElementById('formNuevoGrupo');
     
+    // Función auxiliar para afiliar y asignar roles a los líderes automáticamente
+    async function afiliarLiderAutomaticamente(idBeneficiario, nombreGrupo, rol) {
+        if (!idBeneficiario) return;
+        const misGrupos = window.miembrosGruposMemoria[idBeneficiario] || [];
+        const relacionExistente = misGrupos.find(g => g.nombre_grupo === nombreGrupo);
+        
+        if (relacionExistente) {
+            await db.collection('miembros_grupos').doc(relacionExistente.idRelacion).update({ rol_grupo: rol });
+        } else {
+            await db.collection('miembros_grupos').add({
+                id_beneficiario: idBeneficiario,
+                nombre_grupo: nombreGrupo,
+                rol_grupo: rol,
+                fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    }
+
     if(formNuevoGrupo) {
       formNuevoGrupo.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -4519,6 +4670,16 @@
         const desc = document.getElementById('grupo_desc').value.trim();
         const coordinador = document.getElementById('grupo_coordinador').value.trim().toUpperCase();
         const representante = document.getElementById('grupo_representante').value.trim().toUpperCase();
+        
+        const coordId = document.getElementById('grupo_coordinador_id').value;
+        const repId = document.getElementById('grupo_representante_id').value;
+
+        // CANDADO ANTIDUPLICADOS: Validación en memoria RAM local para mantener lecturas en 0
+        const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
+        if (nombreExiste) {
+            alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
+            return;
+        }
 
         btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
         btn.disabled = true;
@@ -4531,6 +4692,10 @@
               coordinador: coordinador,
               representante: representante
             });
+            // Autoafiliar nuevos roles en edición
+            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
+            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
+
             alert("Grupo actualizado.");
             cancelarEdicionGrupo();
           } else {
@@ -4541,8 +4706,15 @@
               representante: representante,
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
             });
+            
+            // Autoafiliar nuevos roles en creación
+            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
+            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
+
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
             this.reset();
+            document.getElementById('grupo_coordinador_id').value = '';
+            document.getElementById('grupo_representante_id').value = '';
           }
         } catch(e) {
           alert("Error al guardar grupo.");
@@ -4689,9 +4861,49 @@
     }
 
     window.borrarGrupoCatalogo = async function(id, nombre) {
-      if(confirm(`¿Borrar el grupo ${nombre}?\nLos usuarios seguirán con la asignación histórica, pero el grupo desaparecerá del catálogo.`)){
-        if (idGrupoEditando === id) cancelarEdicionGrupo();
-        await db.collection('catalogo_grupos').doc(id).delete();
+      if(!confirm(`⚠️ ATENCIÓN CRÍTICA: Estás a punto de eliminar el grupo "${nombre}" permanentemente.\n\nEsta acción borrará el grupo del catálogo y DESACOPLARÁ AUTOMÁTICAMENTE a todos sus integrantes de la base de datos de Firebase.\n\n¿Estás completamente seguro?`)){
+        return;
+      }
+
+      // Si se está editando el mismo grupo que se va a borrar, cancelamos el modo edición
+      if (idGrupoEditando === id) cancelarEdicionGrupo();
+
+      try {
+        // Inicializamos un lote de escritura (Batch) atómico en Firestore
+        let batch = db.batch();
+
+        // 1. Añadimos la orden de eliminación del documento principal del grupo
+        const grupoRef = db.collection('catalogo_grupos').doc(id);
+        batch.delete(grupoRef);
+
+        // 2. Buscamos y añadimos la orden de eliminación de todos los integrantes vinculados a este grupo
+        const snapshotMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
+        
+        snapshotMiembros.forEach(docMiembro => {
+            batch.delete(docMiembro.ref);
+        });
+
+        // 3. Ejecutamos la operación atómica completa en Firebase en un solo bloque de red
+        await batch.commit();
+
+        // 4. Registramos el movimiento en la bitácora de auditoría de seguridad
+        if(typeof registrarAuditoria === 'function') {
+            registrarAuditoria('SISTEMA', `Eliminó permanentemente el grupo: ${nombre} y purgó a todos sus miembros afiliados.`);
+        }
+
+        alert(`El grupo "${nombre}" y sus afiliaciones han sido eliminados correctamente de Firebase.`);
+
+        // Si el usuario estaba viendo la pestaña de estructuras e integrantes de ese grupo, reseteamos la vista
+        if(typeof grupoSeleccionadoParaEstructura !== 'undefined' && grupoSeleccionadoParaEstructura === nombre) {
+            grupoSeleccionadoParaEstructura = '';
+            const selectEstruc = document.getElementById('selectEstructuraGrupo');
+            if(selectEstruc) selectEstruc.value = '';
+            if(typeof mostrarIntegrantesGrupo === 'function') mostrarIntegrantesGrupo('');
+        }
+
+      } catch (error) {
+        console.error("Error al eliminar el grupo y desacoplar miembros:", error);
+        alert("Ocurrió un error crítico al intentar purgar la información en Firebase.");
       }
     }
 
@@ -4878,6 +5090,7 @@
         await db.collection('miembros_grupos').add({
           id_beneficiario: idBen,
           nombre_grupo: nombreGrp,
+          rol_grupo: 'INTEGRANTE',
           fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
         });
         
@@ -4920,6 +5133,151 @@
 
     window.limpiarCampoCiudadano = function(campo) {
       document.getElementById(`grupo_${campo}`).value = '';
+      document.getElementById(`grupo_${campo}_id`).value = '';
+    }
+
+    let grupoSeleccionadoParaEstructura = '';
+
+    window.cargarEstructuraGrupo = function(reconstruirSelect = true) {
+        const select = document.getElementById('selectEstructuraGrupo');
+        if (reconstruirSelect) {
+            select.innerHTML = '<option value="">Selecciona un grupo para ver sus integrantes...</option>';
+            listaGruposCatalogo.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(g => {
+                select.add(new Option(`${g.nombre} (${conteoMiembrosPorGrupo[g.nombre] || 0} miembros)`, g.nombre));
+            });
+            if(grupoSeleccionadoParaEstructura && Array.from(select.options).some(o=>o.value===grupoSeleccionadoParaEstructura)) {
+                select.value = grupoSeleccionadoParaEstructura;
+            }
+        }
+        mostrarIntegrantesGrupo(select.value);
+    }
+
+    window.mostrarIntegrantesGrupo = function(nombreGrupo) {
+        grupoSeleccionadoParaEstructura = nombreGrupo;
+        const tbody = document.getElementById('tablaEstructuraIntegrantes');
+        const badgeTotal = document.getElementById('badgeEstructuraTotal');
+        
+        if(!nombreGrupo) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo arriba para ver sus integrantes.</td></tr>';
+            badgeTotal.textContent = '0 integrantes';
+            return;
+        }
+
+        let integrantes = [];
+        // Filtramos de forma ultrarrápida usando el diccionario en memoria
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            const rel = grupos.find(g => g.nombre_grupo === nombreGrupo);
+            if(rel) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                integrantes.push({
+                    id_beneficiario: idBen,
+                    idRelacion: rel.idRelacion,
+                    nombre: dataBen ? dataBen.nombre : 'Usuario Desconocido',
+                    seccion: dataBen ? dataBen.seccion : '--',
+                    foto_url: dataBen ? dataBen.foto_url : '',
+                    rol: rel.rol,
+                    fechaMs: rel.fecha ? rel.fecha.toMillis() : 0,
+                    fechaObj: rel.fecha ? rel.fecha.toDate() : new Date()
+                });
+            }
+        }
+
+        badgeTotal.textContent = `${integrantes.length} integrantes`;
+
+        // Ordenamos dándole prioridad matemática a los líderes para que queden siempre arriba
+        const pesosJerarquia = { 'COORDINADOR': 1, 'REPRESENTANTE': 2, 'INTEGRANTE': 3 };
+        integrantes.sort((a,b) => {
+            const pesoA = pesosJerarquia[a.rol] || 4;
+            const pesoB = pesosJerarquia[b.rol] || 4;
+            if (pesoA !== pesoB) return pesoA - pesoB;
+            return a.nombre.localeCompare(b.nombre); // Si son iguales, alfabéticamente
+        });
+
+        tbody.innerHTML = '';
+        if(integrantes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Este grupo no tiene integrantes todavía. ¡Añade el primero!</td></tr>';
+            return;
+        }
+
+        integrantes.forEach(i => {
+            const miniaturaHtml = (i.foto_url && i.foto_url.trim() !== "")
+                ? `<img src="${i.foto_url}" class="w-full h-full object-cover">`
+                : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
+            const dateStr = i.fechaObj.toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'});
+
+            // Selector dinámico de Rol con colores corporativos
+            const colorRol = i.rol === 'COORDINADOR' ? 'text-indigo-600 bg-indigo-50 border-indigo-200' : (i.rol === 'REPRESENTANTE' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-slate-600 bg-slate-50 border-slate-200');
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                ${miniaturaHtml}
+                            </div>
+                            <span class="font-bold text-slate-800 text-xs uppercase">${i.nombre}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <select onchange="cambiarRolIntegrante('${i.idRelacion}', this.value, '${i.nombre}')" class="w-full max-w-[140px] text-[10px] font-black uppercase tracking-wider outline-none border rounded-lg px-2 py-1.5 transition-colors cursor-pointer text-center shadow-sm ${colorRol}">
+                            <option value="INTEGRANTE" ${i.rol === 'INTEGRANTE' ? 'selected' : ''}>INTEGRANTE</option>
+                            <option value="REPRESENTANTE" ${i.rol === 'REPRESENTANTE' ? 'selected' : ''}>REPRESENTANTE</option>
+                            <option value="COORDINADOR" ${i.rol === 'COORDINADOR' ? 'selected' : ''}>COORDINADOR</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 text-center text-xs font-bold text-slate-600">${i.seccion || '--'}</td>
+                    <td class="px-4 py-3 text-center text-[10px] text-slate-500 font-medium">${dateStr}</td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="abrirPerfil('${i.id_beneficiario}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md" title="Ver Expediente Oficial">
+                                <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="quitarIntegranteEstructura('${i.idRelacion}', '${i.nombre}')" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm flex items-center justify-center" title="Remover del grupo">
+                                <i data-lucide="user-minus" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        lucide.createIcons();
+    }
+
+    window.cambiarRolIntegrante = async function(idRelacion, nuevoRol, nombre) {
+        try {
+            await db.collection('miembros_grupos').doc(idRelacion).update({ rol_grupo: nuevoRol });
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Modificó jerarquía a ${nuevoRol} para ${nombre} en el grupo ${grupoSeleccionadoParaEstructura}`);
+        } catch(e) {
+            alert('Error de conexión al cambiar la jerarquía.');
+        }
+    }
+
+    window.quitarIntegranteEstructura = async function(idRelacion, nombre) {
+        if(confirm(`¿Seguro que deseas remover a ${nombre} de este grupo?`)) {
+            try {
+                await db.collection('miembros_grupos').doc(idRelacion).delete();
+                if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Removió a ${nombre} del grupo ${grupoSeleccionadoParaEstructura}`);
+            } catch(e) {
+                alert("Error al remover integrante.");
+            }
+        }
+    }
+
+    window.abrirModalAgregarIntegranteEstructura = function() {
+        if(!grupoSeleccionadoParaEstructura) {
+            alert("Primero debes seleccionar un grupo en la lista desplegable.");
+            return;
+        }
+        campoDestinoBusqueda = 'estructura_add';
+        const modal = document.getElementById('modalBuscarCiudadano');
+        const input = document.getElementById('inputBuscarCiudadanoModal');
+        const lista = document.getElementById('listaCiudadanosModal');
+        
+        modal.classList.remove('hidden');
+        input.value = '';
+        lista.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">Escriba nombre, sección o clave para buscar al ciudadano...</div>';
+        setTimeout(() => input.focus(), 100);
+        lucide.createIcons();
     }
 
     window.filtrarCiudadanosModal = function() {
@@ -4931,16 +5289,14 @@
         return;
       }
 
-      // Aprovechamos los datos que ya están en memoria (0 lecturas a Firebase)
       const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
       
-      // Filtramos coincidencias
       const filtrados = allData.filter(d => {
         const nom = (d.nombre || '').toUpperCase();
         const cve = (d.clave_elector || '').toUpperCase();
         const sec = (d.seccion || '').toUpperCase();
         return nom.includes(query) || cve.includes(query) || sec.includes(query);
-      }).slice(0, 15); // Mostrar máximo los primeros 15
+      }).slice(0, 15);
 
       if (filtrados.length === 0) {
         contenedor.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">No se encontró a nadie con esos datos.</div>';
@@ -4953,11 +5309,11 @@
           ? `<img src="${d.foto_url}" class="w-full h-full object-cover">`
           : `<i data-lucide="user" class="w-5 h-5 text-slate-400"></i>`;
 
-        // Pasamos el nombre con un escape para evitar errores si tiene comillas
         const nombreSafe = d.nombre ? d.nombre.replace(/'/g, "\\'") : '';
 
+        // SE AGREGÓ d.id A LA FUNCIÓN PARA VINCULAR AL USUARIO DIRECTAMENTE
         contenedor.innerHTML += `
-          <div onclick="seleccionarCiudadanoModal('${nombreSafe}')" class="flex items-center justify-between p-3 hover:bg-indigo-50 rounded-xl cursor-pointer transition-colors border-b border-slate-100 last:border-0 group">
+          <div onclick="seleccionarCiudadanoModal('${nombreSafe}', '${d.id}')" class="flex items-center justify-between p-3 hover:bg-indigo-50 rounded-xl cursor-pointer transition-colors border-b border-slate-100 last:border-0 group">
             <div class="flex items-center gap-4">
               <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                 ${miniaturaHtml}
@@ -4974,13 +5330,35 @@
       lucide.createIcons();
     }
 
-    window.seleccionarCiudadanoModal = function(nombre) {
+    window.seleccionarCiudadanoModal = async function(nombre, idBeneficiario) {
       if (campoDestinoBusqueda === 'coordinador') {
         document.getElementById('grupo_coordinador').value = nombre;
+        document.getElementById('grupo_coordinador_id').value = idBeneficiario;
+        cerrarModalBusquedaCiudadano();
       } else if (campoDestinoBusqueda === 'representante') {
         document.getElementById('grupo_representante').value = nombre;
+        document.getElementById('grupo_representante_id').value = idBeneficiario;
+        cerrarModalBusquedaCiudadano();
+      } else if (campoDestinoBusqueda === 'estructura_add') {
+        // Lógica para registrarlo directamente en la base de datos de grupos
+        const misGrupos = window.miembrosGruposMemoria[idBeneficiario] || [];
+        if(misGrupos.some(g => g.nombre_grupo === grupoSeleccionadoParaEstructura)) {
+            alert("El ciudadano ya pertenece a este grupo."); 
+            return;
+        }
+        try {
+            await db.collection('miembros_grupos').add({
+                id_beneficiario: idBeneficiario,
+                nombre_grupo: grupoSeleccionadoParaEstructura,
+                rol_grupo: 'INTEGRANTE', // Se inscribe como base
+                fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Integró a ${nombre} al grupo ${grupoSeleccionadoParaEstructura}`);
+            cerrarModalBusquedaCiudadano();
+        } catch(error) { 
+            alert("Error de conexión al asignar integrante."); 
+        }
       }
-      cerrarModalBusquedaCiudadano();
     }
 
     // Disparador inicial (Global)
