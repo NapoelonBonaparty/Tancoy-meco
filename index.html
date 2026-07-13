@@ -449,11 +449,23 @@
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Sección</label>
                   <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <!-- Icono Izquierdo -->
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                       <i data-lucide="map" class="w-4 h-4 text-slate-400"></i>
                     </div>
-                    <input type="text" id="f_seccion" list="lista_secciones_datalist" required class="w-full text-sm pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="EJ. 0001">
-                    <datalist id="lista_secciones_datalist"></datalist>
+                    
+                    <!-- Input Text (Con eventos JS para controlar el Dropdown) -->
+                    <input type="text" id="f_seccion" autocomplete="off" required class="w-full text-sm pl-10 pr-10 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all relative z-10" placeholder="EJ. 0001" onfocus="mostrarDropdownSecciones()" onblur="ocultarDropdownSeccionesDelayed()" onkeyup="filtrarDropdownSecciones()">
+                    
+                    <!-- Icono Flecha Derecho -->
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-10">
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform duration-200" id="f_seccion_chevron"></i>
+                    </div>
+
+                    <!-- Dropdown Personalizado Minimalista -->
+                    <div id="dropdown_secciones" class="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-2xl z-50 hidden max-h-56 overflow-y-auto transform origin-top transition-all duration-200 ease-out scale-95 opacity-0">
+                       <!-- JS inyecta opciones aquí -->
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -2247,6 +2259,21 @@
         if (loader) loader.classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('appScreen').classList.add('hidden');
+        
+        // --- LIMPIEZA DE INTERFAZ AL CERRAR SESIÓN ---
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.innerHTML = 'Iniciar Sesión <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+            loginBtn.disabled = false;
+        }
+        
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) loginForm.reset();
+        
+        const errorBox = document.getElementById('errorMessage');
+        if (errorBox) errorBox.classList.add('hidden');
+        
+        lucide.createIcons();
       }
     });
 
@@ -2959,22 +2986,102 @@
       });
     }
 
-    // Función para llenar la lista desplegable con las secciones que ya existen
+    // --- LÓGICA DEL COMBOBOX PERSONALIZADO (SECCIONES ELECTORALES) ---
+    window.seccionesCacheadasArray = [];
+
+    // Función principal para extraer de memoria y construir el arsenal de opciones
     window.actualizarDatalistSecciones = function() {
-        const dataList = document.getElementById('lista_secciones_datalist');
-        if (!dataList) return;
+        const dropdown = document.getElementById('dropdown_secciones');
+        if (!dropdown) return;
+        
         const seccionesUnicas = new Set();
         Object.values(window.registrosGlobalesMemoria).forEach(d => {
             if (d.seccion && d.seccion !== '--' && d.seccion !== 'N/A') {
                 seccionesUnicas.add(d.seccion.trim().toUpperCase());
             }
         });
-        dataList.innerHTML = '';
-        Array.from(seccionesUnicas).sort().forEach(sec => {
-            const option = document.createElement('option');
-            option.value = sec;
-            dataList.appendChild(option);
+        
+        // Guardar globalmente para el buscador en vivo
+        window.seccionesCacheadasArray = Array.from(seccionesUnicas).sort();
+        renderizarDropdownSecciones(window.seccionesCacheadasArray);
+    }
+
+    // Constructor dinámico del HTML interno del dropdown
+    window.renderizarDropdownSecciones = function(lista) {
+        const dropdown = document.getElementById('dropdown_secciones');
+        if (!dropdown) return;
+        
+        dropdown.innerHTML = '';
+        
+        // Si no hay coincidencias, sugerir que se ingresará como una nueva sección
+        if(lista.length === 0) {
+            dropdown.innerHTML = `
+                <div class="px-4 py-3 flex flex-col items-center justify-center text-slate-400">
+                    <i data-lucide="plus-circle" class="w-5 h-5 mb-1 text-indigo-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Nueva Sección Detectada</span>
+                </div>`;
+            lucide.createIcons();
+            return;
+        }
+        
+        lista.forEach(sec => {
+            const item = document.createElement('div');
+            // Diseño expansivo y amigable para entornos Touch y Punteros
+            item.className = "px-4 py-3 text-sm font-mono font-bold text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 hover:text-indigo-700 dark:hover:text-indigo-400 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-700/50 last:border-0 flex items-center gap-2";
+            item.innerHTML = `<i data-lucide="map-pin" class="w-3.5 h-3.5 opacity-50"></i> ${sec}`;
+            
+            // Usar onmousedown es crítico: se dispara antes del onblur del input, evitando que la caja desaparezca antes de procesar el clic
+            item.onmousedown = function(e) { 
+                e.preventDefault(); 
+                document.getElementById('f_seccion').value = sec;
+                ocultarDropdownSecciones();
+            };
+            dropdown.appendChild(item);
         });
+        lucide.createIcons();
+    }
+
+    // Funciones de control de estado visual y animaciones
+    window.mostrarDropdownSecciones = function() {
+        const dropdown = document.getElementById('dropdown_secciones');
+        const chevron = document.getElementById('f_seccion_chevron');
+        if(dropdown) {
+            dropdown.classList.remove('hidden');
+            if(chevron) chevron.classList.add('rotate-180');
+            // Micro-retraso para que el navegador procese el renderizado previo a la clase CSS de transición
+            setTimeout(() => {
+                dropdown.classList.remove('scale-95', 'opacity-0');
+                dropdown.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        filtrarDropdownSecciones(); // Limpiar filtro previo si existía
+    }
+
+    window.ocultarDropdownSecciones = function() {
+        const dropdown = document.getElementById('dropdown_secciones');
+        const chevron = document.getElementById('f_seccion_chevron');
+        if(dropdown) {
+            dropdown.classList.remove('scale-100', 'opacity-100');
+            dropdown.classList.add('scale-95', 'opacity-0');
+            if(chevron) chevron.classList.remove('rotate-180');
+            
+            // Esperar a que la opacidad baje antes de colapsar la altura del bloque con 'hidden'
+            setTimeout(() => {
+                dropdown.classList.add('hidden');
+            }, 200); 
+        }
+    }
+
+    // Retraso artificial para convivir con los toques nativos de pantallas
+    window.ocultarDropdownSeccionesDelayed = function() {
+        setTimeout(ocultarDropdownSecciones, 200);
+    }
+
+    // Motor de búsqueda predictivo ultra-rápido en RAM
+    window.filtrarDropdownSecciones = function() {
+        const inputVal = document.getElementById('f_seccion').value.trim().toUpperCase();
+        const listaFiltrada = window.seccionesCacheadasArray.filter(sec => sec.includes(inputVal));
+        renderizarDropdownSecciones(listaFiltrada);
     }
 
     // --- CAPTURA MANUAL NUEVA ---

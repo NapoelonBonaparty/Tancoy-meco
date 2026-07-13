@@ -1196,11 +1196,12 @@
 
       <section id="page-configuracion" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
-          <div><h2 class="text-2xl font-bold">Configuración Corporativa</h2><p class="text-sm text-slate-500">Marca visual y mantenimiento técnico del sistema</p></div>
+          <div><h2 class="text-2xl font-bold">Configuración Corporativa</h2><p class="text-sm text-slate-500">Marca visual, auditoría técnica y mantenimiento del sistema</p></div>
         </div>
-        <div class="flex gap-6 border-b border-slate-200">
-          <button id="btn-tab-apariencia" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600" onclick="switchConfigTab('apariencia')">Marca Institucional</button>
-          <button id="btn-tab-peligro" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1" onclick="switchConfigTab('peligro')"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i> Zona de Peligro</button>
+        <div class="flex gap-6 border-b border-slate-200 overflow-x-auto">
+          <button id="btn-tab-apariencia" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 shrink-0" onclick="switchConfigTab('apariencia')">Marca Institucional</button>
+          <button id="btn-tab-ranking" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-indigo-600 transition-all flex items-center gap-1.5 shrink-0" onclick="switchConfigTab('ranking')"><i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> Rendimiento Orgánico</button>
+          <button id="btn-tab-peligro" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1.5 shrink-0" onclick="switchConfigTab('peligro')"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i> Zona de Peligro</button>
         </div>
 
         <div id="config-apariencia" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1252,7 +1253,27 @@
 
         <div id="config-peligro" class="hidden bg-white rounded-xl p-8 border border-slate-200 shadow-sm max-w-4xl">
           <div class="flex items-start gap-4">
+            <div class="p-3 bg-red-10<div id="config-peligro" class="hidden bg-white rounded-xl p-8 border border-slate-200 shadow-sm max-w-4xl">
+          <div class="flex items-start gap-4">
             <div class="p-3 bg-red-100/80 rounded-full shrink-0">
+              <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-base font-bold text-red-700 mb-1">Mantenimiento Crítico del Sistema</h4>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">Esta acción eliminará de forma irreversible y permanente <strong>TODOS</strong> los ciudadanos registrados en el Padrón de Beneficiarios. Esta operación no se puede deshacer.</p>
+              
+              <!-- NUEVO: BOTÓN DE RESPALDO DE EMERGENCIA -->
+              <div class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <p class="text-sm font-bold text-slate-800">Copia de Seguridad (Backup)</p>
+                  <p class="text-[10px] text-slate-500 mt-0.5">Descarga un archivo JSON con todo el padrón actual antes de realizar la purga.</p>
+                </div>
+                <button onclick="descargarRespaldoJSON()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap">
+                  <i data-lucide="download-cloud" class="w-4 h-4"></i> Descargar JSON
+                </button>
+              </div>
+
+              <div class="max-w-md space-y-2 bg-red-50/50 p-4 border border-red-100 rounded-xl">HOLA SOY NAPZ JIJI MIAU
               <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
             </div>
             <div class="flex-1">
@@ -1268,6 +1289,27 @@
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NUEVA PESTAÑA OCULTA: RANKING DE CAPTURISTAS -->
+        <div id="config-ranking" class="hidden bg-white rounded-xl p-8 border border-slate-200 shadow-sm max-w-2xl">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="p-3 bg-amber-100/80 text-amber-600 rounded-xl shrink-0 border border-amber-200 shadow-inner">
+              <i data-lucide="trophy" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-black text-slate-800 tracking-tight">Ranking Oficial de Capturistas</h4>
+              <p class="text-xs font-medium text-slate-500 mt-0.5">Métricas de productividad de captura orgánica (excluye importaciones de Excel).</p>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-6 border border-indigo-800/50 shadow-lg relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <h3 class="text-xs font-black text-indigo-200 uppercase tracking-widest mb-5 flex items-center gap-2 relative z-10"><i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Top 5: Mejores Elementos en Campo</h3>
+            <div id="listaRankingCapturistas" class="space-y-3 relative z-10">
+              <div class="text-center py-6 text-indigo-300 text-xs font-medium"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto mb-2 opacity-50"></i> Procesando métricas de captura...</div>
             </div>
           </div>
         </div>
@@ -1981,11 +2023,27 @@
                let permisos = data.permisos || []; 
                let rolMostrar = data.rol || 'Usuario';
                
-               // 👻 MAGIA: MODO DIOS PARA EL FANTASMA (Dinámico) NAPOLEON BONAPARTY W11
+               // 👻 MAGIA: MODO DIOS Y RESTRICCIÓN ABSOLUTA
                if (email.toLowerCase() === 'master@delta.com') {
-                   // Escanea automáticamente todos los botones del menú y se los asigna
+                   // El Mega Admin obtiene todo escaneando el menú
                    permisos = Array.from(document.querySelectorAll('.sidebar-item')).map(btn => btn.getAttribute('data-nav'));
                    rolMostrar = 'Mega Super Admin';
+               } else {
+                   // Candado de Titanio: Forzamos la eliminación del permiso "configuracion" si alguien lo tuviera
+                   permisos = permisos.filter(p => p !== 'configuracion');
+                   
+                   // Ocultamos visualmente el checkbox de Configuración para que NADIE más lo pueda asignar
+                   const chkConfigAdd = document.querySelector('input[name="permiso_modulo"][value="configuracion"]');
+                   if(chkConfigAdd) chkConfigAdd.parentElement.style.display = 'none';
+                   
+                   const chkConfigEdit = document.querySelector('input[name="mu_permiso"][value="configuracion"]');
+                   if(chkConfigEdit) chkConfigEdit.parentElement.style.display = 'none';
+               }
+
+               // Mostrar Ranking de Capturistas SOLO a Administradores
+               const rankingWidget = document.getElementById('widgetRankingCapturistas');
+               if (rankingWidget && (rolMostrar.includes('Admin') || rolMostrar.includes('Mega'))) {
+                   rankingWidget.classList.remove('hidden');
                }
                
                document.getElementById('userRole').textContent = rolMostrar;
@@ -2189,6 +2247,21 @@
         if (loader) loader.classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('appScreen').classList.add('hidden');
+        
+        // --- LIMPIEZA DE INTERFAZ AL CERRAR SESIÓN ---
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.innerHTML = 'Iniciar Sesión <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+            loginBtn.disabled = false;
+        }
+        
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) loginForm.reset();
+        
+        const errorBox = document.getElementById('errorMessage');
+        if (errorBox) errorBox.classList.add('hidden');
+        
+        lucide.createIcons();
       }
     });
 
@@ -2251,7 +2324,6 @@
       const registros = Object.values(window.registrosGlobalesMemoria);
       const total = registros.length;
 
-      // Conteo corregido a "INDECISO"
       const aFavor = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'A FAVOR').length;
       const indecisos = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'INDECISO').length;
       const enContra = registros.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'EN CONTRA').length;
@@ -2267,6 +2339,61 @@
       document.getElementById('kpiIndecisosPct').textContent = `(${pctIndecisos}%)`;
       document.getElementById('kpiEnContra').textContent = enContra.toLocaleString('en-US');
       document.getElementById('kpiEnContraPct').textContent = `(${pctEnContra}%)`;
+
+      // Llamamos silenciosamente al cálculo del ranking para que esté listo en caché
+      if(typeof calcularYRenderizarRanking === 'function') calcularYRenderizarRanking(); 
+    }
+
+    // LÓGICA DE RENDIMIENTO DE CAPTURISTAS MOVIDA A CONFIGURACIÓN
+    window.calcularYRenderizarRanking = function() {
+      const registros = Object.values(window.registrosGlobalesMemoria);
+      const conteoCapturistas = {};
+      
+      registros.forEach(d => {
+          const capturista = d.registrado_por || 'Origen Externo';
+          // Se excluyen explícitamente importaciones masivas para no falsificar la productividad manual
+          if(!capturista.toUpperCase().includes('EXCEL')) {
+              conteoCapturistas[capturista] = (conteoCapturistas[capturista] || 0) + 1;
+          }
+      });
+
+      const rankingArray = Object.keys(conteoCapturistas).map(email => {
+          return { email: email, count: conteoCapturistas[email] };
+      });
+      
+      // Ordenar por quién capturó más
+      rankingArray.sort((a, b) => b.count - a.count);
+      const top5 = rankingArray.slice(0, 5); // Ampliado a Top 5
+      
+      const listaRanking = document.getElementById('listaRankingCapturistas');
+      if (listaRanking) {
+          listaRanking.innerHTML = '';
+          if (top5.length === 0) {
+              listaRanking.innerHTML = '<p class="text-[11px] font-medium text-indigo-300 text-center py-4">No hay métricas orgánicas registradas.</p>';
+          } else {
+              const coloresMedallas = ['text-amber-400', 'text-slate-300', 'text-orange-400'];
+              top5.forEach((c, index) => {
+                  const colorMedalla = coloresMedallas[index] || 'text-indigo-400';
+                  let alias = c.email.split('@')[0];
+                  
+                  listaRanking.innerHTML += `
+                      <div class="flex items-center justify-between bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/30 hover:border-indigo-500/50 transition-colors">
+                          <div class="flex items-center gap-3 min-w-0">
+                              <div class="w-8 h-8 rounded-full bg-slate-900/50 flex items-center justify-center border border-indigo-700/50 shrink-0 shadow-sm">
+                                  <span class="text-xs font-black text-indigo-100">${index + 1}</span>
+                              </div>
+                              <p class="text-sm font-bold text-indigo-50 truncate w-40 md:w-56 uppercase tracking-wider" title="${c.email}">${alias}</p>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0 bg-indigo-950/80 px-3 py-1.5 rounded-lg border border-indigo-900 shadow-inner">
+                              <span class="text-sm font-black text-white">${c.count}</span>
+                              <i data-lucide="award" class="w-4 h-4 ${colorMedalla}"></i>
+                          </div>
+                      </div>
+                  `;
+              });
+              lucide.createIcons();
+          }
+      }
     }
 
     const mapCoordsDictionary = {};
@@ -3766,19 +3893,26 @@
     function switchConfigTab(tab) {
       document.getElementById('config-apariencia').classList.toggle('hidden', tab !== 'apariencia');
       document.getElementById('config-peligro').classList.toggle('hidden', tab !== 'peligro');
+      document.getElementById('config-ranking').classList.toggle('hidden', tab !== 'ranking');
 
       const btnApariencia = document.getElementById('btn-tab-apariencia');
       const btnPeligro = document.getElementById('btn-tab-peligro');
+      const btnRanking = document.getElementById('btn-tab-ranking');
 
-      btnApariencia.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all";
-      btnPeligro.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1";
+      btnApariencia.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all shrink-0";
+      btnPeligro.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-red-600 transition-all flex items-center gap-1.5 shrink-0";
+      if(btnRanking) btnRanking.className = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-indigo-600 transition-all flex items-center gap-1.5 shrink-0";
 
       if (tab === 'apariencia') {
-        btnApariencia.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600";
+        btnApariencia.className = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 shrink-0";
       } else if (tab === 'peligro') {
-        btnPeligro.className = "pb-2 text-sm px-1 font-semibold text-red-600 border-b-2 border-red-600 flex items-center gap-1";
+        btnPeligro.className = "pb-2 text-sm px-1 font-semibold text-red-600 border-b-2 border-red-600 flex items-center gap-1.5 shrink-0";
         const inputB = document.getElementById('inputConfirmarBorrado');
         if(inputB) { inputB.value = ''; validarBorradoMasivo(); }
+      } else if (tab === 'ranking') {
+        if(btnRanking) btnRanking.className = "pb-2 text-sm px-1 font-semibold text-amber-500 border-b-2 border-amber-500 flex items-center gap-1.5 shrink-0";
+        // Recalcular métricas cada que entra a esta pestaña en vivo
+        if(typeof calcularYRenderizarRanking === 'function') calcularYRenderizarRanking(); 
       }
       lucide.createIcons();
     }
@@ -6386,6 +6520,38 @@
             `;
         });
         lucide.createIcons();
+    }
+    // --- LÓGICA DE RESPALDO DE EMERGENCIA (BACKUP JSON) ---
+    window.descargarRespaldoJSON = function() {
+        // Usamos la memoria RAM que ya está filtrada y consolidada (0 lecturas a DB)
+        if (Object.keys(window.registrosGlobalesMemoria).length === 0) {
+            AppAlert("Alerta", "No hay datos en el padrón para respaldar o aún no han terminado de cargar.", "warning");
+            return;
+        }
+        
+        // Convertimos el diccionario a String JSON legible
+        const dataStr = JSON.stringify(window.registrosGlobalesMemoria, null, 2);
+        
+        // Creamos un Blob (archivo virtual en el navegador)
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        // Creamos un elemento <a> invisible para forzar la descarga
+        const a = document.createElement('a');
+        a.href = url;
+        const fecha = new Date().toISOString().split('T')[0];
+        a.download = `RESPALDO_PADRON_DELTA_${fecha}.json`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpiamos la memoria del navegador
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Descargó un backup JSON de la Base de Datos`);
+        
+        AppAlert("Respaldo Exitoso", "El archivo JSON con la base de datos se ha descargado a tu equipo de forma segura.", "success");
     }
     // Disparador inicial (Global)
     activarSincronizacionTemaRealtime();
