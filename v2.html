@@ -564,7 +564,7 @@
           </div>
         </div>
 
-        <div class="flex gap-6 border-b border-slate-200 dark:border-slate-700 mb-4">
+        <div class="flex flex-wrap gap-x-6 gap-y-2 border-b border-slate-200 dark:border-slate-700 mb-4">
           <button id="btn-tab-apoyos-estadisticas" class="pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2" onclick="switchApoyosTab('estadisticas')">
             <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estadísticas
           </button>
@@ -572,7 +572,13 @@
             <i data-lucide="list" class="w-4 h-4"></i> Catálogo de Programas
           </button>
           <button id="btn-tab-apoyos-asignacion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2" onclick="switchApoyosTab('asignacion')">
-            <i data-lucide="user-check" class="w-4 h-4"></i> Asignación
+            <i data-lucide="user-check" class="w-4 h-4"></i> Asignación Individual
+          </button>
+          <button id="btn-tab-apoyos-dispersion" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-emerald-600 transition-all flex items-center gap-2" onclick="switchApoyosTab('dispersion')">
+            <i data-lucide="boxes" class="w-4 h-4"></i> Dispersión a Grupos
+          </button>
+          <button id="btn-tab-apoyos-grupos" class="pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-indigo-600 transition-all flex items-center gap-2" onclick="switchApoyosTab('grupos')">
+            <i data-lucide="layers" class="w-4 h-4"></i> Apoyos por Grupo
           </button>
         </div>
 
@@ -644,6 +650,12 @@
                 <label class="text-xs font-bold text-slate-500 block mb-1">Nombre del Programa / Apoyo</label>
                 <input type="text" id="apoyo_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 uppercase" placeholder="Ej. FERTILIZANTES 2024">
               </div>
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="text-xs font-bold text-slate-500 block mb-1">Inventario / Topes (Opcional)</label>
+                  <input type="number" id="apoyo_inventario" min="0" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Dejar vacío si es ilimitado">
+                </div>
+              </div>
               <div>
                 <label class="text-xs font-bold text-slate-500 block mb-1">Descripción del Apoyo</label>
                 <textarea id="apoyo_desc" required rows="3" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Detalles o requisitos del programa..."></textarea>
@@ -664,7 +676,8 @@
                 <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
                   <tr>
                     <th class="px-4 py-3 font-semibold">Programa / Apoyo</th>
-                    <th class="px-4 py-3 text-center font-semibold w-28">Acciones</th>
+                    <th class="px-4 py-3 font-semibold text-center w-28">Inventario</th>
+                    <th class="px-4 py-3 text-center font-semibold w-32">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="tablaApoyos" class="divide-y divide-slate-100 bg-white">
@@ -713,14 +726,78 @@
                 </tbody>
               </table>
             </div>
-            <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs">
+            <div class="p-4 flex flex-wrap items-center justify-center gap-4 bg-white text-xs border-t border-slate-100">
               <div class="flex items-center gap-1" id="ca_contenedorBotonesPaginas"></div>
             </div>
           </div>
         </div>
-      </section>
-      
 
+        <!-- NUEVA PESTAÑA: DISPERSIÓN MASIVA A GRUPOS -->
+        <div id="tab-apoyos-dispersion" class="hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="network" class="w-4 h-4 text-emerald-500"></i>
+                <h3 class="text-sm font-bold text-slate-800">Grupos Activos (Dispersión Masiva)</h3>
+              </div>
+              <div class="flex-1 w-full md:max-w-xs relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i></div>
+                <input type="text" id="filtroBuscadorDispersion" onkeyup="renderizarTablaDispersionMasiva()" placeholder="Buscar grupo institucional..." class="w-full text-xs pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-emerald-500 transition-colors">
+              </div>
+            </div>
+            <div class="overflow-x-auto flex-1 max-h-[500px]">
+              <table class="w-full text-left text-sm">
+                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 py-3 font-semibold">Grupo Institucional</th>
+                    <th class="px-4 py-3 font-semibold text-center w-32">Integrantes</th>
+                    <th class="px-4 py-3 text-center font-semibold w-40">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaDispersionMasiva" class="divide-y divide-slate-100 bg-white">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- NUEVA PESTAÑA: APOYOS POR GRUPO -->
+        <div id="tab-apoyos-grupos" class="hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center gap-4">
+            <div class="flex-1 w-full relative">
+              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Selecciona un Grupo Institucional</label>
+              <select id="selectApoyosGrupo" onchange="renderizarTablaApoyosPorGrupo()" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900">
+                <option value="">Selecciona un grupo para auditar sus apoyos...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Desglose de Apoyos por Integrante
+              </h3>
+              <span id="badgeApoyosGrupoTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+            </div>
+            <div class="overflow-x-auto max-h-[500px]">
+              <table class="w-full text-left text-sm">
+                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 py-3 font-semibold">Ciudadano</th>
+                    <th class="px-4 py-3 font-semibold text-center w-32">Jerarquía</th>
+                    <th class="px-4 py-3 font-semibold w-64">Apoyos Recibidos Históricamente</th>
+                    <th class="px-4 py-3 text-center font-semibold w-32">Gestión</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaApoyosPorGrupo" class="divide-y divide-slate-100 bg-white">
+                  <tr><td colspan="4" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo para visualizar la tabla.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
 
       <section id="page-grupos" class="p-6 space-y-6 hidden">
         <div class="flex items-center justify-between">
@@ -1128,7 +1205,7 @@
 
         <div id="config-apariencia" class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-            <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> Apariencia y Colores</h3>
+            <h3 class="text-sm font-semibold mb-4 flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> Ajustes de Marca e Interfaz</h3>
             <div class="space-y-5">
               <div>
                 <label class="text-xs text-slate-500 block mb-2 font-medium">Logotipo Principal</label>
@@ -1146,6 +1223,22 @@
                   <input type="color" id="colorTema" value="#4f46e5" class="w-10 h-10 rounded cursor-pointer border-0 p-0 bg-transparent">
                   <span class="text-xs text-slate-600">Reemplaza el índigo base.</span>
                 </div>
+              </div>
+              <div class="pt-3 border-t border-slate-100">
+                <label class="text-xs text-slate-500 block mb-2 font-bold uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="monitor" class="w-3.5 h-3.5 text-indigo-500"></i> Escala Visual Global (Resoluciones Altas)</label>
+                <div class="relative w-full">
+                  <select id="escalaGlobal" class="w-full text-xs font-black text-slate-700 px-4 py-2.5 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-white cursor-pointer shadow-sm">
+                    <option value="90%">90% (Pantallas Chicas / Laptops)</option>
+                    <option value="100%">100% (Vista Estándar Base)</option>
+                    <option value="105%">105% (Ajuste Leve)</option>
+                    <option value="110%">110% (Recomendado monitores 1080p Grandes)</option>
+                    <option value="115%">115% (Ajuste Intermedio)</option>
+                    <option value="120%">120% (Ideal Monitores 2K de Ingenieros)</option>
+                    <option value="125%">125% (Ajuste Alto)</option>
+                    <option value="130%">130% (Máxima Escala / Monitores 4K)</option>
+                  </select>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1.5">Forzar el zoom estandariza el tamaño de fuentes y tablas para que todos los ingenieros y capturistas vean la misma proporción que tú.</p>
               </div>
               <div class="pt-4 border-t border-slate-100">
                 <button id="btnGuardarConfig" onclick="guardarConfiguracion()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2">
@@ -1422,6 +1515,55 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <!-- MODAL DE DISPERSIÓN MASIVA DE APOYOS A GRUPOS -->
+    <div id="modalAsignacionMasiva" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col border border-slate-100">
+        <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center border border-emerald-200 shadow-sm">
+              <i data-lucide="gift" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-black text-slate-800 tracking-tight leading-none">Dispersión Masiva</h3>
+              <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1" id="am_grupo_display">GRUPO</p>
+            </div>
+          </div>
+          <button onclick="cerrarModalAsignacionMasiva()" class="p-1.5 hover:bg-slate-200 rounded-xl transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+        </div>
+
+        <form id="formAsignacionMasiva" class="p-6 space-y-5 bg-white">
+          <input type="hidden" id="am_nombre_grupo">
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-xs font-bold text-amber-800 mb-1">Acción en Lote</p>
+              <p class="text-[10px] text-amber-700">Se registrará una entrega individual en el expediente de cada uno de los <strong id="am_conteo_display">0</strong> miembros activos de este grupo. Esta acción no se puede deshacer de forma masiva.</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Programa a Dispersar</label>
+            <select id="am_select_apoyo" required class="w-full text-sm font-bold text-slate-700 px-4 py-2.5 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500 transition-all shadow-sm">
+              <option value="">Selecciona el programa...</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Fecha de Dispersión</label>
+            <input type="date" id="am_fecha" required class="w-full text-sm font-bold text-slate-700 px-4 py-2.5 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500 transition-all shadow-sm">
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Observaciones Globales (Opcional)</label>
+            <input type="text" id="am_observaciones" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500 transition-all shadow-sm" placeholder="Ej. Entrega programada en asamblea">
+          </div>
+
+          <button type="submit" id="btnConfirmarMasiva" class="w-full px-5 py-3 bg-emerald-500 hover:bg-emerald-600 transition-colors text-white text-sm font-black rounded-xl shadow-sm flex items-center justify-center gap-2 uppercase tracking-wide mt-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Iniciar Dispersión
+          </button>
+        </form>
       </div>
     </div>
     <div id="modalAsignarGrupo" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
@@ -2235,25 +2377,42 @@
       }
     }
 
-            // 🔥 LA FUNCIÓN DE LAS PESTAÑAS QUE SE HABÍA BORRADO POR ACCIDENTE
+            // 🔥 FUNCIÓN DE PESTAÑAS DE GESTIÓN DE APOYOS
             function switchApoyosTab(tab) {
               document.getElementById('tab-apoyos-estadisticas').classList.toggle('hidden', tab !== 'estadisticas');
               document.getElementById('tab-apoyos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
               document.getElementById('tab-apoyos-asignacion').classList.toggle('hidden', tab !== 'asignacion');
+              document.getElementById('tab-apoyos-dispersion').classList.toggle('hidden', tab !== 'dispersion');
+              document.getElementById('tab-apoyos-grupos').classList.toggle('hidden', tab !== 'grupos');
 
               const btnEstadisticas = document.getElementById('btn-tab-apoyos-estadisticas');
               const btnCatalogo = document.getElementById('btn-tab-apoyos-catalogo');
               const btnAsignacion = document.getElementById('btn-tab-apoyos-asignacion');
+              const btnDispersion = document.getElementById('btn-tab-apoyos-dispersion');
+              const btnGrupos = document.getElementById('btn-tab-apoyos-grupos');
 
               const activeClass = "pb-2 text-sm px-1 font-semibold text-indigo-600 border-b-2 border-indigo-600 transition-all flex items-center gap-2";
+              const activeClassEmerald = "pb-2 text-sm px-1 font-semibold text-emerald-600 border-b-2 border-emerald-600 transition-all flex items-center gap-2";
               const inactiveClass = "pb-2 text-sm px-1 font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-all flex items-center gap-2";
 
               if(btnEstadisticas) btnEstadisticas.className = tab === 'estadisticas' ? activeClass : inactiveClass;
               if(btnCatalogo) btnCatalogo.className = tab === 'catalogo' ? activeClass : inactiveClass;
               if(btnAsignacion) btnAsignacion.className = tab === 'asignacion' ? activeClass : inactiveClass;
+              if(btnDispersion) btnDispersion.className = tab === 'dispersion' ? activeClassEmerald : inactiveClass;
+              if(btnGrupos) btnGrupos.className = tab === 'grupos' ? activeClass : inactiveClass;
 
               if (tab === 'asignacion') aplicarFiltrosCA();
               if (tab === 'estadisticas') cargarEstadisticasApoyos();
+              if (tab === 'dispersion') renderizarTablaDispersionMasiva(); 
+              
+              if (tab === 'grupos') {
+                  const sel = document.getElementById('selectApoyosGrupo');
+                  sel.innerHTML = '<option value="">Selecciona un grupo para auditar sus apoyos...</option>';
+                  listaGruposCatalogo.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(g => {
+                      sel.add(new Option(g.nombre, g.nombre));
+                  });
+                  renderizarTablaApoyosPorGrupo();
+              }
               lucide.createIcons();
             }
 
@@ -3245,16 +3404,22 @@
           historial.forEach(d => {
             let dateStr = d.fecha_asignada || (d.fecha_entrega && d.fecha_entrega.toDate ? d.fecha_entrega.toDate().toLocaleDateString('es-MX') : '--');
 
-            // Aquí se dibuja la fila incluyendo la CUARTA columna de Acción
+            // Aquí se dibuja la fila incluyendo la CUARTA columna de Acción con Botón EDITAR
+            const descLimpiaObs = d.observaciones ? d.observaciones.replace(/'/g, "\\'") : '';
             tbody.innerHTML += `
             <tr class="hover:bg-slate-50 transition-colors">
               <td class="px-4 py-3 text-xs font-medium text-slate-600">${dateStr}</td>
               <td class="px-4 py-3 text-xs font-bold text-slate-800">${d.nombre_apoyo}</td>
               <td class="px-4 py-3 text-xs text-slate-500">${d.observaciones || '--'}</td>
               <td class="px-4 py-3 text-center">
-                <button onclick="eliminarEntregaApoyo('${d.idEntrega}', '${idBeneficiario}', 'asignacion')" class="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Borrar Entrega">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
+                <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="editarEntregaApoyo('${d.idEntrega}', '${d.nombre_apoyo}', '${dateStr}', '${descLimpiaObs}')" class="p-1 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors" title="Editar Fecha u Observaciones">
+                      <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="eliminarEntregaApoyo('${d.idEntrega}', '${idBeneficiario}', 'asignacion')" class="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Borrar Entrega Permanente">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
               </td>
             </tr>
             `;
@@ -3457,6 +3622,7 @@
 
     async function guardarConfiguracion() {
       const colorInput = document.getElementById('colorTema').value;
+      const escalaInput = document.getElementById('escalaGlobal').value; // Lectura del nuevo factor de zoom
       const logoInput = document.getElementById('logoUpload');
       const btn = document.getElementById('btnGuardarConfig');
       const successMsg = document.getElementById('configSuccess');
@@ -3482,7 +3648,10 @@
           }
         }
 
-        const datosUpdate = { color_corporativo: colorInput };
+        const datosUpdate = { 
+            color_corporativo: colorInput,
+            factor_escala: escalaInput // Guardado persistente en Firebase
+        };
         if (logoBase64) datosUpdate.logo_url = logoBase64;
 
         await db.collection('configuracion').doc('global').set(datosUpdate, { merge: true });
@@ -3492,7 +3661,11 @@
 
       } catch (error) {
         console.error("Error al guardar la configuración:", error);
-        alert("Ocurrió un error al guardar los cambios.");
+        if(typeof AppAlert === 'function') {
+            await AppAlert("Error", "Ocurrió un error al guardar los cambios de escala.", "danger");
+        } else {
+            alert("Ocurrió un error al guardar los cambios.");
+        }
       } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -3525,13 +3698,25 @@
         if (doc.exists) {
           const data = doc.data();
 
-          // 1. Aplicar Color
+          // 1. Aplicar Color Corporativo
           if (data.color_corporativo) {
             document.getElementById('colorTema').value = data.color_corporativo;
             aplicarColorTema(data.color_corporativo);
           }
 
-          // 2. Aplicar Logotipo en todas las vistas
+          // 2. Aplicar Escala Visual Global (Forzar Zoom Realtime para Monitores de Alta Resolución)
+          if (data.factor_escala) {
+              const selectEscala = document.getElementById('escalaGlobal');
+              if(selectEscala) selectEscala.value = data.factor_escala;
+              
+              const cuerpoApp = document.getElementById('appBody');
+              if (cuerpoApp) {
+                  // Inyección atómica de la propiedad zoom en la raíz del cuerpo de la SPA
+                  cuerpoApp.style.zoom = data.factor_escala;
+              }
+          }
+
+          // 3. Aplicar Logotipo en todas las vistas
           if (data.logo_url) {
             // Definición de todos los elementos
             const imgSidebar = document.getElementById('appLogoImage');
@@ -3793,41 +3978,43 @@
 
         const nombre = document.getElementById('apoyo_nombre').value.trim().toUpperCase();
         const desc = document.getElementById('apoyo_desc').value.trim();
+        const invStr = document.getElementById('apoyo_inventario').value.trim();
+        // BLINDAJE ANTIBUGS: Garantizamos que sea null estricto y no un 0 engañoso
+        const invValue = (invStr === "" || isNaN(parseInt(invStr))) ? null : parseInt(invStr);
 
         try {
           if (idApoyoEditando) {
             await db.collection('catalogo_apoyos').doc(idApoyoEditando).update({
               nombre: nombre,
               descripcion: desc,
+              inventario: invValue,
               fecha_ultima_modificacion: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            // 🔥 NUEVO: Registrar auditoría al EDITAR
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Editó el apoyo del catálogo: ${nombre}`);
+            if(typeof AppAlert === 'function') await AppAlert("Éxito", "Apoyo actualizado correctamente.", "success");
 
-            alert("Apoyo actualizado correctamente.");
             cancelarEdicionApoyo();
           } else {
             const existe = await db.collection('catalogo_apoyos').where('nombre', '==', nombre).get();
             if(!existe.empty) {
-              alert("Este apoyo ya existe en el catálogo.");
+              if(typeof AppAlert === 'function') await AppAlert("Aviso", "Este apoyo ya existe en el catálogo.", "warning");
               return;
             }
             await db.collection('catalogo_apoyos').add({
               nombre: nombre,
               descripcion: desc,
+              inventario: invValue,
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp(),
               creado_por: auth.currentUser ? auth.currentUser.email : 'Admin'
             });
 
-            // 🔥 NUEVO: Registrar auditoría al CREAR
             if(typeof registrarAuditoria === 'function') registrarAuditoria('CAPTURA', `Registró un nuevo apoyo en el catálogo: ${nombre}`);
-
             this.reset();
           }
         } catch (error) {
           console.error("Error al procesar apoyo: ", error);
-          alert("Ocurrió un error en la base de datos.");
+          if(typeof AppAlert === 'function') await AppAlert("Error", "Ocurrió un error en la base de datos.", "danger");
         } finally {
           btn.innerHTML = idApoyoEditando ? 'Guardar Cambios' : 'Registrar Apoyo';
           btn.disabled = false;
@@ -3836,10 +4023,11 @@
       });
     }
 
-    window.cargarApoyoParaEditar = function(id, nombre, descripcion) {
+    window.cargarApoyoParaEditar = function(id, nombre, descripcion, inventario) {
       idApoyoEditando = id;
       document.getElementById('apoyo_nombre').value = nombre;
       document.getElementById('apoyo_desc').value = descripcion;
+      document.getElementById('apoyo_inventario').value = (inventario !== 'null' && inventario !== null && inventario !== undefined) ? inventario : '';
 
       const tituloForm = document.getElementById('formNuevoApoyo').previousElementSibling;
       tituloForm.innerHTML = `
@@ -3878,16 +4066,25 @@
         listaApoyosDisponibles = []; // Reseteamos la lista global para el select de asignación
 
         if (snapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="2" class="px-4 py-8 text-center text-sm text-slate-400">No hay apoyos registrados en el catálogo.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No hay apoyos registrados en el catálogo.</td></tr>`;
           return;
         }
 
         snapshot.forEach((doc) => {
           const data = doc.data();
           const descLimpia = data.descripcion ? data.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
+          const invData = data.inventario;
 
-          // Guardar en la lista global para usarla en el modal
-          listaApoyosDisponibles.push({ id: doc.id, nombre: data.nombre });
+          // Guardar en la lista global para usarla en los modales y que traiga el ID
+          listaApoyosDisponibles.push({ id: doc.id, nombre: data.nombre, inventario: invData });
+
+          // Renderizado dinámico del inventario
+          let badgeInv = '<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-black uppercase">Ilimitado</span>';
+          if (invData !== null && invData !== undefined) {
+              if (invData <= 0) badgeInv = '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-600 border border-rose-200 text-[10px] font-black uppercase">Agotado (0)</span>';
+              else if (invData <= 20) badgeInv = `<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-600 border border-amber-200 text-[10px] font-black uppercase">Quedan ${invData}</span>`;
+              else badgeInv = `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-black uppercase">${invData} disp.</span>`;
+          }
 
           tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition-colors">
@@ -3903,11 +4100,14 @@
               </div>
             </td>
             <td class="px-4 py-3 text-center">
+              ${badgeInv}
+            </td>
+            <td class="px-4 py-3 text-center">
               <div class="flex items-center justify-center gap-2">
-                <button onclick="cargarApoyoParaEditar('${doc.id}', '${data.nombre}', \`${descLimpia}\`)" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors" title="Editar Apoyo">
+                <button onclick="cargarApoyoParaEditar('${doc.id}', '${data.nombre}', \`${descLimpia}\`, ${invData})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors shadow-sm" title="Editar Apoyo">
                   <i data-lucide="edit" class="w-3.5 h-3.5"></i>
                 </button>
-                <button onclick="eliminarApoyoCatalogo('${doc.id}', '${data.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors" title="Eliminar Apoyo">
+                <button onclick="eliminarApoyoCatalogo('${doc.id}', '${data.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm" title="Eliminar Apoyo">
                   <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
@@ -3917,7 +4117,7 @@
         });
         lucide.createIcons();
 
-        // 🔥 NUEVO: Llenar el filtro de asignaciones con los apoyos
+        // Llenar el filtro de asignaciones
         const filtroApoyo = document.getElementById('ca_filtro_apoyo');
         if(filtroApoyo) {
           const valorActual = filtroApoyo.value;
@@ -3927,7 +4127,6 @@
           });
           if(Array.from(filtroApoyo.options).some(o=>o.value===valorActual)) filtroApoyo.value = valorActual;
         }
-
       });
     }
 
@@ -4100,21 +4299,21 @@
       contenedor.appendChild(btnNext);
     }
 
-    // Modal Asignar Apoyo Lógica (ACTUALIZADA)
+    // Modal Asignar Apoyo Lógica (ACTUALIZADA CON EDICIÓN)
+    let idEntregaEditando = null; // Control de edición
+
     window.abrirModalAsignarApoyo = function(idBeneficiario, nombreBeneficiario) {
       if(listaApoyosDisponibles.length === 0) {
         alert("No hay apoyos registrados en el catálogo. Crea uno primero.");
         return;
       }
 
-      // Obtener datos extra desde la memoria
       const data = window.registrosGlobalesMemoria[idBeneficiario];
       if(!data) return alert("Error al cargar datos del beneficiario.");
 
       document.getElementById('ma_id_beneficiario').value = idBeneficiario;
       document.getElementById('ma_nombre_beneficiario').value = nombreBeneficiario;
 
-      // Pintar Cabecera
       document.getElementById('ma_nombre_display').textContent = nombreBeneficiario;
       document.getElementById('ma_clave_display').textContent = (data.clave_elector && data.clave_elector !== '') ? data.clave_elector : 'NO REGISTRADA';
 
@@ -4125,80 +4324,134 @@
         fotoContainer.innerHTML = `<i data-lucide="user" class="w-10 h-10 text-slate-400"></i>`;
       }
 
-      // Cargar Select Dinámico
       const selectApoyo = document.getElementById('ma_select_apoyo');
       selectApoyo.innerHTML = '<option value="">Selecciona un apoyo</option>';
       listaApoyosDisponibles.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(ap => {
         selectApoyo.add(new Option(ap.nombre, ap.nombre));
       });
 
-      // Configurar campos por defecto (Fecha actual y Limpiar observaciones)
-      document.getElementById('ma_fecha_entrega').value = new Date().toISOString().split('T')[0];
-      document.getElementById('ma_observaciones').value = '';
-
-      // Abrir Modal
+      // Resetear vista de captura a valores normales
+      cancelarEdicionAsignacion();
       document.getElementById('modalAsignarApoyo').classList.remove('hidden');
       lucide.createIcons();
-
-      // Cargar Historial Inmediatamente
       cargarHistorialApoyos(idBeneficiario);
     }
 
     window.cerrarModalAsignarApoyo = function() {
       document.getElementById('modalAsignarApoyo').classList.add('hidden');
-      document.getElementById('formAsignarApoyo').reset();
+      cancelarEdicionAsignacion();
     }
 
-    /* Nota DELTA: Se eliminó la función duplicada cargarHistorialApoyos.
-      La versión correcta y operativa (con 4 columnas y botón de eliminar) 
-      se mantiene activa más arriba en el código.
-    */
+    window.editarEntregaApoyo = function(idEntrega, nombreApoyo, fechaAsignada, observaciones) {
+        idEntregaEditando = idEntrega;
+        const selectApoyo = document.getElementById('ma_select_apoyo');
+        selectApoyo.value = nombreApoyo;
+        selectApoyo.disabled = true; // No dejamos cambiar el TIPO de apoyo para no romper inventarios cruzados
+
+        if (fechaAsignada && fechaAsignada.includes('/')) {
+            const [dd, mm, yy] = fechaAsignada.split('/');
+            document.getElementById('ma_fecha_entrega').value = `${yy}-${mm}-${dd}`;
+        }
+        
+        document.getElementById('ma_observaciones').value = observaciones;
+        
+        const btn = document.getElementById('btnConfirmarAsignacion');
+        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+        btn.classList.replace('bg-sky-500', 'bg-amber-500');
+        btn.classList.replace('hover:bg-sky-600', 'hover:bg-amber-600');
+        lucide.createIcons();
+    }
+
+    window.cancelarEdicionAsignacion = function() {
+        idEntregaEditando = null;
+        document.getElementById('formAsignarApoyo').reset();
+        document.getElementById('ma_fecha_entrega').value = new Date().toISOString().split('T')[0];
+        document.getElementById('ma_select_apoyo').disabled = false;
+        
+        const btn = document.getElementById('btnConfirmarAsignacion');
+        btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Registrar Entrega';
+        btn.classList.replace('bg-amber-500', 'bg-sky-500');
+        btn.classList.replace('hover:bg-amber-600', 'hover:bg-sky-600');
+        lucide.createIcons();
+    }
 
     document.getElementById('formAsignarApoyo').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const btn = document.getElementById('btnConfirmarAsignacion');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Registrando...';
+      
+      const selectApoyo = document.getElementById('ma_select_apoyo');
+      const nombreApoyo = selectApoyo.value; 
+      
+      const datosApoyo = listaApoyosDisponibles.find(a => a.nombre === nombreApoyo);
+      if (!datosApoyo) return;
+
+      // Solo evaluamos el inventario si NO estamos editando una entrega ya existente
+      if (!idEntregaEditando && typeof datosApoyo.inventario === 'number' && datosApoyo.inventario <= 0) {
+          if(typeof AppAlert === 'function') await AppAlert("Apoyo Agotado", `El programa "${nombreApoyo}" se ha quedado sin inventario disponible.`, "danger");
+          return;
+      }
+
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
       btn.disabled = true;
       lucide.createIcons();
 
       const idBeneficiario = document.getElementById('ma_id_beneficiario').value;
       const nombreBeneficiario = document.getElementById('ma_nombre_beneficiario').value;
-      const nombreApoyo = document.getElementById('ma_select_apoyo').value;
       const fechaInput = document.getElementById('ma_fecha_entrega').value;
       const observaciones = document.getElementById('ma_observaciones').value.trim();
 
-      // Convertir formato YYYY-MM-DD a DD/MM/YYYY
       const [yy, mm, dd] = fechaInput.split('-');
       const dateStr = `${dd}/${mm}/${yy}`;
 
       try {
-        await db.collection('entregas_apoyos').add({
-          id_beneficiario: idBeneficiario,
-          nombre_beneficiario: nombreBeneficiario,
-          nombre_apoyo: nombreApoyo,
-          fecha_asignada: dateStr, // Fecha elegida manualmente
-          observaciones: observaciones,
-          fecha_entrega: firebase.firestore.FieldValue.serverTimestamp(), // Marca de tiempo real del servidor
-          capturista: auth.currentUser ? auth.currentUser.email : 'Admin'
-        });
-        
-        // AUDITORÍA
-        if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Otorgó [${nombreApoyo}] a ${nombreBeneficiario}`);
+        if (idEntregaEditando) {
+            // Lógica de EDICIÓN de entrega
+            await db.collection('entregas_apoyos').doc(idEntregaEditando).update({
+                fecha_asignada: dateStr,
+                observaciones: observaciones
+            });
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('EDICIÓN', `Editó detalles del apoyo [${nombreApoyo}] de ${nombreBeneficiario}`);
+            cancelarEdicionAsignacion(); // Reset
+            cargarHistorialApoyos(idBeneficiario);
 
-        // Limpiamos los campos para poder meter otro si quiere
-        document.getElementById('ma_select_apoyo').value = '';
-        document.getElementById('ma_observaciones').value = '';
+        } else {
+            // Lógica de ASIGNACIÓN NUEVA
+            const batch = db.batch();
+            const entregaRef = db.collection('entregas_apoyos').doc();
+            
+            batch.set(entregaRef, {
+              id_beneficiario: idBeneficiario,
+              nombre_beneficiario: nombreBeneficiario,
+              nombre_apoyo: nombreApoyo,
+              fecha_asignada: dateStr,
+              observaciones: observaciones,
+              fecha_entrega: firebase.firestore.FieldValue.serverTimestamp(),
+              capturista: auth.currentUser ? auth.currentUser.email : 'Admin'
+            });
 
-        // Recargar tabla de historial mágicamente
-        cargarHistorialApoyos(idBeneficiario);
+            // BLINDAJE INVENTARIO: Reducir solo si es estrictamente un número (no ilimitado)
+            if (typeof datosApoyo.inventario === 'number') {
+                const apoyoCatRef = db.collection('catalogo_apoyos').doc(datosApoyo.id);
+                batch.update(apoyoCatRef, {
+                    inventario: firebase.firestore.FieldValue.increment(-1)
+                });
+            }
+
+            await batch.commit();
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Otorgó [${nombreApoyo}] a ${nombreBeneficiario}`);
+
+            document.getElementById('ma_select_apoyo').value = '';
+            document.getElementById('ma_observaciones').value = '';
+            cargarHistorialApoyos(idBeneficiario);
+        }
 
       } catch (error) {
-        console.error("Error al asignar apoyo:", error);
-        alert("Ocurrió un error al registrar la asignación.");
+        console.error("Error en operación:", error);
+        if(typeof AppAlert === 'function') await AppAlert("Error", "Ocurrió un error de red.", "danger");
       } finally {
-        btn.innerHTML = originalText;
+        btn.innerHTML = originalText; // El texto depende de si era edición o no, lo maneja la UI
         btn.disabled = false;
         lucide.createIcons();
       }
@@ -5867,6 +6120,273 @@
       }
     }
 
+    // --- LÓGICA DE LA TABLA DE DISPERSIÓN MASIVA (MÓDULO APOYOS) ---
+    window.renderizarTablaDispersionMasiva = function() {
+        const query = document.getElementById('filtroBuscadorDispersion').value.trim().toUpperCase();
+        const tbody = document.getElementById('tablaDispersionMasiva');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        // Usamos los arreglos globales de grupos que ya existen en memoria (0 lecturas a DB)
+        const gruposFiltrados = listaGruposCatalogo.filter(g => 
+            g.nombre.toUpperCase().includes(query) || (g.descripcion && g.descripcion.toUpperCase().includes(query))
+        );
+
+        if(gruposFiltrados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No se encontraron grupos para dispersión.</td></tr>';
+            return;
+        }
+
+        gruposFiltrados.forEach(d => {
+            const conteo = conteoMiembrosPorGrupo[d.nombre] || 0;
+            
+            // Estilo visual dependiendo de si tiene miembros o está vacío
+            const opacityClass = conteo === 0 ? 'opacity-60 grayscale' : '';
+            const btnClass = conteo === 0 
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' 
+                : 'bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 hover:border-emerald-200 text-emerald-600 shadow-sm';
+
+            tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors ${opacityClass}">
+                <td class="px-4 py-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <i data-lucide="network" class="w-4 h-4 text-emerald-500"></i>
+                    </div>
+                    <div>
+                    <p class="font-bold text-slate-800 text-xs">${d.nombre}</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5 leading-tight">${d.descripcion || 'Sin descripción.'}</p>
+                    </div>
+                </div>
+                </td>
+                <td class="px-4 py-3 text-center">
+                <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 shadow-sm">${conteo}</span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                <button onclick="abrirModalAsignacionMasiva('${d.nombre}', ${conteo})" class="px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 font-bold text-[10px] uppercase tracking-wider mx-auto ${btnClass}" title="Entregar apoyo a todo el grupo">
+                    <i data-lucide="boxes" class="w-4 h-4"></i> Dispersar
+                </button>
+                </td>
+            </tr>`;
+        });
+        lucide.createIcons();
+    }
+
+    // --- MODAL Y LOGICA DE DISPERSIÓN MASIVA A GRUPOS ---
+    window.abrirModalAsignacionMasiva = function(nombreGrupo, cantidadMiembros) {
+        if (cantidadMiembros <= 0) {
+            AppAlert("Acción Denegada", "No puedes realizar una dispersión masiva porque este grupo aún no tiene integrantes registrados.", "warning");
+            return;
+        }
+
+        document.getElementById('am_nombre_grupo').value = nombreGrupo;
+        document.getElementById('am_grupo_display').textContent = nombreGrupo;
+        document.getElementById('am_conteo_display').textContent = cantidadMiembros;
+
+        const selApoyo = document.getElementById('am_select_apoyo');
+        selApoyo.innerHTML = '<option value="">Selecciona el programa...</option>';
+        listaApoyosDisponibles.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(ap => {
+            const extraTxt = (ap.inventario !== null) ? ` (Disponibles: ${ap.inventario})` : ' (Ilimitado)';
+            selApoyo.add(new Option(ap.nombre + extraTxt, ap.nombre));
+        });
+
+        document.getElementById('am_fecha').value = new Date().toISOString().split('T')[0];
+        document.getElementById('am_observaciones').value = '';
+
+        document.getElementById('modalAsignacionMasiva').classList.remove('hidden');
+        lucide.createIcons();
+    }
+
+    window.cerrarModalAsignacionMasiva = function() {
+        document.getElementById('modalAsignacionMasiva').classList.add('hidden');
+    }
+
+    document.getElementById('formAsignacionMasiva').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnConfirmarMasiva');
+        const nombreGrupo = document.getElementById('am_nombre_grupo').value;
+        const nombreApoyo = document.getElementById('am_select_apoyo').value;
+        const fechaInput = document.getElementById('am_fecha').value;
+        const observaciones = document.getElementById('am_observaciones').value.trim();
+
+        // 1. Obtener a todos los miembros de este grupo
+        const beneficiariosDelGrupo = [];
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            if (grupos.some(g => g.nombre_grupo === nombreGrupo)) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                if (dataBen) beneficiariosDelGrupo.push({ id: idBen, nombre: dataBen.nombre });
+            }
+        }
+
+        const cantRequerida = beneficiariosDelGrupo.length;
+        if (cantRequerida === 0) return; // Validación extra
+
+        // 2. Verificar disponibilidad de inventario
+        const datosApoyo = listaApoyosDisponibles.find(a => a.nombre === nombreApoyo);
+        if (!datosApoyo) return;
+
+        if (datosApoyo.inventario !== null && datosApoyo.inventario < cantRequerida) {
+            await AppAlert("Inventario Insuficiente", `No puedes realizar la dispersión.\n\nEl grupo tiene ${cantRequerida} miembros, pero el programa "${nombreApoyo}" solo tiene ${datosApoyo.inventario} unidades disponibles.`, "danger");
+            return;
+        }
+
+        // 3. Confirmación Final de Seguridad
+        if (!(await AppConfirm("Confirmar Dispersión Masiva", `¿Estás seguro de registrar la entrega de "${nombreApoyo}" a los ${cantRequerida} miembros del grupo ${nombreGrupo}?\n\nEsta acción ejecutará una escritura en lote en la base de datos.`, "warning", "Sí, Dispersar en Lote"))) {
+            return;
+        }
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Dispersando en Nube...';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        const [yy, mm, dd] = fechaInput.split('-');
+        const dateStr = `${dd}/${mm}/${yy}`;
+        const capturistaActual = auth.currentUser ? auth.currentUser.email : 'Admin';
+
+        try {
+            // Operación de Escritura Atómica Loteada (Batch)
+            let batch = db.batch();
+            let operaciones = 0;
+            let lotesEjecutados = 0;
+
+            // 4. Bucle para agregar cada entrega (El límite seguro de Firestore por batch es 500)
+            for (let i = 0; i < beneficiariosDelGrupo.length; i++) {
+                const b = beneficiariosDelGrupo[i];
+                const entregaRef = db.collection('entregas_apoyos').doc();
+                
+                batch.set(entregaRef, {
+                    id_beneficiario: b.id,
+                    nombre_beneficiario: b.nombre,
+                    nombre_apoyo: nombreApoyo,
+                    fecha_asignada: dateStr,
+                    observaciones: observaciones !== '' ? observaciones : `Dispersión Masiva: ${nombreGrupo}`,
+                    fecha_entrega: firebase.firestore.FieldValue.serverTimestamp(),
+                    capturista: capturistaActual
+                });
+
+                operaciones++;
+
+                // En el rarísimo caso de que un grupo sea mayor a 490 personas, dividimos en sub-lotes.
+                if (operaciones === 490) {
+                    await batch.commit();
+                    batch = db.batch();
+                    operaciones = 0;
+                    lotesEjecutados++;
+                }
+            }
+
+            // 5. Descontar el total del inventario al final SOLO SI ES UN NÚMERO
+            if (typeof datosApoyo.inventario === 'number') {
+                const apoyoCatRef = db.collection('catalogo_apoyos').doc(datosApoyo.id);
+                batch.update(apoyoCatRef, {
+                    inventario: firebase.firestore.FieldValue.increment(-cantRequerida)
+                });
+            }
+
+            // Commitear el último lote sobrante
+            if (operaciones > 0) {
+                await batch.commit();
+            }
+
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Dispersión Masiva: ${cantRequerida} [${nombreApoyo}] al grupo ${nombreGrupo}`);
+
+            await AppAlert("Dispersión Exitosa", `Se han registrado exitosamente ${cantRequerida} entregas en la base de datos y se actualizó el inventario.`, "success");
+            cerrarModalAsignacionMasiva();
+
+        } catch (error) {
+            console.error("Error en batch:", error);
+            await AppAlert("Error del Sistema", "La red falló a mitad de la operación. Se canceló la escritura para proteger la integridad de los datos.", "danger");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+    });
+
+    // --- NUEVA LÓGICA: PESTAÑA DE APOYOS POR GRUPO (AUDITORÍA VISUAL) ---
+    window.renderizarTablaApoyosPorGrupo = function() {
+        const selectGrupo = document.getElementById('selectApoyosGrupo').value;
+        const tbody = document.getElementById('tablaApoyosPorGrupo');
+        const badge = document.getElementById('badgeApoyosGrupoTotal');
+        
+        if (!selectGrupo) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo para visualizar la tabla.</td></tr>';
+            badge.textContent = '0 integrantes';
+            return;
+        }
+
+        let integrantes = [];
+        // Filtramos miembros del grupo en memoria
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            const rel = grupos.find(g => g.nombre_grupo === selectGrupo);
+            if(rel) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                integrantes.push({
+                    id_beneficiario: idBen,
+                    nombre: dataBen ? dataBen.nombre : 'Usuario Desconocido',
+                    foto_url: dataBen ? dataBen.foto_url : '',
+                    rol: rel.rol || 'INTEGRANTE'
+                });
+            }
+        }
+
+        badge.textContent = `${integrantes.length} integrantes`;
+
+        // Ordenamos por jerarquía
+        const pesosJerarquia = { 'COORDINADOR': 1, 'REPRESENTANTE': 2, 'INTEGRANTE': 3 };
+        integrantes.sort((a,b) => {
+            const pA = pesosJerarquia[a.rol] || 4;
+            const pB = pesosJerarquia[b.rol] || 4;
+            if (pA !== pB) return pA - pB;
+            return a.nombre.localeCompare(b.nombre);
+        });
+
+        tbody.innerHTML = '';
+        if(integrantes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10 text-slate-500 font-medium">Este grupo no tiene integrantes.</td></tr>';
+            return;
+        }
+
+        integrantes.forEach(i => {
+            const miniaturaHtml = (i.foto_url && i.foto_url.trim() !== "")
+                ? `<img src="${i.foto_url}" class="w-full h-full object-cover">`
+                : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
+            
+            let colorRol = i.rol === 'COORDINADOR' ? 'text-indigo-600 bg-indigo-50 border-indigo-200' : (i.rol === 'REPRESENTANTE' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-slate-600 bg-slate-50 border-slate-200');
+
+            // Mapear los apoyos que tiene este integrante gracias al feed global de la memoria
+            const listaApoyos = window.entregasGlobalesMemoria[i.id_beneficiario] || [];
+            let apoyosBadgeHtml = listaApoyos.map(ap => `<span class="inline-block px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-black uppercase tracking-widest shadow-sm m-0.5">${ap}</span>`).join('');
+            if (apoyosBadgeHtml === '') apoyosBadgeHtml = '<span class="text-[10px] text-slate-400 italic">No ha recibido apoyos.</span>';
+
+            tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                            ${miniaturaHtml}
+                        </div>
+                        <span class="font-bold text-slate-800 text-xs uppercase">${i.nombre}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border shadow-sm ${colorRol}">${i.rol}</span>
+                </td>
+                <td class="px-4 py-3 max-w-[250px] flex-wrap items-center">
+                    ${apoyosBadgeHtml}
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <button onclick="abrirModalAsignarApoyo('${i.id_beneficiario}', '${i.nombre}')" class="px-3 py-1.5 bg-white border border-slate-200 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-600 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 mx-auto">
+                        <i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Gestionar
+                    </button>
+                </td>
+            </tr>
+            `;
+        });
+        lucide.createIcons();
+    }
     // Disparador inicial (Global)
     activarSincronizacionTemaRealtime();
   </script>
