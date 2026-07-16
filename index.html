@@ -966,6 +966,7 @@
                     <i data-lucide="x" class="w-4 h-4"></i>
                   </button>
                 </div>
+                <p id="lbl_seccion_coordinador" class="text-[10px] font-bold text-indigo-600 mt-2 hidden bg-indigo-50 px-2.5 py-1.5 rounded w-fit border border-indigo-100 shadow-sm"></p>
               </div>
               <div>
                 <label class="text-xs font-bold text-slate-500 block mb-1">Representante</label>
@@ -2860,6 +2861,7 @@
         calcularYRenderizarKPIs();
         aplicarFiltros();
         if(typeof actualizarDatalistSecciones === 'function') actualizarDatalistSecciones();
+        if(typeof renderizarSubMenuGrupos === 'function') renderizarSubMenuGrupos();
 
       } catch (error) {
         console.error("Error de Firebase:", error);
@@ -5817,6 +5819,19 @@
       });
     }
 
+    window.abrirGrupoDesdeSidebar = function(nombreGrupo) {
+        navigate('grupos'); // Te envía a la página principal de grupos
+        switchGruposTab('estructura'); // Mueve la pestaña activa a "Integrantes"
+        grupoSeleccionadoParaEstructura = nombreGrupo; // Define globalmente qué grupo mostrar
+        cargarEstructuraGrupo(true); // Recrea el Select y carga la tabla
+        
+        // Cierra el menú lateral automáticamente si estás en un celular
+        if (window.innerWidth < 768) {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebarBackdrop').classList.add('hidden');
+        }
+    }
+
     window.toggleSubMenuGrupos = function() {
       const submenu = document.getElementById('submenu-grupos');
       const chevron = document.getElementById('chevron-grupos');
@@ -5842,7 +5857,6 @@
       }
 
       listaGruposCatalogo.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(g => {
-        // Algoritmo Relacional: Rastrear al integrante asignado como COORDINADOR en este grupo
         let seccionCoord = '--';
         const idCoordinadorEstructura = Object.keys(window.miembrosGruposMemoria || {}).find(idBen => {
           return window.miembrosGruposMemoria[idBen].some(m => m.nombre_grupo === g.nombre && m.rol === 'COORDINADOR');
@@ -5851,14 +5865,12 @@
         if (idCoordinadorEstructura && window.registrosGlobalesMemoria[idCoordinadorEstructura]) {
           seccionCoord = window.registrosGlobalesMemoria[idCoordinadorEstructura].seccion || '--';
         } else if (g.coordinador && g.coordinador.trim() !== '') {
-          // Fallback por Nombre si la afiliación de la estructura aún no se registra en la nube
           const coordData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre && user.nombre.trim().toUpperCase() === g.coordinador.trim().toUpperCase());
           if (coordData && coordData.seccion) seccionCoord = coordData.seccion;
         }
 
-        // Diseño optimizado: Menos margen izquierdo, texto adaptable (break-words) para no cortar nombres largos
         submenu.innerHTML += `
-        <div class="py-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-600" onclick="switchGruposTab('estructura'); mostrarIntegrantesGrupo('${g.nombre}');">
+        <div class="py-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-600" onclick="abrirGrupoDesdeSidebar('${g.nombre}')">
           <div class="flex items-start gap-1.5">
             <i data-lucide="network" class="w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5"></i>
             <p class="text-[11px] font-black text-slate-700 dark:text-slate-300 leading-tight uppercase whitespace-normal break-words">${g.nombre}</p>
@@ -5981,6 +5993,19 @@
       document.getElementById('grupo_coordinador').value = coordinador;
       document.getElementById('grupo_representante').value = representante;
 
+      // Buscar la sección del coordinador en RAM para mostrarla dinámicamente
+      const lblSeccion = document.getElementById('lbl_seccion_coordinador');
+      if(lblSeccion) {
+          if (coordinador !== '') {
+              const coordData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre === coordinador);
+              const seccion = coordData && coordData.seccion ? coordData.seccion : '--';
+              lblSeccion.innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 inline"></i> Sección: <span class="text-slate-800">${seccion}</span>`;
+              lblSeccion.classList.remove('hidden');
+          } else {
+              lblSeccion.classList.add('hidden');
+          }
+      }
+
       const tituloForm = document.getElementById('tituloFormGrupo');
       tituloForm.innerHTML = `
         <div class="p-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 rounded-lg"><i data-lucide="edit" class="w-4 h-4"></i></div>
@@ -5996,6 +6021,9 @@
     window.cancelarEdicionGrupo = function() {
       idGrupoEditando = null;
       document.getElementById('formNuevoGrupo').reset();
+      
+      const lblSeccion = document.getElementById('lbl_seccion_coordinador');
+      if(lblSeccion) lblSeccion.classList.add('hidden');
 
       const tituloForm = document.getElementById('tituloFormGrupo');
       tituloForm.innerHTML = `
@@ -6282,6 +6310,11 @@
     window.limpiarCampoCiudadano = function(campo) {
       document.getElementById(`grupo_${campo}`).value = '';
       document.getElementById(`grupo_${campo}_id`).value = '';
+      
+      if(campo === 'coordinador') {
+          const lblSeccion = document.getElementById('lbl_seccion_coordinador');
+          if(lblSeccion) lblSeccion.classList.add('hidden');
+      }
     }
 
     let grupoSeleccionadoParaEstructura = '';
@@ -6479,10 +6512,22 @@
     }
 
     window.seleccionarCiudadanoModal = async function(nombre, idBeneficiario) {
+      const dataBen = window.registrosGlobalesMemoria[idBeneficiario];
+      const seccionElectoral = dataBen && dataBen.seccion ? dataBen.seccion : '--';
+
       if (campoDestinoBusqueda === 'coordinador') {
         document.getElementById('grupo_coordinador').value = nombre;
         document.getElementById('grupo_coordinador_id').value = idBeneficiario;
+        
+        // Muestra dinámicamente la sección del coordinador en el formulario
+        const lblSeccion = document.getElementById('lbl_seccion_coordinador');
+        if(lblSeccion) {
+            lblSeccion.innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 inline"></i> Sección: <span class="text-slate-800">${seccionElectoral}</span>`;
+            lblSeccion.classList.remove('hidden');
+        }
+        
         cerrarModalBusquedaCiudadano();
+        lucide.createIcons();
       } else if (campoDestinoBusqueda === 'representante') {
         document.getElementById('grupo_representante').value = nombre;
         document.getElementById('grupo_representante_id').value = idBeneficiario;
