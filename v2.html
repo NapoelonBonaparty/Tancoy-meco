@@ -135,7 +135,14 @@
         <button onclick="navigate('censo')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="censo"> <i data-lucide="users" class="w-4 h-4"></i> Padrón de Beneficiarios </button>
         <button onclick="navigate('padron-electoral'); renderizarPadronElectoral();" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="padron-electoral"> <i data-lucide="list-checks" class="w-4 h-4"></i> Padrón Electoral </button>
         <button onclick="navigate('apoyos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="apoyos"> <i data-lucide="gift" class="w-4 h-4"></i> Gestión de Apoyos </button>
-        <button onclick="navigate('grupos')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="grupos"> <i data-lucide="network" class="w-4 h-4"></i> Gestión de Grupos </button>
+        
+        <button onclick="navigate('grupos'); toggleSubMenuGrupos();" class="sidebar-item hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all" data-nav="grupos">
+          <div class="flex items-center gap-3"><i data-lucide="network" class="w-4 h-4"></i> Gestión de Grupos</div>
+          <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" id="chevron-grupos"></i>
+        </button>
+        <div id="submenu-grupos" class="hidden flex-col gap-1 pl-2 pr-2 py-2 mb-1 border-l-2 border-indigo-100 dark:border-indigo-900/50 ml-6 overflow-y-auto max-h-56 custom-scrollbar">
+                  </div>
+
         <button onclick="navigate('seguridad')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="seguridad"> <i data-lucide="shield" class="w-4 h-4"></i> Seguridad </button>
         <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
@@ -449,11 +456,23 @@
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Sección</label>
                   <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <!-- Icono Izquierdo -->
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                       <i data-lucide="map" class="w-4 h-4 text-slate-400"></i>
                     </div>
-                    <input type="text" id="f_seccion" list="lista_secciones_datalist" required class="w-full text-sm pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="EJ. 0001">
-                    <datalist id="lista_secciones_datalist"></datalist>
+                    
+                    <!-- Input Text (Con eventos JS para controlar el Dropdown) -->
+                    <input type="text" id="f_seccion" autocomplete="off" required class="w-full text-sm pl-10 pr-10 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 uppercase font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all relative z-10" placeholder="EJ. 0001" onfocus="mostrarDropdownSecciones()" onblur="ocultarDropdownSeccionesDelayed()" onkeyup="filtrarDropdownSecciones()">
+                    
+                    <!-- Icono Flecha Derecho -->
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none z-10">
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform duration-200" id="f_seccion_chevron"></i>
+                    </div>
+
+                    <!-- Dropdown Personalizado Minimalista -->
+                    <div id="dropdown_secciones" class="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-2xl z-50 hidden max-h-56 overflow-y-auto transform origin-top transition-all duration-200 ease-out scale-95 opacity-0">
+                       <!-- JS inyecta opciones aquí -->
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -1371,19 +1390,28 @@
                   <input type="text" id="mp_nombre_input" class="hidden w-full text-sm font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
                 </div>
                 <div>
+                  <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Sección Electoral</p>
+                  <p id="mp_seccion_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
+                  <div id="mp_seccion_wrapper" class="hidden relative">
+                    <input type="text" id="mp_seccion_input" autocomplete="off" class="w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase focus:ring-2 focus:ring-indigo-400 relative z-10" placeholder="Buscar o crear..." onfocus="mostrarDropdownSeccionesExp()" onblur="ocultarDropdownSeccionesDelayedExp()" onkeyup="filtrarDropdownSeccionesExp()">
+                    <div id="dropdown_secciones_exp" class="absolute left-0 right-0 top-full mt-1 bg-white border border-indigo-100 rounded-lg shadow-xl z-50 hidden max-h-40 overflow-y-auto transform origin-top transition-all duration-200 ease-out scale-95 opacity-0">
+                       </div>
+                  </div>
+                </div>
+                <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Casilla / Identificador</p>
                   <p id="mp_casilla_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
-                  <input type="text" id="mp_casilla_input" class="hidden w-full text-xs font-mono px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
+                  <input type="text" id="mp_casilla_input" class="hidden w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
                 </div>
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Clave de Elector</p>
                   <p id="mp_clave_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
-                  <input type="text" id="mp_clave_input" class="hidden w-full text-xs font-mono px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase" maxlength="18">
+                  <input type="text" id="mp_clave_input" class="hidden w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase" maxlength="18">
                 </div>
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">CURP / Referencia Foto</p>
                   <p id="mp_curp_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
-                  <input type="text" id="mp_curp_input" class="hidden w-full text-xs font-mono px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
+                  <input type="text" id="mp_curp_input" class="hidden w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
                 </div>
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Sexo</p>
@@ -2467,6 +2495,17 @@
       const activeNav = document.querySelector(`[data-nav="${page}"]`);
       if(activeNav) activeNav.classList.add('active');
 
+      // Ocultar el submenú de grupos si se navega a otra sección
+      if (page !== 'grupos') {
+        const submenu = document.getElementById('submenu-grupos');
+        const chevron = document.getElementById('chevron-grupos');
+        if (submenu && !submenu.classList.contains('hidden')) {
+          submenu.classList.add('hidden');
+          submenu.classList.remove('flex');
+          if(chevron) chevron.classList.remove('rotate-180');
+        }
+      }
+
       // Cierra el menú en móviles automáticamente al elegir una opción
       if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('-translate-x-full');
@@ -2974,22 +3013,153 @@
       });
     }
 
-    // Función para llenar la lista desplegable con las secciones que ya existen
+    // --- LÓGICA DEL COMBOBOX PERSONALIZADO (SECCIONES ELECTORALES) ---
+    window.seccionesCacheadasArray = [];
+
+    // Función principal para extraer de memoria y construir el arsenal de opciones
     window.actualizarDatalistSecciones = function() {
-        const dataList = document.getElementById('lista_secciones_datalist');
-        if (!dataList) return;
+        const dropdown = document.getElementById('dropdown_secciones');
+        if (!dropdown) return;
+        
         const seccionesUnicas = new Set();
         Object.values(window.registrosGlobalesMemoria).forEach(d => {
             if (d.seccion && d.seccion !== '--' && d.seccion !== 'N/A') {
                 seccionesUnicas.add(d.seccion.trim().toUpperCase());
             }
         });
-        dataList.innerHTML = '';
-        Array.from(seccionesUnicas).sort().forEach(sec => {
-            const option = document.createElement('option');
-            option.value = sec;
-            dataList.appendChild(option);
+        
+        // Guardar globalmente para el buscador en vivo
+        window.seccionesCacheadasArray = Array.from(seccionesUnicas).sort();
+        renderizarDropdownSecciones(window.seccionesCacheadasArray);
+    }
+
+    // Constructor dinámico del HTML interno del dropdown
+    window.renderizarDropdownSecciones = function(lista) {
+        const dropdown = document.getElementById('dropdown_secciones');
+        if (!dropdown) return;
+        
+        dropdown.innerHTML = '';
+        
+        // Si no hay coincidencias, sugerir que se ingresará como una nueva sección
+        if(lista.length === 0) {
+            dropdown.innerHTML = `
+                <div class="px-4 py-3 flex flex-col items-center justify-center text-slate-400">
+                    <i data-lucide="plus-circle" class="w-5 h-5 mb-1 text-indigo-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Nueva Sección Detectada</span>
+                </div>`;
+            lucide.createIcons();
+            return;
+        }
+        
+        lista.forEach(sec => {
+            const item = document.createElement('div');
+            // Diseño expansivo y amigable para entornos Touch y Punteros
+            item.className = "px-4 py-3 text-sm font-mono font-bold text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 hover:text-indigo-700 dark:hover:text-indigo-400 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-700/50 last:border-0 flex items-center gap-2";
+            item.innerHTML = `<i data-lucide="map-pin" class="w-3.5 h-3.5 opacity-50"></i> ${sec}`;
+            
+            // Usar onmousedown es crítico: se dispara antes del onblur del input, evitando que la caja desaparezca antes de procesar el clic
+            item.onmousedown = function(e) { 
+                e.preventDefault(); 
+                document.getElementById('f_seccion').value = sec;
+                ocultarDropdownSecciones();
+            };
+            dropdown.appendChild(item);
         });
+        lucide.createIcons();
+    }
+
+    // Funciones de control de estado visual y animaciones
+    window.mostrarDropdownSecciones = function() {
+        const dropdown = document.getElementById('dropdown_secciones');
+        const chevron = document.getElementById('f_seccion_chevron');
+        if(dropdown) {
+            dropdown.classList.remove('hidden');
+            if(chevron) chevron.classList.add('rotate-180');
+            // Micro-retraso para que el navegador procese el renderizado previo a la clase CSS de transición
+            setTimeout(() => {
+                dropdown.classList.remove('scale-95', 'opacity-0');
+                dropdown.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        filtrarDropdownSecciones(); // Limpiar filtro previo si existía
+    }
+
+    window.ocultarDropdownSecciones = function() {
+        const dropdown = document.getElementById('dropdown_secciones');
+        const chevron = document.getElementById('f_seccion_chevron');
+        if(dropdown) {
+            dropdown.classList.remove('scale-100', 'opacity-100');
+            dropdown.classList.add('scale-95', 'opacity-0');
+            if(chevron) chevron.classList.remove('rotate-180');
+            
+            // Esperar a que la opacidad baje antes de colapsar la altura del bloque con 'hidden'
+            setTimeout(() => {
+                dropdown.classList.add('hidden');
+            }, 200); 
+        }
+    }
+
+    // Retraso artificial para convivir con los toques nativos de pantallas
+    window.ocultarDropdownSeccionesDelayed = function() {
+        setTimeout(ocultarDropdownSecciones, 200);
+    }
+
+    // Motor de búsqueda predictivo ultra-rápido en RAM
+    window.filtrarDropdownSecciones = function() {
+        const inputVal = document.getElementById('f_seccion').value.trim().toUpperCase();
+        const listaFiltrada = window.seccionesCacheadasArray.filter(sec => sec.includes(inputVal));
+        renderizarDropdownSecciones(listaFiltrada);
+    }
+
+    // --- FUNCIONES CLONADAS PARA EL EXPEDIENTE (MODO EDICIÓN) ---
+    window.renderizarDropdownSeccionesExp = function(lista) {
+        const dropdown = document.getElementById('dropdown_secciones_exp');
+        if (!dropdown) return;
+        dropdown.innerHTML = '';
+        if(lista.length === 0) {
+            dropdown.innerHTML = `<div class="px-3 py-2 text-center text-[10px] font-bold text-slate-400">Nueva Sección Detectada</div>`;
+            return;
+        }
+        lista.forEach(sec => {
+            const item = document.createElement('div');
+            item.className = "px-3 py-2 text-xs font-mono font-bold text-indigo-700 hover:bg-indigo-50 cursor-pointer transition-colors border-b border-indigo-50 last:border-0";
+            item.textContent = sec;
+            item.onmousedown = function(e) { 
+                e.preventDefault(); 
+                document.getElementById('mp_seccion_input').value = sec;
+                ocultarDropdownSeccionesExp();
+            };
+            dropdown.appendChild(item);
+        });
+    }
+
+    window.mostrarDropdownSeccionesExp = function() {
+        const dropdown = document.getElementById('dropdown_secciones_exp');
+        if(dropdown) {
+            dropdown.classList.remove('hidden');
+            setTimeout(() => {
+                dropdown.classList.remove('scale-95', 'opacity-0');
+                dropdown.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        filtrarDropdownSeccionesExp();
+    }
+
+    window.ocultarDropdownSeccionesExp = function() {
+        const dropdown = document.getElementById('dropdown_secciones_exp');
+        if(dropdown) {
+            dropdown.classList.remove('scale-100', 'opacity-100');
+            dropdown.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { dropdown.classList.add('hidden'); }, 200); 
+        }
+    }
+
+    window.ocultarDropdownSeccionesDelayedExp = function() { setTimeout(ocultarDropdownSeccionesExp, 200); }
+
+    window.filtrarDropdownSeccionesExp = function() {
+        const inputVal = document.getElementById('mp_seccion_input').value.trim().toUpperCase();
+        const listaFiltrada = window.seccionesCacheadasArray.filter(sec => sec.includes(inputVal));
+        renderizarDropdownSeccionesExp(listaFiltrada);
     }
 
     // --- CAPTURA MANUAL NUEVA ---
@@ -3357,6 +3527,7 @@
       document.getElementById('mp_tipo').textContent = data.tipo_afiliacion || 'SIMPATIZANTE';
       document.getElementById('mp_nombre_texto').textContent = data.nombre || '--';
       document.getElementById('mp_casilla_texto').textContent = data.casilla || '--';
+      document.getElementById('mp_seccion_texto').textContent = data.seccion || '--';
       document.getElementById('mp_clave_texto').textContent = data.clave_elector || '--';
       document.getElementById('mp_curp_texto').textContent = data.curp || '--';
       document.getElementById('mp_sexo_texto').textContent = data.sexo || '--';
@@ -3471,8 +3642,16 @@
       document.getElementById('mp_foto_input').value = '';
 
       camposEdicion.forEach(campo => {
-        document.getElementById(`mp_${campo.id}_input`).classList.add('hidden');
-        document.getElementById(`mp_${campo.id}_texto`).classList.remove('hidden');
+        const inputEl = document.getElementById(`mp_${campo.id}_input`);
+        const wrapperEl = document.getElementById(`mp_${campo.id}_wrapper`);
+        const textoEl = document.getElementById(`mp_${campo.id}_texto`);
+        
+        if (wrapperEl) {
+            wrapperEl.classList.add('hidden');
+        } else if (inputEl) {
+            inputEl.classList.add('hidden');
+        }
+        if (textoEl) textoEl.classList.remove('hidden');
       });
     }
 
@@ -3587,6 +3766,7 @@
     const camposEdicion = [
       { id: 'nombre', dbField: 'nombre' },
       { id: 'casilla', dbField: 'casilla' },
+      { id: 'seccion', dbField: 'seccion' },
       { id: 'clave', dbField: 'clave_elector' },
       { id: 'curp', dbField: 'curp' },
       { id: 'sexo', dbField: 'sexo' },
@@ -3600,13 +3780,20 @@
       camposEdicion.forEach(campo => {
         const textoEl = document.getElementById(`mp_${campo.id}_texto`);
         const inputEl = document.getElementById(`mp_${campo.id}_input`);
+        const wrapperEl = document.getElementById(`mp_${campo.id}_wrapper`);
 
         let valorActual = textoEl.textContent.trim();
         if (valorActual === '--' || valorActual === 'N/A') valorActual = '';
 
-        inputEl.value = valorActual;
-        textoEl.classList.add('hidden');
-        inputEl.classList.remove('hidden');
+        if (inputEl) inputEl.value = valorActual;
+        if (textoEl) textoEl.classList.add('hidden');
+        
+        // El campo 'seccion' ahora tiene un wrapper para el dropdown
+        if (wrapperEl) {
+            wrapperEl.classList.remove('hidden');
+        } else if (inputEl) {
+            inputEl.classList.remove('hidden');
+        }
       });
 
       document.getElementById('flag_borrar_foto').value = 'false';
@@ -3691,18 +3878,29 @@
 
         await db.collection('simpatizantes').doc(idDoc).update(datosActualizados);
 
-        // ACTUALIZAR TODOS LOS DATOS EN LA MEMORIA RAM LOCAL
+        // ACTUALIZAR TODOS LOS DATOS EN LA MEMORIA RAM LOCAL Y ESCONDER INPUTS
         camposEdicion.forEach(campo => {
           const textoEl = document.getElementById(`mp_${campo.id}_texto`);
           const inputEl = document.getElementById(`mp_${campo.id}_input`);
+          const wrapperEl = document.getElementById(`mp_${campo.id}_wrapper`);
+          
+          if (!inputEl) return;
+          
           const nuevoValor = inputEl.value.trim();
-          textoEl.textContent = nuevoValor !== '' ? nuevoValor : '--';
+          if (textoEl) {
+              textoEl.textContent = nuevoValor !== '' ? nuevoValor : '--';
+              textoEl.classList.remove('hidden');
+          }
+          
           inputEl.classList.add('hidden');
-          textoEl.classList.remove('hidden');
+          if (wrapperEl) wrapperEl.classList.add('hidden');
 
           // LÍNEA CLAVE PARA NO RE-LEER DE FIREBASE
           window.registrosGlobalesMemoria[idDoc][campo.dbField] = nuevoValor;
         });
+        
+        // Actualizamos los Dropdowns globales para que la nueva sección quede guardada en el menú predictivo
+        if(typeof actualizarDatalistSecciones === 'function') actualizarDatalistSecciones();
 
         if (nuevaFotoUrl !== null) {
           window.registrosGlobalesMemoria[idDoc].foto_url = nuevaFotoUrl;
@@ -5619,6 +5817,62 @@
       });
     }
 
+    window.toggleSubMenuGrupos = function() {
+      const submenu = document.getElementById('submenu-grupos');
+      const chevron = document.getElementById('chevron-grupos');
+      if (submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+        submenu.classList.add('flex');
+        if(chevron) chevron.classList.add('rotate-180');
+      } else {
+        submenu.classList.add('hidden');
+        submenu.classList.remove('flex');
+        if(chevron) chevron.classList.remove('rotate-180');
+      }
+    }
+
+    window.renderizarSubMenuGrupos = function() {
+      const submenu = document.getElementById('submenu-grupos');
+      if (!submenu) return;
+      submenu.innerHTML = '';
+      
+      if (listaGruposCatalogo.length === 0) {
+        submenu.innerHTML = '<span class="text-[10px] text-slate-400 italic px-2">No hay grupos creados.</span>';
+        return;
+      }
+
+      listaGruposCatalogo.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(g => {
+        // Algoritmo Relacional: Rastrear al integrante asignado como COORDINADOR en este grupo
+        let seccionCoord = '--';
+        const idCoordinadorEstructura = Object.keys(window.miembrosGruposMemoria || {}).find(idBen => {
+          return window.miembrosGruposMemoria[idBen].some(m => m.nombre_grupo === g.nombre && m.rol === 'COORDINADOR');
+        });
+
+        if (idCoordinadorEstructura && window.registrosGlobalesMemoria[idCoordinadorEstructura]) {
+          seccionCoord = window.registrosGlobalesMemoria[idCoordinadorEstructura].seccion || '--';
+        } else if (g.coordinador && g.coordinador.trim() !== '') {
+          // Fallback por Nombre si la afiliación de la estructura aún no se registra en la nube
+          const coordData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre && user.nombre.trim().toUpperCase() === g.coordinador.trim().toUpperCase());
+          if (coordData && coordData.seccion) seccionCoord = coordData.seccion;
+        }
+
+        // Diseño optimizado: Menos margen izquierdo, texto adaptable (break-words) para no cortar nombres largos
+        submenu.innerHTML += `
+        <div class="py-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-600" onclick="switchGruposTab('estructura'); mostrarIntegrantesGrupo('${g.nombre}');">
+          <div class="flex items-start gap-1.5">
+            <i data-lucide="network" class="w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5"></i>
+            <p class="text-[11px] font-black text-slate-700 dark:text-slate-300 leading-tight uppercase whitespace-normal break-words">${g.nombre}</p>
+          </div>
+          <div class="pl-2.5 mt-1 border-l-2 border-slate-200 dark:border-slate-700 ml-1.5 space-y-0.5">
+            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest whitespace-normal break-words leading-tight">Coord: <span class="text-indigo-600 dark:text-indigo-400">${g.coordinador || 'N/A'}</span></p>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Secc: <span class="text-slate-600 dark:text-slate-400 font-mono">${seccionCoord}</span></p>
+          </div>
+        </div>
+        `;
+      });
+      lucide.createIcons();
+    }
+
     window.escucharCatalogoGrupos = function() {
       db.collection('catalogo_grupos').orderBy('nombre').onSnapshot(snap => {
         document.getElementById('totalGruposBadge').textContent = snap.size;
@@ -5636,6 +5890,7 @@
         });
         
         renderizarTablaCatGrupos();
+        renderizarSubMenuGrupos(); // Llama a construir el menú lateral en tiempo real
         
         // Alimentar selectores de asignación
         const selFiltro = document.getElementById('gr_filtro_grupo');
