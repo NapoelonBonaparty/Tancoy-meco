@@ -144,7 +144,12 @@
                   </div>
 
         <button onclick="navigate('seguridad')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="seguridad"> <i data-lucide="shield" class="w-4 h-4"></i> Seguridad </button>
-        <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-4 border-t border-slate-200 dark:border-slate-700 pt-4" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
+        
+        <button onclick="navigate('estadisticas')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2" data-nav="estadisticas"> 
+          <i data-lucide="bar-chart-big" class="w-4 h-4 text-emerald-500"></i> Estadísticas 
+        </button>
+
+        <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-200 dark:border-slate-700 pt-2" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
 
       <div class="p-3 border-t border-slate-200 dark:border-slate-700">
@@ -1332,9 +1337,117 @@
               <div class="text-center py-6 text-indigo-300 text-xs font-medium"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto mb-2 opacity-50"></i> Procesando métricas de captura...</div>
             </div>
           </div>
+       </div>
+      </section>
+
+      <section id="page-estadisticas" class="p-6 space-y-6 hidden animate-fadeIn">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 pb-4">
+          <div>
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Estadísticas Electorales</h2>
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Análisis dinámico e histórico de casillas</p>
+          </div>
+          <div class="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 shadow-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Inteligencia Activa</span>
+          </div>
         </div>
 
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-2" id="contenedor-filtros-estadisticas">
+            <button onclick="filtrarEstadisticas('TODAS')" id="btn-est-TODAS" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-slate-800 text-white shadow-md transition-all uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i> Todas
+            </button>
+            <button onclick="filtrarEstadisticas('MORENA')" id="btn-est-MORENA" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-red-600 border border-slate-200 dark:border-slate-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="flag" class="w-4 h-4"></i> Morena
+            </button>
+            <button onclick="filtrarEstadisticas('PVEM')" id="btn-est-PVEM" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-emerald-600 border border-slate-200 dark:border-slate-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="leaf" class="w-4 h-4"></i> PVEM
+            </button>
+            <button onclick="filtrarEstadisticas('PAN')" id="btn-est-PAN" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-blue-600 border border-slate-200 dark:border-slate-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="droplet" class="w-4 h-4"></i> PAN
+            </button>
+          </div>
+          <div class="relative w-full md:w-48">
+            <i data-lucide="calendar" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <select id="est_select_anio" class="w-full pl-9 pr-4 py-2.5 text-xs font-black text-slate-700 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm appearance-none cursor-pointer">
+              <option value="2024">Proceso 2024</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex items-center justify-between group hover:-translate-y-1 transition-transform">
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Lista Nominal</p>
+              <h3 id="est_kpi_lista" class="text-3xl font-black text-slate-800 dark:text-white leading-none">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-6 h-6"></i></div>
+          </div>
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex items-center justify-between group hover:-translate-y-1 transition-transform">
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Votos Emitidos</p>
+              <h3 id="est_kpi_votos" class="text-3xl font-black text-slate-800 dark:text-white leading-none">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="box" class="w-6 h-6"></i></div>
+          </div>
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex items-center justify-between group hover:-translate-y-1 transition-transform">
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Participación</p>
+              <h3 id="est_kpi_participacion" class="text-3xl font-black text-emerald-600 leading-none">0%</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
+          </div>
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex items-center justify-between group hover:-translate-y-1 transition-transform">
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Votos al Ganador</p>
+              <h3 id="est_kpi_ganador" class="text-3xl font-black text-red-600 leading-none">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="award" class="w-6 h-6"></i></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm lg:col-span-1">
+            <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2"><i data-lucide="donut" class="w-4 h-4 text-indigo-500"></i> Reparto de Votos</h4>
+            <div class="relative w-full h-56 flex items-center justify-center">
+              <canvas id="chartEstDona"></canvas>
+            </div>
+          </div>
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm lg:col-span-2">
+            <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2"><i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-indigo-500"></i> Rendimiento por Casilla</h4>
+            <div class="relative w-full h-56">
+              <canvas id="chartEstBarras"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2"><i data-lucide="table" class="w-4 h-4 text-indigo-500"></i> Desglose Detallado de Actas</h3>
+            <span id="est_badge_resultados" class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-md shadow-sm">0 RESULTADOS</span>
+          </div>
+          <div class="overflow-x-auto max-h-[400px]">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+              <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-wider sticky top-0 z-10">
+                <tr>
+                  <th class="px-4 py-3 font-bold cursor-pointer hover:bg-slate-800 transition-colors" onclick="ordenarEstadisticas('SECCION')">Sección <i data-lucide="arrow-up-down" class="w-3 h-3 inline ml-1 opacity-50"></i></th>
+                  <th class="px-4 py-3 font-bold">Casilla</th>
+                  <th class="px-4 py-3 font-bold text-center">MORENA</th>
+                  <th class="px-4 py-3 font-bold text-center">PVEM</th>
+                  <th class="px-4 py-3 font-bold text-center">PAN</th>
+                  <th class="px-4 py-3 font-bold text-center cursor-pointer hover:bg-slate-800 transition-colors" onclick="ordenarEstadisticas('TOTAL')">Total Votos <i data-lucide="arrow-up-down" class="w-3 h-3 inline ml-1 opacity-50"></i></th>
+                  <th class="px-4 py-3 font-bold text-center">Lista Nominal</th>
+                  <th class="px-4 py-3 font-bold text-center cursor-pointer hover:bg-slate-800 transition-colors" onclick="ordenarEstadisticas('PCT')">% Part. <i data-lucide="arrow-up-down" class="w-3 h-3 inline ml-1 opacity-50"></i></th>
+                  <th class="px-4 py-3 font-bold text-center">Ganador</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyEstadisticas" class="divide-y divide-slate-100 dark:divide-slate-700/50 bg-white dark:bg-slate-800">
+                </tbody>
+            </table>
+          </div>
+        </div>
       </section>
+
     </main>
 
     <div id="modalPerfil" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
@@ -2517,6 +2630,7 @@
       if(page === 'apoyos') switchApoyosTab('estadisticas');
       if(page === 'seguridad') switchSeguridadTab('accesos');
       if(page === 'configuracion') switchConfigTab('apariencia');
+      if(page === 'estadisticas') iniciarModuloEstadisticas();
     }
 
     function switchCensoTab(tab){
@@ -6852,6 +6966,253 @@
         if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Descargó un backup JSON de la Base de Datos`);
         
         AppAlert("Respaldo Exitoso", "El archivo JSON con la base de datos se ha descargado a tu equipo de forma segura.", "success");
+    }
+    // =====================================================================
+    // MÓDULO: ESTADÍSTICAS ELECTORALES (VANILLA JS, SIN JQUERY)
+    // =====================================================================
+    
+    // Dataset embebido nativamente
+    const datosElecciones2024 = [
+      {"SECCION": 1070, "CASILLA": "1B", "MORENA": 161, "PVEM": 91, "PAN": 3, "TOTAL": 357, "LISTA": 566, "GANADOR": "MORENA"},
+      {"SECCION": 1070, "CASILLA": "1C", "MORENA": 203, "PVEM": 85, "PAN": 4, "TOTAL": 386, "LISTA": 566, "GANADOR": "MORENA"},
+      {"SECCION": 1070, "CASILLA": "2C", "MORENA": 222, "PVEM": 85, "PAN": 7, "TOTAL": 393, "LISTA": 566, "GANADOR": "MORENA"},
+      {"SECCION": 1070, "CASILLA": "3C", "MORENA": 171, "PVEM": 47, "PAN": 2, "TOTAL": 370, "LISTA": 566, "GANADOR": "MORENA"},
+      {"SECCION": 1071, "CASILLA": "1B", "MORENA": 138, "PVEM": 170, "PAN": 2, "TOTAL": 381, "LISTA": 592, "GANADOR": "PVEM"},
+      {"SECCION": 1071, "CASILLA": "1C", "MORENA": 140, "PVEM": 182, "PAN": 3, "TOTAL": 393, "LISTA": 591, "GANADOR": "PVEM"},
+      {"SECCION": 1071, "CASILLA": "2C", "MORENA": 147, "PVEM": 159, "PAN": 3, "TOTAL": 381, "LISTA": 591, "GANADOR": "PVEM"},
+      {"SECCION": 1071, "CASILLA": "3C", "MORENA": 136, "PVEM": 169, "PAN": 5, "TOTAL": 381, "LISTA": 591, "GANADOR": "PVEM"},
+      {"SECCION": 1072, "CASILLA": "1B", "MORENA": 144, "PVEM": 167, "PAN": 3, "TOTAL": 382, "LISTA": 551, "GANADOR": "PVEM"},
+      {"SECCION": 1072, "CASILLA": "1C", "MORENA": 122, "PVEM": 179, "PAN": 5, "TOTAL": 372, "LISTA": 551, "GANADOR": "PVEM"},
+      {"SECCION": 1073, "CASILLA": "1B", "MORENA": 202, "PVEM": 103, "PAN": 12, "TOTAL": 372, "LISTA": 574, "GANADOR": "MORENA"},
+      {"SECCION": 1073, "CASILLA": "1C", "MORENA": 213, "PVEM": 94, "PAN": 5, "TOTAL": 369, "LISTA": 574, "GANADOR": "MORENA"},
+      {"SECCION": 1073, "CASILLA": "2C", "MORENA": 222, "PVEM": 73, "PAN": 4, "TOTAL": 349, "LISTA": 574, "GANADOR": "MORENA"},
+      {"SECCION": 1074, "CASILLA": "1B", "MORENA": 177, "PVEM": 133, "PAN": 4, "TOTAL": 376, "LISTA": 583, "GANADOR": "MORENA"},
+      {"SECCION": 1074, "CASILLA": "1C", "MORENA": 196, "PVEM": 103, "PAN": 3, "TOTAL": 365, "LISTA": 583, "GANADOR": "MORENA"},
+      {"SECCION": 1074, "CASILLA": "2C", "MORENA": 167, "PVEM": 101, "PAN": 5, "TOTAL": 341, "LISTA": 583, "GANADOR": "MORENA"},
+      {"SECCION": 1075, "CASILLA": "1B", "MORENA": 192, "PVEM": 140, "PAN": 4, "TOTAL": 395, "LISTA": 605, "GANADOR": "MORENA"},
+      {"SECCION": 1075, "CASILLA": "1C", "MORENA": 185, "PVEM": 115, "PAN": 6, "TOTAL": 366, "LISTA": 604, "GANADOR": "MORENA"},
+      {"SECCION": 1075, "CASILLA": "2C", "MORENA": 182, "PVEM": 136, "PAN": 4, "TOTAL": 371, "LISTA": 604, "GANADOR": "MORENA"},
+      {"SECCION": 1076, "CASILLA": "1B", "MORENA": 163, "PVEM": 139, "PAN": 7, "TOTAL": 358, "LISTA": 587, "GANADOR": "MORENA"},
+      {"SECCION": 1076, "CASILLA": "1C", "MORENA": 169, "PVEM": 116, "PAN": 4, "TOTAL": 341, "LISTA": 586, "GANADOR": "MORENA"},
+      {"SECCION": 1076, "CASILLA": "2C", "MORENA": 178, "PVEM": 123, "PAN": 6, "TOTAL": 358, "LISTA": 586, "GANADOR": "MORENA"},
+      {"SECCION": 1077, "CASILLA": "1B", "MORENA": 183, "PVEM": 113, "PAN": 2, "TOTAL": 353, "LISTA": 593, "GANADOR": "MORENA"},
+      {"SECCION": 1077, "CASILLA": "1C", "MORENA": 196, "PVEM": 116, "PAN": 5, "TOTAL": 371, "LISTA": 593, "GANADOR": "MORENA"},
+      {"SECCION": 1077, "CASILLA": "2C", "MORENA": 195, "PVEM": 116, "PAN": 6, "TOTAL": 375, "LISTA": 592, "GANADOR": "MORENA"},
+      {"SECCION": 1078, "CASILLA": "1B", "MORENA": 141, "PVEM": 165, "PAN": 8, "TOTAL": 377, "LISTA": 573, "GANADOR": "PVEM"},
+      {"SECCION": 1078, "CASILLA": "1C", "MORENA": 149, "PVEM": 158, "PAN": 7, "TOTAL": 381, "LISTA": 573, "GANADOR": "PVEM"},
+      {"SECCION": 1078, "CASILLA": "2C", "MORENA": 121, "PVEM": 190, "PAN": 4, "TOTAL": 377, "LISTA": 573, "GANADOR": "PVEM"},
+      {"SECCION": 1079, "CASILLA": "1B", "MORENA": 163, "PVEM": 146, "PAN": 6, "TOTAL": 370, "LISTA": 547, "GANADOR": "MORENA"},
+      {"SECCION": 1079, "CASILLA": "1C", "MORENA": 178, "PVEM": 139, "PAN": 7, "TOTAL": 382, "LISTA": 547, "GANADOR": "MORENA"},
+      {"SECCION": 1080, "CASILLA": "1B", "MORENA": 193, "PVEM": 117, "PAN": 6, "TOTAL": 376, "LISTA": 551, "GANADOR": "MORENA"},
+      {"SECCION": 1080, "CASILLA": "1C", "MORENA": 210, "PVEM": 105, "PAN": 8, "TOTAL": 384, "LISTA": 550, "GANADOR": "MORENA"},
+      {"SECCION": 1081, "CASILLA": "1B", "MORENA": 144, "PVEM": 165, "PAN": 6, "TOTAL": 371, "LISTA": 526, "GANADOR": "PVEM"},
+      {"SECCION": 1081, "CASILLA": "1C", "MORENA": 145, "PVEM": 170, "PAN": 7, "TOTAL": 379, "LISTA": 525, "GANADOR": "PVEM"},
+      {"SECCION": 1082, "CASILLA": "1B", "MORENA": 132, "PVEM": 38, "PAN": 15, "TOTAL": 352, "LISTA": 487, "GANADOR": "PAN"},
+      {"SECCION": 1082, "CASILLA": "1C", "MORENA": 142, "PVEM": 37, "PAN": 16, "TOTAL": 349, "LISTA": 486, "GANADOR": "PAN"}
+    ];
+
+    let est_filtroActual = 'TODAS';
+    let est_donaInstancia = null;
+    let est_barrasInstancia = null;
+    let est_columnaOrden = 'SECCION';
+    let est_ordenAscendente = true;
+
+    window.iniciarModuloEstadisticas = function() {
+      if(!est_donaInstancia) inicializarGraficosEstadisticas();
+      filtrarEstadisticas('TODAS');
+    }
+
+    window.filtrarEstadisticas = function(criterio) {
+      est_filtroActual = criterio;
+
+      // Actualizar UI de botones (Estilo Corporativo Dinámico)
+      const btnIDs = ['TODAS', 'MORENA', 'PVEM', 'PAN'];
+      btnIDs.forEach(id => {
+        const btn = document.getElementById(`btn-est-${id}`);
+        if(btn) {
+          // Reset base
+          btn.className = "px-5 py-2.5 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 transition-all uppercase tracking-wider flex items-center gap-2";
+          
+          if(id === 'TODAS') btn.classList.add('text-slate-800', 'dark:text-white');
+          if(id === 'MORENA') btn.classList.add('text-red-600', 'hover:bg-red-50');
+          if(id === 'PVEM') btn.classList.add('text-emerald-600', 'hover:bg-emerald-50');
+          if(id === 'PAN') btn.classList.add('text-blue-600', 'hover:bg-blue-50');
+        }
+      });
+
+      // Iluminar botón activo
+      const btnActivo = document.getElementById(`btn-est-${criterio}`);
+      if(btnActivo) {
+        btnActivo.className = "px-5 py-2.5 text-xs font-bold rounded-xl text-white shadow-md transition-all uppercase tracking-wider flex items-center gap-2 transform scale-105";
+        if(criterio === 'TODAS') btnActivo.classList.add('bg-slate-800');
+        if(criterio === 'MORENA') btnActivo.classList.add('bg-red-600');
+        if(criterio === 'PVEM') btnActivo.classList.add('bg-emerald-500');
+        if(criterio === 'PAN') btnActivo.classList.add('bg-blue-600');
+      }
+
+      procesarDatosEstadisticos();
+    }
+
+    function procesarDatosEstadisticos() {
+      // 1. Filtrar
+      let datosFiltrados = datosElecciones2024;
+      if (est_filtroActual !== 'TODAS') {
+        datosFiltrados = datosElecciones2024.filter(d => d.GANADOR.trim() === est_filtroActual);
+      }
+
+      // 2. Ordenar
+      datosFiltrados.sort((a, b) => {
+        let valA = a[est_columnaOrden];
+        let valB = b[est_columnaOrden];
+        
+        // Columna virtual PCT
+        if (est_columnaOrden === 'PCT') {
+            valA = (a.TOTAL / a.LISTA) * 100;
+            valB = (b.TOTAL / b.LISTA) * 100;
+        }
+
+        if (valA < valB) return est_ordenAscendente ? -1 : 1;
+        if (valA > valB) return est_ordenAscendente ? 1 : -1;
+        return 0;
+      });
+
+      // 3. Renderizar Tabla Nativa
+      const tbody = document.getElementById('tbodyEstadisticas');
+      tbody.innerHTML = '';
+      
+      document.getElementById('est_badge_resultados').textContent = `${datosFiltrados.length} RESULTADOS`;
+
+      let totalLista = 0, totalVotos = 0, totalMorena = 0, totalPvem = 0, totalPan = 0;
+
+      datosFiltrados.forEach(row => {
+        // Contabilidad KPIs
+        totalLista += row.LISTA;
+        totalVotos += row.TOTAL;
+        totalMorena += row.MORENA;
+        totalPvem += row.PVEM;
+        totalPan += row.PAN;
+
+        const pct = ((row.TOTAL / row.LISTA) * 100).toFixed(1);
+        
+        let badgeStyle = "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
+        if(row.GANADOR === "MORENA") badgeStyle = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-bold border border-red-200 dark:border-red-800";
+        if(row.GANADOR === "PVEM") badgeStyle = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800";
+        if(row.GANADOR === "PAN") badgeStyle = "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800";
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+            <td class="px-4 py-2.5 font-black text-slate-700 dark:text-slate-200">${row.SECCION}</td>
+            <td class="px-4 py-2.5 font-medium text-slate-500 dark:text-slate-400">${row.CASILLA}</td>
+            <td class="px-4 py-2.5 text-center font-bold text-red-600">${row.MORENA}</td>
+            <td class="px-4 py-2.5 text-center font-bold text-emerald-600">${row.PVEM}</td>
+            <td class="px-4 py-2.5 text-center font-bold text-blue-600">${row.PAN}</td>
+            <td class="px-4 py-2.5 text-center font-black text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-900/50">${row.TOTAL}</td>
+            <td class="px-4 py-2.5 text-center text-slate-400 font-mono">${row.LISTA}</td>
+            <td class="px-4 py-2.5 text-center font-black text-indigo-600 dark:text-indigo-400">${pct}%</td>
+            <td class="px-4 py-2.5 text-center">
+              <span class="px-3 py-1 rounded-md text-[10px] uppercase tracking-wider ${badgeStyle}">${row.GANADOR}</span>
+            </td>
+          </tr>
+        `;
+      });
+
+      // 4. Actualizar KPIs Visuales
+      const porcPartGlobal = totalLista > 0 ? ((totalVotos / totalLista) * 100).toFixed(1) : 0;
+      
+      document.getElementById('est_kpi_lista').textContent = totalLista.toLocaleString();
+      document.getElementById('est_kpi_votos').textContent = totalVotos.toLocaleString();
+      document.getElementById('est_kpi_participacion').textContent = `${porcPartGlobal}%`;
+      
+      let ganadorFiltro = totalMorena; // Default
+      if(est_filtroActual === 'PVEM') ganadorFiltro = totalPvem;
+      if(est_filtroActual === 'PAN') ganadorFiltro = totalPan;
+      document.getElementById('est_kpi_ganador').textContent = ganadorFiltro.toLocaleString();
+
+      // 5. Actualizar Gráficas
+      if (chartEstDona) {
+        chartEstDona.data.datasets[0].data = [totalMorena, totalPvem, totalPan];
+        chartEstDona.update();
+      }
+
+      if (chartEstBarras) {
+        let subsetBarras = datosFiltrados.slice(0, 15); // Mostrar top 15 para no saturar
+        chartEstBarras.data.labels = subsetBarras.map(d => `${d.SECCION}-${d.CASILLA}`);
+        
+        let datosBarra = subsetBarras.map(d => d.MORENA);
+        let colorBarra = '#dc2626'; // Red Morena default
+        
+        if (est_filtroActual === 'PVEM') { datosBarra = subsetBarras.map(d => d.PVEM); colorBarra = '#10b981'; }
+        if (est_filtroActual === 'PAN') { datosBarra = subsetBarras.map(d => d.PAN); colorBarra = '#2563eb'; }
+
+        chartEstBarras.data.datasets[0].data = datosBarra;
+        chartEstBarras.data.datasets[0].backgroundColor = colorBarra;
+        chartEstBarras.update();
+      }
+
+      lucide.createIcons();
+    }
+
+    window.ordenarEstadisticas = function(columna) {
+      if (est_columnaOrden === columna) {
+        est_ordenAscendente = !est_ordenAscendente;
+      } else {
+        est_columnaOrden = columna;
+        est_ordenAscendente = false; // Por defecto ordenar mayor a menor al hacer click nuevo
+      }
+      procesarDatosEstadisticos();
+    }
+
+    function inicializarGraficosEstadisticas() {
+      const ctxDona = document.getElementById('chartEstDona');
+      const ctxBar = document.getElementById('chartEstBarras');
+      if(!ctxDona || !ctxBar) return;
+
+      Chart.defaults.color = '#94a3b8';
+      Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+      chartEstDona = new Chart(ctxDona, {
+        type: 'doughnut',
+        data: { 
+          labels: ['MORENA', 'PVEM', 'PAN'], 
+          datasets: [{ 
+            data: [0,0,0], 
+            backgroundColor: ['#dc2626', '#10b981', '#2563eb'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          cutout: '75%',
+          plugins: { 
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { weight: 'bold' } } } 
+          } 
+        }
+      });
+
+      chartEstBarras = new Chart(ctxBar, {
+        type: 'bar',
+        data: { 
+          labels: [], 
+          datasets: [{ 
+            label: 'Votos', 
+            data: [], 
+            backgroundColor: '#dc2626', 
+            borderRadius: 6,
+            borderSkipped: false
+          }] 
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e2e8f0' } }, 
+            x: { grid: { display: false } } 
+          }
+        }
+      });
     }
     // Disparador inicial (Global)
     activarSincronizacionTemaRealtime();
