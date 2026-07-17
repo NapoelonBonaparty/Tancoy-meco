@@ -149,6 +149,10 @@
           <i data-lucide="bar-chart-big" class="w-4 h-4 text-emerald-500"></i> Estadísticas 
         </button>
 
+        <button onclick="navigate('offline')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2" data-nav="offline"> 
+          <i data-lucide="wifi-off" class="w-4 h-4 text-amber-500"></i> Captura Offline 
+        </button>
+
         <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-200 dark:border-slate-700 pt-2" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
 
@@ -1087,7 +1091,7 @@
         </div>
 
         <div id="tab-grupos-estructura" class="hidden space-y-6">
-          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center gap-4">
+          <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-4">
             <div class="flex-1 w-full relative">
               <label class="text-xs font-bold text-slate-500 mb-1.5 block">Selecciona un Grupo Activo</label>
               <select id="selectEstructuraGrupo" onchange="mostrarIntegrantesGrupo(this.value)" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900">
@@ -1101,26 +1105,38 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros del Grupo</h3>
-              <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[400px] lg:h-[600px] relative">
+              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between z-10">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-indigo-500"></i> Despliegue Territorial</h3>
+                <div class="flex gap-2">
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Coord</span>
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-emerald-500"></div> Rep</span>
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-red-500"></div> Base</span>
+                </div>
+              </div>
+              <div id="mapaEstructuraGrupos" class="flex-1 w-full bg-slate-200 z-0"></div>
             </div>
-            <div class="overflow-x-auto max-h-[500px]">
-              <table class="w-full text-left text-sm">
-                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-4 py-3 font-semibold">Ciudadano</th>
-                    <th class="px-4 py-3 font-semibold text-center w-32">Jerarquía / Rol</th>
-                    <th class="px-4 py-3 font-semibold text-center w-28">Sección</th>
-                    <th class="px-4 py-3 font-semibold text-center w-28">F. Ingreso</th>
-                    <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
-                  </tr>
-                </thead>
-                <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
-                  <tr><td colspan="5" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
-                </tbody>
-              </table>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] lg:h-[600px]">
+              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros</h3>
+                <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+              </div>
+              <div class="overflow-y-auto flex-1 custom-scrollbar">
+                <table class="w-full text-left text-sm">
+                  <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">Ciudadano / Rol</th>
+                      <th class="px-4 py-3 font-semibold text-center w-24">Sección</th>
+                      <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
+                    <tr><td colspan="3" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -1458,6 +1474,85 @@
               <tbody id="tbodyEstadisticas" class="divide-y divide-slate-100 dark:divide-slate-700/50 bg-white dark:bg-slate-800">
                 </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-offline" class="p-4 sm:p-6 space-y-6 hidden animate-fadeIn pb-20">
+        <div class="flex items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center border border-amber-200 dark:border-amber-800 shrink-0">
+              <i data-lucide="wifi-off" class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-500"></i>
+            </div>
+            <div>
+              <h2 class="text-lg sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-none">Captura Offline</h2>
+              <p class="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-500 uppercase tracking-widest mt-1">Modo sin conexión activa</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <i data-lucide="file-edit" class="w-4 h-4 text-indigo-500"></i> Datos del Simpatizante
+            </h3>
+            
+            <form id="formOffline" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nombres</label>
+                  <input type="text" id="off_nombres" required class="w-full text-sm font-bold text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="Ej. Juan Pérez">
+                </div>
+                <div>
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Apellidos</label>
+                  <input type="text" id="off_apellidos" required class="w-full text-sm font-bold text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="Ej. López Gómez">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Sección</label>
+                  <input type="number" id="off_seccion" required class="w-full text-sm font-black text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="0000">
+                </div>
+                <div>
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Casilla</label>
+                  <input type="text" id="off_casilla" required class="w-full text-sm font-black text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="B1, C1...">
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Clave de Elector</label>
+                <input type="text" id="off_clave" maxlength="18" required class="w-full text-sm font-mono font-bold text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="18 Caracteres">
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Barrio / Colonia</label>
+                <input type="text" id="off_barrio" required class="w-full text-sm font-bold text-slate-700 dark:text-slate-200 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 outline-none focus:ring-2 focus:ring-amber-500 uppercase transition-all" placeholder="Ej. Centro">
+              </div>
+
+              <button type="submit" id="btnGuardarOffline" class="w-full mt-4 px-5 py-3.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 uppercase tracking-wider">
+                <i data-lucide="download" class="w-4 h-4"></i> Guardar Localmente
+              </button>
+            </form>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-[500px] lg:h-auto">
+            <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+              <h3 class="text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                <i data-lucide="database" class="w-4 h-4 text-emerald-500"></i> Cola de Sincronización
+              </h3>
+              <span id="off_badge_count" class="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-[10px] font-black px-3 py-1 rounded-lg border border-amber-200 dark:border-amber-700 shadow-sm">0 Pendientes</span>
+            </div>
+            
+            <div id="off_lista_cola" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar bg-slate-50/30 dark:bg-slate-900/30">
+              </div>
+
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+              <button onclick="sincronizarRegistrosOffline()" id="btnSincronizarNube" disabled class="w-full px-5 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2 uppercase tracking-wider">
+                <i data-lucide="cloud-upload" class="w-4 h-4"></i> Sincronizar a la Nube
+              </button>
+              <p class="text-[9px] text-center text-slate-400 mt-2 font-bold uppercase tracking-wider">Requiere conexión a Internet</p>
+            </div>
           </div>
         </div>
       </section>
@@ -2879,6 +2974,7 @@
       if(page === 'seguridad') switchSeguridadTab('accesos');
       if(page === 'configuracion') switchConfigTab('apariencia');
       if(page === 'estadisticas') iniciarModuloEstadisticas();
+      if(page === 'offline') renderizarColaOffline();
     }
 
     function switchCensoTab(tab){
@@ -5972,7 +6068,13 @@
 
       if(tab === 'asignacion') aplicarFiltrosGrAsignacion(true);
       if(tab === 'estadisticas') calcularEstadisticasGrupos();
-      if(tab === 'estructura') cargarEstructuraGrupo(true);
+      if(tab === 'estructura') {
+          cargarEstructuraGrupo(true);
+          // Inicializar el mapa al hacer visible la pestaña
+          setTimeout(() => { 
+              if (typeof initMapaEstructura === 'function') initMapaEstructura(); 
+          }, 300);
+      }
       lucide.createIcons();
     }
 
@@ -6683,7 +6785,105 @@
       }
     }
 
-    let grupoSeleccionadoParaEstructura = '';
+   let grupoSeleccionadoParaEstructura = '';
+    let mapaEstructura = null;
+    let marcadoresEstructura = [];
+
+    window.initMapaEstructura = function() {
+        const mapEl = document.getElementById('mapaEstructuraGrupos');
+        if(!mapEl || mapaEstructura) return;
+        mapaEstructura = new google.maps.Map(mapEl, {
+            center: { lat: 16.3575, lng: -92.3672 },
+            zoom: 14,
+            mapTypeId: 'roadmap',
+            disableDefaultUI: true,
+            zoomControl: true,
+            fullscreenControl: true
+        });
+    }
+
+    window.limpiarMarcadoresEstructura = function() {
+        if(marcadoresEstructura.length > 0) {
+            marcadoresEstructura.forEach(m => m.setMap(null));
+            marcadoresEstructura = [];
+        }
+    }
+
+    window.dibujarPinesEstructura = function(integrantes) {
+        if (!mapaEstructura) return;
+        limpiarMarcadoresEstructura();
+
+        const bounds = new google.maps.LatLngBounds();
+        let validCoords = 0;
+
+        // VECTORES SVG NATIVOS (Inyectados como Data URIs para máxima calidad)
+        const svgBase = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23ef4444' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M17 18v-1.5a3 3 0 0 0-3-3H10a3 3 0 0 0-3 3V18' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='8.5' r='2.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgRep = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%2310b981' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 19s6-3 6-7.5V6.5L12 4.25 6 6.5v5c0 4.5 6 7.5 6 7.5z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgCoord = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%234f46e5' stroke='%23ffffff' stroke-width='2'/%3E%3Cpolygon points='12 5.5 13.85 9.6 18.31 10.12 14.97 13.12 15.88 17.5 12 15.33 8.12 17.5 9.03 13.12 5.69 10.12 10.15 9.6 12 5.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+
+        integrantes.forEach(i => {
+            if(i.coordenadas) {
+                validCoords++;
+
+                let iconUrl = svgBase; 
+                let zIndex = 1;
+                let anchorPoint = new google.maps.Point(14, 14);
+
+                if(i.rol === 'COORDINADOR') {
+                    iconUrl = svgCoord;
+                    zIndex = 3;
+                    anchorPoint = new google.maps.Point(21, 21);
+                } else if(i.rol === 'REPRESENTANTE') {
+                    iconUrl = svgRep;
+                    zIndex = 2;
+                    anchorPoint = new google.maps.Point(17, 17);
+                }
+
+                const marker = new google.maps.Marker({
+                    position: i.coordenadas,
+                    map: mapaEstructura,
+                    icon: { url: iconUrl, anchor: anchorPoint },
+                    zIndex: zIndex,
+                    title: `${i.nombre} (${i.rol})`,
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Diseño Premium de la Tarjeta al presionar el pin
+                const fotoSrc = (i.foto_url && i.foto_url.trim() !== "") ? i.foto_url : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+                const colorTexto = i.rol === 'COORDINADOR' ? '#4f46e5' : (i.rol === 'REPRESENTANTE' ? '#10b981' : '#ef4444');
+                
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="padding:8px; font-family:'DM Sans', sans-serif; text-align:center; min-width:130px;">
+                                <div style="width:50px; height:50px; border-radius:50%; margin:0 auto 8px; overflow:hidden; border:2px solid ${colorTexto}; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                                    <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;">
+                                </div>
+                                <strong style="font-size:13px; color:#1e293b; display:block; margin-bottom:2px; line-height:1.1;">${i.nombre}</strong>
+                                <span style="font-size:9px; color:${colorTexto}; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">${i.rol}</span>
+                              </div>`
+                });
+                
+                marker.addListener("click", () => {
+                    // Cerrar infoWindows previas si tuviéramos un array, pero aquí abrimos la nueva
+                    infoWindow.open({ anchor: marker, map: mapaEstructura });
+                });
+                
+                marcadoresEstructura.push(marker);
+                bounds.extend(i.coordenadas);
+            }
+        });
+
+        // Auto-encuadrar el mapa a las casas disponibles
+        if (validCoords > 0) {
+            mapaEstructura.fitBounds(bounds);
+            const listener = google.maps.event.addListener(mapaEstructura, "idle", function() { 
+                if (mapaEstructura.getZoom() > 18) mapaEstructura.setZoom(18); 
+                google.maps.event.removeListener(listener); 
+            });
+        } else {
+             mapaEstructura.setCenter({ lat: 16.3575, lng: -92.3672 });
+             mapaEstructura.setZoom(14);
+        }
+    }
 
     window.cargarEstructuraGrupo = function(reconstruirSelect = true) {
         const select = document.getElementById('selectEstructuraGrupo');
@@ -6705,13 +6905,13 @@
         const badgeTotal = document.getElementById('badgeEstructuraTotal');
         
         if(!nombreGrupo) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo arriba para ver sus integrantes.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo arriba para ver sus integrantes.</td></tr>';
             badgeTotal.textContent = '0 integrantes';
+            if(typeof limpiarMarcadoresEstructura === 'function') limpiarMarcadoresEstructura();
             return;
         }
 
         let integrantes = [];
-        // Filtramos de forma ultrarrápida usando el diccionario en memoria
         for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
             const rel = grupos.find(g => g.nombre_grupo === nombreGrupo);
             if(rel) {
@@ -6724,35 +6924,37 @@
                     foto_url: dataBen ? dataBen.foto_url : '',
                     rol: rel.rol,
                     fechaMs: rel.fecha ? rel.fecha.toMillis() : 0,
-                    fechaObj: rel.fecha ? rel.fecha.toDate() : new Date()
+                    fechaObj: rel.fecha ? rel.fecha.toDate() : new Date(),
+                    coordenadas: dataBen ? dataBen.coordenadas : null
                 });
             }
         }
 
         badgeTotal.textContent = `${integrantes.length} integrantes`;
 
-        // Ordenamos dándole prioridad matemática a los líderes para que queden siempre arriba
         const pesosJerarquia = { 'COORDINADOR': 1, 'REPRESENTANTE': 2, 'INTEGRANTE': 3 };
         integrantes.sort((a,b) => {
             const pesoA = pesosJerarquia[a.rol] || 4;
             const pesoB = pesosJerarquia[b.rol] || 4;
             if (pesoA !== pesoB) return pesoA - pesoB;
-            return a.nombre.localeCompare(b.nombre); // Si son iguales, alfabéticamente
+            return a.nombre.localeCompare(b.nombre);
         });
 
         tbody.innerHTML = '';
         if(integrantes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Este grupo no tiene integrantes todavía. ¡Añade el primero!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-slate-400">Este grupo no tiene integrantes todavía. ¡Añade el primero!</td></tr>';
+            if(typeof limpiarMarcadoresEstructura === 'function') limpiarMarcadoresEstructura();
             return;
         }
+
+        // Ejecutar el nuevo motor vectorial atómico de renderizado en mapa
+        if (typeof dibujarPinesEstructura === 'function') dibujarPinesEstructura(integrantes);
 
         integrantes.forEach(i => {
             const miniaturaHtml = (i.foto_url && i.foto_url.trim() !== "")
                 ? `<img src="${i.foto_url}" class="w-full h-full object-cover">`
                 : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
-            const dateStr = i.fechaObj.toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'});
-
-            // Selector dinámico de Rol con colores corporativos
+            
             const colorRol = i.rol === 'COORDINADOR' ? 'text-indigo-600 bg-indigo-50 border-indigo-200' : (i.rol === 'REPRESENTANTE' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-slate-600 bg-slate-50 border-slate-200');
 
             tbody.innerHTML += `
@@ -6762,24 +6964,23 @@
                             <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                                 ${miniaturaHtml}
                             </div>
-                            <span class="font-bold text-slate-800 text-xs uppercase">${i.nombre}</span>
+                            <div class="flex flex-col min-w-0">
+                                <span class="font-bold text-slate-800 text-xs uppercase truncate">${i.nombre}</span>
+                                <select onchange="cambiarRolIntegrante('${i.idRelacion}', this.value, '${i.nombre}')" class="mt-1 w-[120px] text-[9px] font-black uppercase tracking-wider outline-none border rounded px-1 py-1 transition-colors cursor-pointer shadow-sm ${colorRol}">
+                                    <option value="INTEGRANTE" ${i.rol === 'INTEGRANTE' ? 'selected' : ''}>INTEGRANTE</option>
+                                    <option value="REPRESENTANTE" ${i.rol === 'REPRESENTANTE' ? 'selected' : ''}>REPRESENTANTE</option>
+                                    <option value="COORDINADOR" ${i.rol === 'COORDINADOR' ? 'selected' : ''}>COORDINADOR</option>
+                                </select>
+                            </div>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-center">
-                        <select onchange="cambiarRolIntegrante('${i.idRelacion}', this.value, '${i.nombre}')" class="w-full max-w-[140px] text-[10px] font-black uppercase tracking-wider outline-none border rounded-lg px-2 py-1.5 transition-colors cursor-pointer text-center shadow-sm ${colorRol}">
-                            <option value="INTEGRANTE" ${i.rol === 'INTEGRANTE' ? 'selected' : ''}>INTEGRANTE</option>
-                            <option value="REPRESENTANTE" ${i.rol === 'REPRESENTANTE' ? 'selected' : ''}>REPRESENTANTE</option>
-                            <option value="COORDINADOR" ${i.rol === 'COORDINADOR' ? 'selected' : ''}>COORDINADOR</option>
-                        </select>
-                    </td>
                     <td class="px-4 py-3 text-center text-xs font-bold text-slate-600">${i.seccion || '--'}</td>
-                    <td class="px-4 py-3 text-center text-[10px] text-slate-500 font-medium">${dateStr}</td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex items-center justify-center gap-1.5">
-                            <button onclick="abrirPerfil('${i.id_beneficiario}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md" title="Ver Expediente Oficial">
+                            <button onclick="abrirPerfil('${i.id_beneficiario}')" class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition shadow-sm border border-blue-100" title="Ver Expediente Oficial">
                                 <i data-lucide="user" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button onclick="quitarIntegranteEstructura('${i.idRelacion}', '${i.nombre}')" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm flex items-center justify-center" title="Remover del grupo">
+                            <button onclick="quitarIntegranteEstructura('${i.idRelacion}', '${i.nombre}')" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm border border-red-100 flex items-center justify-center" title="Remover del grupo">
                                 <i data-lucide="user-minus" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -7843,6 +8044,172 @@
         }
     }
     // Disparador inicial (Global)
+    // =====================================================================
+    // MÓDULO: CAPTURA OFFLINE (ALMACENAMIENTO EN DISPOSITIVO)
+    // =====================================================================
+
+    document.getElementById('formOffline').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const nombres = document.getElementById('off_nombres').value.trim().toUpperCase();
+      const apellidos = document.getElementById('off_apellidos').value.trim().toUpperCase();
+      
+      // Construimos el objeto exacto que requiere Firebase, pero lo guardamos en RAM temporal
+      const registroLocal = {
+        id_local: 'off_' + Date.now(), // ID temporal único para la cola
+        nombre: `${nombres} ${apellidos}`, // Fusionamos para el Padrón principal
+        seccion: document.getElementById('off_seccion').value.trim().toUpperCase(),
+        casilla: document.getElementById('off_casilla').value.trim().toUpperCase(),
+        clave_elector: document.getElementById('off_clave').value.trim().toUpperCase(),
+        barrio: document.getElementById('off_barrio').value.trim().toUpperCase(),
+        // Valores por defecto implícitos en campo
+        municipio: "LAS ROSAS",
+        tipo_afiliacion: "SIMPATIZANTE",
+        nivel_simpatia: "NO VISITADO",
+        registrado_por: (auth.currentUser ? auth.currentUser.email : 'Modo Offline'),
+        origen: "App_Offline"
+      };
+
+      // Extraer la cola actual de la memoria interna del teléfono
+      let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+      colaOffline.push(registroLocal);
+      
+      // Guardar de vuelta al celular
+      localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
+
+      // Limpiar formulario y dar feedback visual
+      this.reset();
+      document.getElementById('off_nombres').focus();
+      
+      // Refrescar la UI
+      renderizarColaOffline();
+      
+      // Alerta de éxito elegante sin interrumpir el flujo
+      const btnGuardar = document.getElementById('btnGuardarOffline');
+      const textOriginal = btnGuardar.innerHTML;
+      btnGuardar.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ¡Guardado en Celular!';
+      lucide.createIcons();
+      setTimeout(() => {
+          btnGuardar.innerHTML = textOriginal;
+          lucide.createIcons();
+      }, 2000);
+    });
+
+    window.renderizarColaOffline = function() {
+      const colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+      const contenedor = document.getElementById('off_lista_cola');
+      const badge = document.getElementById('off_badge_count');
+      const btnSincronizar = document.getElementById('btnSincronizarNube');
+      
+      if(!contenedor) return;
+
+      badge.textContent = `${colaOffline.length} Pendiente${colaOffline.length !== 1 ? 's' : ''}`;
+      
+      if (colaOffline.length === 0) {
+          contenedor.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 text-slate-400 opacity-60">
+              <i data-lucide="check-circle" class="w-10 h-10 mb-2 text-emerald-500"></i>
+              <p class="text-xs font-bold uppercase tracking-widest">Todo está sincronizado</p>
+            </div>
+          `;
+          btnSincronizar.disabled = true;
+          lucide.createIcons();
+          return;
+      }
+
+      btnSincronizar.disabled = false;
+      contenedor.innerHTML = '';
+
+      // Mostramos los más recientes arriba
+      colaOffline.slice().reverse().forEach(reg => {
+          contenedor.innerHTML += `
+            <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between group hover:border-amber-300 transition-colors">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center border border-amber-200 dark:border-amber-800 shrink-0 text-amber-600">
+                  <i data-lucide="file-clock" class="w-4 h-4"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs font-black text-slate-800 dark:text-slate-200 truncate uppercase tracking-tight">${reg.nombre}</p>
+                  <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> Secc: ${reg.seccion} | ${reg.casilla}</p>
+                </div>
+              </div>
+              <button onclick="eliminarRegistroOffline('${reg.id_local}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors shrink-0" title="Descartar Captura">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+      });
+      lucide.createIcons();
+    }
+
+    window.eliminarRegistroOffline = function(idLocal) {
+        if(confirm("¿Estás seguro de descartar este registro de la memoria local?")) {
+            let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+            colaOffline = colaOffline.filter(r => r.id_local !== idLocal);
+            localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
+            renderizarColaOffline();
+        }
+    }
+
+    window.sincronizarRegistrosOffline = async function() {
+        const colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+        if (colaOffline.length === 0) return;
+
+        // Validar si el dispositivo tiene internet físico
+        if (!navigator.onLine) {
+            return AppAlert("Sin Conexión", "Tu dispositivo no detecta internet. Conéctate a una red WiFi o activa tus datos móviles para poder subir la información a la nube.", "warning");
+        }
+
+        const btn = document.getElementById('btnSincronizarNube');
+        const textOriginal = btn.innerHTML;
+        
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Subiendo a la Nube...';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        try {
+            // Empaquetar todo en un Batch atómico de Firestore
+            let batch = db.batch();
+            let operaciones = 0;
+            
+            colaOffline.forEach(registro => {
+                const docRef = db.collection('simpatizantes').doc();
+                // Limpiamos el ID temporal usado para la lista local
+                delete registro.id_local;
+                // Inyectamos la estampa de tiempo oficial del servidor de Google
+                registro.fecha_captura = firebase.firestore.FieldValue.serverTimestamp();
+                
+                batch.set(docRef, registro);
+                operaciones++;
+            });
+
+            await batch.commit();
+
+            // Si todo salió bien, vaciamos la cola local
+            localStorage.removeItem('delta_offline_queue');
+            
+            // Registramos la auditoría
+            if(typeof registrarAuditoria === 'function') {
+                registrarAuditoria('CAPTURA', `Sincronizó un lote OFFLINE de ${operaciones} registros`);
+            }
+
+            // Refrescamos la UI
+            renderizarColaOffline();
+            AppAlert("Sincronización Exitosa", `Se han subido exitosamente ${operaciones} registros a la base de datos oficial.`, "success");
+
+        } catch (error) {
+            console.error("Error al sincronizar lote:", error);
+            AppAlert("Error de Red", "La red parpadeó o falló la conexión con Firebase a mitad del proceso. Los datos siguen seguros en tu teléfono. Intenta nuevamente cuando tengas mejor señal.", "danger");
+        } finally {
+            btn.innerHTML = textOriginal;
+            btn.disabled = false;
+            lucide.createIcons();
+            
+            // Forzar una descarga limpia de Firebase para actualizar las tablas principales si es necesario
+            window.registrosGlobalesMemoria = {};
+            if(typeof leerRegistrosEnTiempoReal === 'function') leerRegistrosEnTiempoReal();
+        }
+    }
     activarSincronizacionTemaRealtime();
   </script>
 </body>
