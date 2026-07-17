@@ -397,13 +397,45 @@
         </div>
 
         <div id="pe-consulta" class="space-y-6">
-          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div><h3 class="text-sm font-bold">Filtro rápido</h3></div>
-            <div class="w-full md:w-64">
-              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Buscar por Sección</label>
-              <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 transition-colors">
-                <option value="TODAS">Todas las secciones</option>
-              </select>
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+              <div class="flex-1">
+                <h3 class="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Filtro Rápido y Métricas</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Selecciona una sección y/o casilla para aislar el rendimiento.</p>
+              </div>
+              <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div class="w-full sm:w-40">
+                  <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">Aislar Sección</label>
+                  <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-sm">
+                    <option value="TODAS">Todas</option>
+                  </select>
+                </div>
+                <div class="w-full sm:w-40">
+                  <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">Aislar Casilla</label>
+                  <select id="pe_mini_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-sm">
+                    <option value="TODAS">Todas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+               <div class="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700/50 transition-colors">
+                  <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> Total Local</p>
+                  <h4 class="text-2xl font-black text-slate-700 dark:text-slate-200 leading-none" id="pe_mini_total">0</h4>
+               </div>
+               <div class="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/30 transition-colors">
+                  <p class="text-[9px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="check-circle-2" class="w-3 h-3"></i> A Favor</p>
+                  <h4 class="text-2xl font-black text-emerald-700 dark:text-emerald-400 leading-none" id="pe_mini_afavor">0</h4>
+               </div>
+               <div class="text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 transition-colors">
+                  <p class="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="help-circle" class="w-3 h-3"></i> Indecisos</p>
+                  <h4 class="text-2xl font-black text-amber-700 dark:text-amber-400 leading-none" id="pe_mini_indecisos">0</h4>
+               </div>
+               <div class="text-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800/30 transition-colors flex flex-col justify-center">
+                  <p class="text-[9px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="x-circle" class="w-3 h-3"></i> En Contra</p>
+                  <h4 class="text-2xl font-black text-rose-700 dark:text-rose-400 leading-none" id="pe_mini_encontra">0</h4>
+               </div>
             </div>
           </div>
 
@@ -4641,13 +4673,61 @@
       actualizarFiltrosDesplegablesPE();
 
       const f_secTop = document.getElementById('pe_filtro_seccion_top').value;
+      const f_miniCas = document.getElementById('pe_mini_filtro_casilla') ? document.getElementById('pe_mini_filtro_casilla').value : 'TODAS';
+      
       const f_nom = document.getElementById('pe_filtro_nombre').value.toUpperCase();
       const f_sec = document.getElementById('pe_filtro_seccion').value.toUpperCase();
       const f_barrio = document.getElementById('pe_filtro_barrio').value;
       const f_casilla = document.getElementById('pe_filtro_casilla').value;
-      const f_simpatia = document.getElementById('pe_filtro_simpatia').value; // <-- LÍNEA NUEVA
+      const f_simpatia = document.getElementById('pe_filtro_simpatia').value;
 
       const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
+
+      // --- INICIO CÁLCULO MINI DASHBOARD ---
+      // 1. Aislamos los datos SOLO para la sección seleccionada en el combo superior
+      const datosSeccion = f_secTop === 'TODAS' ? allData : allData.filter(d => (d.seccion || '').toUpperCase() === f_secTop);
+      
+      // 2. Extraemos qué casillas existen en esta sección para llenar el combo de casilla
+      const casillasSet = new Set();
+      datosSeccion.forEach(d => { 
+          if(d.casilla && d.casilla !== '--' && d.casilla !== 'N/A' && d.casilla !== '') {
+              casillasSet.add(d.casilla.toUpperCase()); 
+          }
+      });
+      
+      const selMiniCas = document.getElementById('pe_mini_filtro_casilla');
+      if (selMiniCas) {
+          const valActualCas = selMiniCas.value;
+          selMiniCas.innerHTML = '<option value="TODAS">Todas</option>';
+          Array.from(casillasSet).sort().forEach(c => selMiniCas.add(new Option(c, c)));
+          // Mantener la selección si aún existe en la sección elegida, si no, se reinicia
+          if(Array.from(selMiniCas.options).some(o=>o.value===valActualCas)) {
+              selMiniCas.value = valActualCas;
+          } else {
+              selMiniCas.value = 'TODAS'; 
+          }
+      }
+
+      const valMiniCasAplicado = selMiniCas ? selMiniCas.value : 'TODAS';
+
+      // 3. Aislamos aún más si hay una casilla seleccionada en el mini dashboard
+      const datosMiniDash = valMiniCasAplicado === 'TODAS' ? datosSeccion : datosSeccion.filter(d => (d.casilla || '').toUpperCase() === valMiniCasAplicado);
+
+      const totalSec = datosMiniDash.length;
+      const aFavorSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'A FAVOR').length;
+      const indecisosSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'INDECISO').length;
+      const enContraSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'EN CONTRA').length;
+      
+      const elTotal = document.getElementById('pe_mini_total');
+      const elAfavor = document.getElementById('pe_mini_afavor');
+      const elIndecisos = document.getElementById('pe_mini_indecisos');
+      const elEnContra = document.getElementById('pe_mini_encontra');
+
+      if(elTotal) elTotal.textContent = totalSec.toLocaleString();
+      if(elAfavor) elAfavor.textContent = aFavorSec.toLocaleString();
+      if(elIndecisos) elIndecisos.textContent = indecisosSec.toLocaleString();
+      if(elEnContra) elEnContra.textContent = enContraSec.toLocaleString();
+      // --- FIN CÁLCULO MINI DASHBOARD ---
 
       pe_datosFiltrados = allData.filter(d => {
         const nom = (d.nombre || '').toUpperCase();
@@ -4655,12 +4735,15 @@
         const bar = (d.barrio || '').toUpperCase();
         const cas = (d.casilla || '').toUpperCase();
 
+        // Aplicamos también los filtros del minidashboard a la tabla visual
         if (f_secTop !== 'TODAS' && sec !== f_secTop) return false;
+        if (valMiniCasAplicado !== 'TODAS' && cas !== valMiniCasAplicado) return false;
+
         if (f_nom && !nom.includes(f_nom)) return false;
         if (f_sec && !sec.includes(f_sec)) return false;
         if (f_barrio !== 'TODOS' && bar !== f_barrio) return false;
         if (f_casilla !== 'TODAS' && cas !== f_casilla) return false;
-        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false; // <-- LÍNEA NUEVA
+        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false;
 
         return true;
       });

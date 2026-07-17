@@ -145,13 +145,8 @@
 
         <button onclick="navigate('seguridad')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="seguridad"> <i data-lucide="shield" class="w-4 h-4"></i> Seguridad </button>
         
-        <button onclick="navigate('estadisticas')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2" data-nav="estadisticas"> 
-          <i data-lucide="bar-chart-big" class="w-4 h-4 text-emerald-500"></i> Estadísticas 
-        </button>
-
-        <button onclick="navigate('offline')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2" data-nav="offline"> 
-          <i data-lucide="wifi-off" class="w-4 h-4 text-amber-500"></i> Captura Offline 
-        </button>
+        <button onclick="navigate('estadisticas')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="estadisticas"> <i data-lucide="bar-chart-big" class="w-4 h-4"></i> Estadísticas </button>
+        <button onclick="navigate('offline')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-nav="offline"> <i data-lucide="wifi-off" class="w-4 h-4"></i> Captura Offline </button>
 
         <button onclick="navigate('configuracion')" class="sidebar-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mt-2 border-t border-slate-200 dark:border-slate-700 pt-2" data-nav="configuracion"> <i data-lucide="settings" class="w-4 h-4"></i> Configuración </button>
       </nav>
@@ -402,13 +397,45 @@
         </div>
 
         <div id="pe-consulta" class="space-y-6">
-          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div><h3 class="text-sm font-bold">Filtro rápido</h3></div>
-            <div class="w-full md:w-64">
-              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Buscar por Sección</label>
-              <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:border-indigo-500 transition-colors">
-                <option value="TODAS">Todas las secciones</option>
-              </select>
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+              <div class="flex-1">
+                <h3 class="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Filtro Rápido y Métricas</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Selecciona una sección y/o casilla para aislar el rendimiento.</p>
+              </div>
+              <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div class="w-full sm:w-40">
+                  <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">Aislar Sección</label>
+                  <select id="pe_filtro_seccion_top" onchange="aplicarFiltrosPE()" class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-sm">
+                    <option value="TODAS">Todas</option>
+                  </select>
+                </div>
+                <div class="w-full sm:w-40">
+                  <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">Aislar Casilla</label>
+                  <select id="pe_mini_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-sm font-bold px-3 py-2.5 rounded-lg border border-slate-300 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 transition-colors shadow-sm">
+                    <option value="TODAS">Todas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+               <div class="text-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700/50 transition-colors">
+                  <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> Total Local</p>
+                  <h4 class="text-2xl font-black text-slate-700 dark:text-slate-200 leading-none" id="pe_mini_total">0</h4>
+               </div>
+               <div class="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/30 transition-colors">
+                  <p class="text-[9px] font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="check-circle-2" class="w-3 h-3"></i> A Favor</p>
+                  <h4 class="text-2xl font-black text-emerald-700 dark:text-emerald-400 leading-none" id="pe_mini_afavor">0</h4>
+               </div>
+               <div class="text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 transition-colors">
+                  <p class="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="help-circle" class="w-3 h-3"></i> Indecisos</p>
+                  <h4 class="text-2xl font-black text-amber-700 dark:text-amber-400 leading-none" id="pe_mini_indecisos">0</h4>
+               </div>
+               <div class="text-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800/30 transition-colors flex flex-col justify-center">
+                  <p class="text-[9px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="x-circle" class="w-3 h-3"></i> En Contra</p>
+                  <h4 class="text-2xl font-black text-rose-700 dark:text-rose-400 leading-none" id="pe_mini_encontra">0</h4>
+               </div>
             </div>
           </div>
 
@@ -1091,7 +1118,7 @@
         </div>
 
         <div id="tab-grupos-estructura" class="hidden space-y-6">
-          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center gap-4">
+          <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-4">
             <div class="flex-1 w-full relative">
               <label class="text-xs font-bold text-slate-500 mb-1.5 block">Selecciona un Grupo Activo</label>
               <select id="selectEstructuraGrupo" onchange="mostrarIntegrantesGrupo(this.value)" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900">
@@ -1105,26 +1132,38 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-            <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros del Grupo</h3>
-              <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[400px] lg:h-[600px] relative">
+              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between z-10">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-indigo-500"></i> Despliegue Territorial</h3>
+                <div class="flex gap-2">
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Coord</span>
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-emerald-500"></div> Rep</span>
+                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-red-500"></div> Base</span>
+                </div>
+              </div>
+              <div id="mapaEstructuraGrupos" class="flex-1 w-full bg-slate-200 z-0"></div>
             </div>
-            <div class="overflow-x-auto max-h-[500px]">
-              <table class="w-full text-left text-sm">
-                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-4 py-3 font-semibold">Ciudadano</th>
-                    <th class="px-4 py-3 font-semibold text-center w-32">Jerarquía / Rol</th>
-                    <th class="px-4 py-3 font-semibold text-center w-28">Sección</th>
-                    <th class="px-4 py-3 font-semibold text-center w-28">F. Ingreso</th>
-                    <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
-                  </tr>
-                </thead>
-                <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
-                  <tr><td colspan="5" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
-                </tbody>
-              </table>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] lg:h-[600px]">
+              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros</h3>
+                <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+              </div>
+              <div class="overflow-y-auto flex-1 custom-scrollbar">
+                <table class="w-full text-left text-sm">
+                  <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">Ciudadano / Rol</th>
+                      <th class="px-4 py-3 font-semibold text-center w-24">Sección</th>
+                      <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
+                    <tr><td colspan="3" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -1187,12 +1226,14 @@
                 <div class="col-span-1 space-y-4 flex flex-col justify-between bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
                   <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Módulos Permitidos</label>
-                    <div class="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                    <div class="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="dashboard" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Panel Principal</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="censo" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón de Beneficiarios</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Padrón Electoral</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Apoyos</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="grupos" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Gestión de Grupos</label>
+                      <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="estadisticas" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Estadísticas</label>
+                      <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="offline" class="rounded text-indigo-600 focus:ring-indigo-500" checked> Captura Offline</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                       <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer font-bold hover:text-indigo-600 transition-colors"><input type="checkbox" name="permiso_modulo" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                     </div>
@@ -2154,6 +2195,8 @@
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="padron-electoral" class="rounded text-indigo-600 focus:ring-indigo-500"> Padrón Electoral</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="apoyos" class="rounded text-indigo-600 focus:ring-indigo-500"> Gestión de Apoyos</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="grupos" class="rounded text-indigo-600 focus:ring-indigo-500"> Gestión de Grupos</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="estadisticas" class="rounded text-indigo-600 focus:ring-indigo-500"> Estadísticas</label>
+                    <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="offline" class="rounded text-indigo-600 focus:ring-indigo-500"> Captura Offline</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="seguridad" class="rounded text-indigo-600 focus:ring-indigo-500"> Seguridad y Logs</label>
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer font-medium"><input type="checkbox" name="mu_permiso" value="configuracion" class="rounded text-indigo-600 focus:ring-indigo-500"> Configuración</label>
                   </div>
@@ -4630,13 +4673,61 @@
       actualizarFiltrosDesplegablesPE();
 
       const f_secTop = document.getElementById('pe_filtro_seccion_top').value;
+      const f_miniCas = document.getElementById('pe_mini_filtro_casilla') ? document.getElementById('pe_mini_filtro_casilla').value : 'TODAS';
+      
       const f_nom = document.getElementById('pe_filtro_nombre').value.toUpperCase();
       const f_sec = document.getElementById('pe_filtro_seccion').value.toUpperCase();
       const f_barrio = document.getElementById('pe_filtro_barrio').value;
       const f_casilla = document.getElementById('pe_filtro_casilla').value;
-      const f_simpatia = document.getElementById('pe_filtro_simpatia').value; // <-- LÍNEA NUEVA
+      const f_simpatia = document.getElementById('pe_filtro_simpatia').value;
 
       const allData = Object.keys(window.registrosGlobalesMemoria || {}).map(k => ({id: k, ...window.registrosGlobalesMemoria[k]}));
+
+      // --- INICIO CÁLCULO MINI DASHBOARD ---
+      // 1. Aislamos los datos SOLO para la sección seleccionada en el combo superior
+      const datosSeccion = f_secTop === 'TODAS' ? allData : allData.filter(d => (d.seccion || '').toUpperCase() === f_secTop);
+      
+      // 2. Extraemos qué casillas existen en esta sección para llenar el combo de casilla
+      const casillasSet = new Set();
+      datosSeccion.forEach(d => { 
+          if(d.casilla && d.casilla !== '--' && d.casilla !== 'N/A' && d.casilla !== '') {
+              casillasSet.add(d.casilla.toUpperCase()); 
+          }
+      });
+      
+      const selMiniCas = document.getElementById('pe_mini_filtro_casilla');
+      if (selMiniCas) {
+          const valActualCas = selMiniCas.value;
+          selMiniCas.innerHTML = '<option value="TODAS">Todas</option>';
+          Array.from(casillasSet).sort().forEach(c => selMiniCas.add(new Option(c, c)));
+          // Mantener la selección si aún existe en la sección elegida, si no, se reinicia
+          if(Array.from(selMiniCas.options).some(o=>o.value===valActualCas)) {
+              selMiniCas.value = valActualCas;
+          } else {
+              selMiniCas.value = 'TODAS'; 
+          }
+      }
+
+      const valMiniCasAplicado = selMiniCas ? selMiniCas.value : 'TODAS';
+
+      // 3. Aislamos aún más si hay una casilla seleccionada en el mini dashboard
+      const datosMiniDash = valMiniCasAplicado === 'TODAS' ? datosSeccion : datosSeccion.filter(d => (d.casilla || '').toUpperCase() === valMiniCasAplicado);
+
+      const totalSec = datosMiniDash.length;
+      const aFavorSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'A FAVOR').length;
+      const indecisosSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'INDECISO').length;
+      const enContraSec = datosMiniDash.filter(d => (d.nivel_simpatia || 'INDECISO').toUpperCase() === 'EN CONTRA').length;
+      
+      const elTotal = document.getElementById('pe_mini_total');
+      const elAfavor = document.getElementById('pe_mini_afavor');
+      const elIndecisos = document.getElementById('pe_mini_indecisos');
+      const elEnContra = document.getElementById('pe_mini_encontra');
+
+      if(elTotal) elTotal.textContent = totalSec.toLocaleString();
+      if(elAfavor) elAfavor.textContent = aFavorSec.toLocaleString();
+      if(elIndecisos) elIndecisos.textContent = indecisosSec.toLocaleString();
+      if(elEnContra) elEnContra.textContent = enContraSec.toLocaleString();
+      // --- FIN CÁLCULO MINI DASHBOARD ---
 
       pe_datosFiltrados = allData.filter(d => {
         const nom = (d.nombre || '').toUpperCase();
@@ -4644,12 +4735,15 @@
         const bar = (d.barrio || '').toUpperCase();
         const cas = (d.casilla || '').toUpperCase();
 
+        // Aplicamos también los filtros del minidashboard a la tabla visual
         if (f_secTop !== 'TODAS' && sec !== f_secTop) return false;
+        if (valMiniCasAplicado !== 'TODAS' && cas !== valMiniCasAplicado) return false;
+
         if (f_nom && !nom.includes(f_nom)) return false;
         if (f_sec && !sec.includes(f_sec)) return false;
         if (f_barrio !== 'TODOS' && bar !== f_barrio) return false;
         if (f_casilla !== 'TODAS' && cas !== f_casilla) return false;
-        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false; // <-- LÍNEA NUEVA
+        if (f_simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== f_simpatia) return false;
 
         return true;
       });
@@ -6056,7 +6150,13 @@
 
       if(tab === 'asignacion') aplicarFiltrosGrAsignacion(true);
       if(tab === 'estadisticas') calcularEstadisticasGrupos();
-      if(tab === 'estructura') cargarEstructuraGrupo(true);
+      if(tab === 'estructura') {
+          cargarEstructuraGrupo(true);
+          // Inicializar el mapa al hacer visible la pestaña
+          setTimeout(() => { 
+              if (typeof initMapaEstructura === 'function') initMapaEstructura(); 
+          }, 300);
+      }
       lucide.createIcons();
     }
 
@@ -6767,7 +6867,105 @@
       }
     }
 
-    let grupoSeleccionadoParaEstructura = '';
+   let grupoSeleccionadoParaEstructura = '';
+    let mapaEstructura = null;
+    let marcadoresEstructura = [];
+
+    window.initMapaEstructura = function() {
+        const mapEl = document.getElementById('mapaEstructuraGrupos');
+        if(!mapEl || mapaEstructura) return;
+        mapaEstructura = new google.maps.Map(mapEl, {
+            center: { lat: 16.3575, lng: -92.3672 },
+            zoom: 14,
+            mapTypeId: 'roadmap',
+            disableDefaultUI: true,
+            zoomControl: true,
+            fullscreenControl: true
+        });
+    }
+
+    window.limpiarMarcadoresEstructura = function() {
+        if(marcadoresEstructura.length > 0) {
+            marcadoresEstructura.forEach(m => m.setMap(null));
+            marcadoresEstructura = [];
+        }
+    }
+
+    window.dibujarPinesEstructura = function(integrantes) {
+        if (!mapaEstructura) return;
+        limpiarMarcadoresEstructura();
+
+        const bounds = new google.maps.LatLngBounds();
+        let validCoords = 0;
+
+        // VECTORES SVG NATIVOS (Inyectados como Data URIs para máxima calidad)
+        const svgBase = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23ef4444' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M17 18v-1.5a3 3 0 0 0-3-3H10a3 3 0 0 0-3 3V18' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='8.5' r='2.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgRep = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%2310b981' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 19s6-3 6-7.5V6.5L12 4.25 6 6.5v5c0 4.5 6 7.5 6 7.5z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgCoord = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%234f46e5' stroke='%23ffffff' stroke-width='2'/%3E%3Cpolygon points='12 5.5 13.85 9.6 18.31 10.12 14.97 13.12 15.88 17.5 12 15.33 8.12 17.5 9.03 13.12 5.69 10.12 10.15 9.6 12 5.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+
+        integrantes.forEach(i => {
+            if(i.coordenadas) {
+                validCoords++;
+
+                let iconUrl = svgBase; 
+                let zIndex = 1;
+                let anchorPoint = new google.maps.Point(14, 14);
+
+                if(i.rol === 'COORDINADOR') {
+                    iconUrl = svgCoord;
+                    zIndex = 3;
+                    anchorPoint = new google.maps.Point(21, 21);
+                } else if(i.rol === 'REPRESENTANTE') {
+                    iconUrl = svgRep;
+                    zIndex = 2;
+                    anchorPoint = new google.maps.Point(17, 17);
+                }
+
+                const marker = new google.maps.Marker({
+                    position: i.coordenadas,
+                    map: mapaEstructura,
+                    icon: { url: iconUrl, anchor: anchorPoint },
+                    zIndex: zIndex,
+                    title: `${i.nombre} (${i.rol})`,
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Diseño Premium de la Tarjeta al presionar el pin
+                const fotoSrc = (i.foto_url && i.foto_url.trim() !== "") ? i.foto_url : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+                const colorTexto = i.rol === 'COORDINADOR' ? '#4f46e5' : (i.rol === 'REPRESENTANTE' ? '#10b981' : '#ef4444');
+                
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="padding:8px; font-family:'DM Sans', sans-serif; text-align:center; min-width:130px;">
+                                <div style="width:50px; height:50px; border-radius:50%; margin:0 auto 8px; overflow:hidden; border:2px solid ${colorTexto}; box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                                    <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;">
+                                </div>
+                                <strong style="font-size:13px; color:#1e293b; display:block; margin-bottom:2px; line-height:1.1;">${i.nombre}</strong>
+                                <span style="font-size:9px; color:${colorTexto}; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">${i.rol}</span>
+                              </div>`
+                });
+                
+                marker.addListener("click", () => {
+                    // Cerrar infoWindows previas si tuviéramos un array, pero aquí abrimos la nueva
+                    infoWindow.open({ anchor: marker, map: mapaEstructura });
+                });
+                
+                marcadoresEstructura.push(marker);
+                bounds.extend(i.coordenadas);
+            }
+        });
+
+        // Auto-encuadrar el mapa a las casas disponibles
+        if (validCoords > 0) {
+            mapaEstructura.fitBounds(bounds);
+            const listener = google.maps.event.addListener(mapaEstructura, "idle", function() { 
+                if (mapaEstructura.getZoom() > 18) mapaEstructura.setZoom(18); 
+                google.maps.event.removeListener(listener); 
+            });
+        } else {
+             mapaEstructura.setCenter({ lat: 16.3575, lng: -92.3672 });
+             mapaEstructura.setZoom(14);
+        }
+    }
 
     window.cargarEstructuraGrupo = function(reconstruirSelect = true) {
         const select = document.getElementById('selectEstructuraGrupo');
@@ -6789,13 +6987,13 @@
         const badgeTotal = document.getElementById('badgeEstructuraTotal');
         
         if(!nombreGrupo) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo arriba para ver sus integrantes.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-slate-500 font-medium">Selecciona un grupo arriba para ver sus integrantes.</td></tr>';
             badgeTotal.textContent = '0 integrantes';
+            if(typeof limpiarMarcadoresEstructura === 'function') limpiarMarcadoresEstructura();
             return;
         }
 
         let integrantes = [];
-        // Filtramos de forma ultrarrápida usando el diccionario en memoria
         for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
             const rel = grupos.find(g => g.nombre_grupo === nombreGrupo);
             if(rel) {
@@ -6808,35 +7006,37 @@
                     foto_url: dataBen ? dataBen.foto_url : '',
                     rol: rel.rol,
                     fechaMs: rel.fecha ? rel.fecha.toMillis() : 0,
-                    fechaObj: rel.fecha ? rel.fecha.toDate() : new Date()
+                    fechaObj: rel.fecha ? rel.fecha.toDate() : new Date(),
+                    coordenadas: dataBen ? dataBen.coordenadas : null
                 });
             }
         }
 
         badgeTotal.textContent = `${integrantes.length} integrantes`;
 
-        // Ordenamos dándole prioridad matemática a los líderes para que queden siempre arriba
         const pesosJerarquia = { 'COORDINADOR': 1, 'REPRESENTANTE': 2, 'INTEGRANTE': 3 };
         integrantes.sort((a,b) => {
             const pesoA = pesosJerarquia[a.rol] || 4;
             const pesoB = pesosJerarquia[b.rol] || 4;
             if (pesoA !== pesoB) return pesoA - pesoB;
-            return a.nombre.localeCompare(b.nombre); // Si son iguales, alfabéticamente
+            return a.nombre.localeCompare(b.nombre);
         });
 
         tbody.innerHTML = '';
         if(integrantes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Este grupo no tiene integrantes todavía. ¡Añade el primero!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-10 text-slate-400">Este grupo no tiene integrantes todavía. ¡Añade el primero!</td></tr>';
+            if(typeof limpiarMarcadoresEstructura === 'function') limpiarMarcadoresEstructura();
             return;
         }
+
+        // Ejecutar el nuevo motor vectorial atómico de renderizado en mapa
+        if (typeof dibujarPinesEstructura === 'function') dibujarPinesEstructura(integrantes);
 
         integrantes.forEach(i => {
             const miniaturaHtml = (i.foto_url && i.foto_url.trim() !== "")
                 ? `<img src="${i.foto_url}" class="w-full h-full object-cover">`
                 : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
-            const dateStr = i.fechaObj.toLocaleDateString('es-MX', {day:'2-digit', month:'short', year:'numeric'});
-
-            // Selector dinámico de Rol con colores corporativos
+            
             const colorRol = i.rol === 'COORDINADOR' ? 'text-indigo-600 bg-indigo-50 border-indigo-200' : (i.rol === 'REPRESENTANTE' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-slate-600 bg-slate-50 border-slate-200');
 
             tbody.innerHTML += `
@@ -6846,24 +7046,23 @@
                             <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                                 ${miniaturaHtml}
                             </div>
-                            <span class="font-bold text-slate-800 text-xs uppercase">${i.nombre}</span>
+                            <div class="flex flex-col min-w-0">
+                                <span class="font-bold text-slate-800 text-xs uppercase truncate">${i.nombre}</span>
+                                <select onchange="cambiarRolIntegrante('${i.idRelacion}', this.value, '${i.nombre}')" class="mt-1 w-[120px] text-[9px] font-black uppercase tracking-wider outline-none border rounded px-1 py-1 transition-colors cursor-pointer shadow-sm ${colorRol}">
+                                    <option value="INTEGRANTE" ${i.rol === 'INTEGRANTE' ? 'selected' : ''}>INTEGRANTE</option>
+                                    <option value="REPRESENTANTE" ${i.rol === 'REPRESENTANTE' ? 'selected' : ''}>REPRESENTANTE</option>
+                                    <option value="COORDINADOR" ${i.rol === 'COORDINADOR' ? 'selected' : ''}>COORDINADOR</option>
+                                </select>
+                            </div>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-center">
-                        <select onchange="cambiarRolIntegrante('${i.idRelacion}', this.value, '${i.nombre}')" class="w-full max-w-[140px] text-[10px] font-black uppercase tracking-wider outline-none border rounded-lg px-2 py-1.5 transition-colors cursor-pointer text-center shadow-sm ${colorRol}">
-                            <option value="INTEGRANTE" ${i.rol === 'INTEGRANTE' ? 'selected' : ''}>INTEGRANTE</option>
-                            <option value="REPRESENTANTE" ${i.rol === 'REPRESENTANTE' ? 'selected' : ''}>REPRESENTANTE</option>
-                            <option value="COORDINADOR" ${i.rol === 'COORDINADOR' ? 'selected' : ''}>COORDINADOR</option>
-                        </select>
-                    </td>
                     <td class="px-4 py-3 text-center text-xs font-bold text-slate-600">${i.seccion || '--'}</td>
-                    <td class="px-4 py-3 text-center text-[10px] text-slate-500 font-medium">${dateStr}</td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex items-center justify-center gap-1.5">
-                            <button onclick="abrirPerfil('${i.id_beneficiario}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md" title="Ver Expediente Oficial">
+                            <button onclick="abrirPerfil('${i.id_beneficiario}')" class="w-7 h-7 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition shadow-sm border border-blue-100" title="Ver Expediente Oficial">
                                 <i data-lucide="user" class="w-3.5 h-3.5"></i>
                             </button>
-                            <button onclick="quitarIntegranteEstructura('${i.idRelacion}', '${i.nombre}')" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm flex items-center justify-center" title="Remover del grupo">
+                            <button onclick="quitarIntegranteEstructura('${i.idRelacion}', '${i.nombre}')" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm border border-red-100 flex items-center justify-center" title="Remover del grupo">
                                 <i data-lucide="user-minus" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
