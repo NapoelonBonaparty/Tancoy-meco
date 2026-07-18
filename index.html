@@ -1175,12 +1175,18 @@
               <div id="mapaEstructuraGrupos" class="flex-1 w-full bg-slate-200 z-0"></div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] lg:h-[600px]">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] lg:h-[600px] relative">
               <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
-                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros</h3>
+                <div class="flex items-center gap-3">
+                  <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Estructura</h3>
+                  <div class="bg-slate-200/50 p-1 rounded-lg flex items-center gap-1">
+                    <button onclick="toggleVistaEstructura('tabla')" id="btnVistaTabla" class="px-2.5 py-1 rounded shadow-sm bg-white text-slate-700 text-[10px] font-bold transition-all"><i data-lucide="list" class="w-3 h-3 inline"></i> Tabla</button>
+                    <button onclick="toggleVistaEstructura('org')" id="btnVistaOrg" class="px-2.5 py-1 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all"><i data-lucide="git-merge" class="w-3 h-3 inline"></i> Árbol</button>
+                  </div>
+                </div>
                 <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
               </div>
-              <div class="overflow-y-auto flex-1 custom-scrollbar">
+              <div id="vistaTablaEstructura" class="overflow-y-auto flex-1 custom-scrollbar block">
                 <table class="w-full text-left text-sm">
                   <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
                     <tr>
@@ -1193,6 +1199,10 @@
                     <tr><td colspan="3" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
                   </tbody>
                 </table>
+              </div>
+              <div id="vistaOrgEstructura" class="hidden overflow-auto flex-1 custom-scrollbar bg-slate-50/50 p-6 relative">
+                 <div id="canvasOrganigrama" class="flex flex-col items-center justify-start min-h-full min-w-max">
+                 </div>
               </div>
             </div>
           </div>
@@ -7577,6 +7587,9 @@
 
         // Ejecutar el nuevo motor vectorial atómico de renderizado en mapa
         if (typeof dibujarPinesEstructura === 'function') dibujarPinesEstructura(integrantes);
+        
+        // Ejecutar motor de renderizado del Organigrama
+        if (typeof renderizarOrganigramaVisual === 'function') renderizarOrganigramaVisual(integrantes);
 
         integrantes.forEach(i => {
             const miniaturaHtml = (i.foto_url && i.foto_url.trim() !== "")
@@ -8847,6 +8860,129 @@
         }
     }
     activarSincronizacionTemaRealtime();
+    window.toggleVistaEstructura = function(vista) {
+        const btnTabla = document.getElementById('btnVistaTabla');
+        const btnOrg = document.getElementById('btnVistaOrg');
+        const containerTabla = document.getElementById('vistaTablaEstructura');
+        const containerOrg = document.getElementById('vistaOrgEstructura');
+
+        if (vista === 'tabla') {
+            btnTabla.classList.replace('text-slate-500', 'text-slate-700');
+            btnTabla.classList.replace('hover:text-slate-700', 'bg-white');
+            btnTabla.classList.add('shadow-sm');
+
+            btnOrg.classList.replace('text-slate-700', 'text-slate-500');
+            btnOrg.classList.replace('bg-white', 'hover:text-slate-700');
+            btnOrg.classList.remove('shadow-sm');
+
+            containerTabla.classList.remove('hidden');
+            containerOrg.classList.add('hidden');
+        } else {
+            btnOrg.classList.replace('text-slate-500', 'text-slate-700');
+            btnOrg.classList.replace('hover:text-slate-700', 'bg-white');
+            btnOrg.classList.add('shadow-sm');
+
+            btnTabla.classList.replace('text-slate-700', 'text-slate-500');
+            btnTabla.classList.replace('bg-white', 'hover:text-slate-700');
+            btnTabla.classList.remove('shadow-sm');
+
+            containerTabla.classList.add('hidden');
+            containerOrg.classList.remove('hidden');
+        }
+    }
+
+    window.renderizarOrganigramaVisual = function(integrantes) {
+        const canvas = document.getElementById('canvasOrganigrama');
+        if(!canvas) return;
+
+        if (integrantes.length === 0) {
+            canvas.innerHTML = '<div class="text-center py-10 text-slate-400 font-medium">No hay estructura para dibujar.</div>';
+            return;
+        }
+
+        const coordinadores = integrantes.filter(i => i.rol === 'COORDINADOR');
+        const representantes = integrantes.filter(i => i.rol === 'REPRESENTANTE');
+        const bases = integrantes.filter(i => i.rol === 'INTEGRANTE');
+
+        // Helper: Generador de Nodos Orgánicos
+        const crearNodo = (persona, color, icon) => {
+            const imgUrl = (persona.foto_url && persona.foto_url.trim() !== "") ? persona.foto_url : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+            return `
+                <div class="flex flex-col items-center group relative z-10 cursor-pointer hover:-translate-y-1 transition-transform" onclick="abrirPerfil('${persona.id_beneficiario}')">
+                    <div class="w-12 h-12 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ring-${color}-200 bg-white">
+                        <img src="${imgUrl}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute top-8 -right-1 bg-${color}-500 text-white rounded-full p-1 shadow-sm border-2 border-white">
+                        <i data-lucide="${icon}" class="w-2.5 h-2.5"></i>
+                    </div>
+                    <div class="bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm text-center min-w-[120px] max-w-[140px] relative">
+                        <p class="text-[10px] font-black text-slate-800 uppercase leading-tight truncate w-full" title="${persona.nombre}">${persona.nombre}</p>
+                        <p class="text-[8.5px] font-bold text-${color}-600 uppercase tracking-widest mt-0.5">${persona.rol}</p>
+                    </div>
+                </div>
+            `;
+        };
+
+        let html = '<div class="flex flex-col items-center w-full pb-10 pt-4">';
+
+        // 1. NIVEL CÚSPIDE (COORDINADORES)
+        if (coordinadores.length > 0) {
+            html += `<div class="flex gap-10 justify-center">`;
+            coordinadores.forEach(c => html += crearNodo(c, 'indigo', 'star'));
+            html += `</div>`;
+            
+            if (representantes.length > 0 || bases.length > 0) {
+                html += `<div class="w-px h-8 bg-slate-300"></div>`; // Línea conectora central
+            }
+        }
+
+        // 2. NIVEL MEDIO (REPRESENTANTES)
+        if (representantes.length > 0) {
+            html += `<div class="relative flex justify-center w-full">`;
+            
+            // Barra horizontal unificadora si hay más de 1 representante
+            if (representantes.length > 1) {
+                html += `<div class="absolute top-0 border-t-2 border-slate-300 left-8 right-8 h-4"></div>`;
+            }
+
+            html += `<div class="flex gap-6 md:gap-12 justify-center w-full px-4">`;
+            representantes.forEach(r => {
+                html += `
+                <div class="flex flex-col items-center relative">
+                    ${representantes.length > 1 ? '<div class="w-px h-4 bg-slate-300 absolute top-0"></div>' : ''}
+                    <div class="pt-4">${crearNodo(r, 'emerald', 'users')}</div>
+                </div>`;
+            });
+            html += `</div></div>`;
+
+            if (bases.length > 0) {
+                html += `<div class="w-px h-8 bg-slate-300 mt-2"></div>`; // Línea conectora central
+            }
+        }
+
+        // 3. NIVEL BASE (INTEGRANTES EN REJILLA)
+        if (bases.length > 0) {
+            html += `<div class="relative flex flex-col items-center w-full max-w-4xl px-4">`;
+            
+            if (bases.length > 1) {
+                 html += `<div class="absolute top-0 border-t-2 border-slate-300 left-10 right-10 h-4"></div>`;
+            }
+
+            html += `<div class="flex flex-wrap justify-center gap-5 pt-4">`;
+            bases.forEach(b => {
+                html += `
+                <div class="flex flex-col items-center relative">
+                    ${bases.length > 1 ? '<div class="w-px h-4 bg-slate-300 absolute top-0"></div>' : ''}
+                    <div class="pt-4">${crearNodo(b, 'slate', 'user')}</div>
+                </div>`;
+            });
+            html += `</div></div>`;
+        }
+
+        html += '</div>';
+        canvas.innerHTML = html;
+        lucide.createIcons();
+    }
   </script>
 </body>
 </html>
