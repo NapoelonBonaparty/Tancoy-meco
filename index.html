@@ -12,7 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHuCOIlcaqylLlveecH32DqTKA10jPW54&libraries=places&callback=initMap" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHuCOIlcaqylLlveecH32DqTKA10jPW54&libraries=places,visualization&callback=initMap" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
@@ -231,15 +231,20 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden">
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden relative">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                     <h3 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                         <div class="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg"><i data-lucide="map-pin" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i></div>
                         Despliegue Territorial Geográfico
                     </h3>
-                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-md shadow-sm">Google Maps API</span>
+                    <div class="flex items-center gap-2">
+                      <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-sm flex items-center gap-1 z-10">
+                          <button onclick="toggleModoMapa('pines')" id="btnModoPines" class="px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm"><i data-lucide="map-pin" class="w-3 h-3"></i> Pines</button>
+                          <button onclick="toggleModoMapa('calor')" id="btnModoCalor" class="px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent"><i data-lucide="flame" class="w-3 h-3"></i> Mapa de Calor</button>
+                      </div>
+                    </div>
                 </div>
-                <div id="mapGrid" class="flex-1 w-full min-h-[400px] bg-slate-100"></div>
+                <div id="mapGrid" class="flex-1 w-full min-h-[400px] bg-slate-100 relative z-0"></div>
             </div>
 
             <div class="lg:col-span-1 flex flex-col gap-6">
@@ -2847,6 +2852,9 @@
       }
 
       if(typeof calcularYRenderizarRanking === 'function') calcularYRenderizarRanking(); 
+      
+      // 🔥 Llama a repintar los pines del mapa automáticamente cada vez que se detecte un cambio
+      if(typeof actualizarMapaDashboard === 'function') actualizarMapaDashboard();
     }
 
     // LÓGICA DE RENDIMIENTO DE CAPTURISTAS MOVIDA A CONFIGURACIÓN
@@ -2906,18 +2914,21 @@
       'Comitán de Domínguez': [16.2519, -92.1340], 'Palenque': [17.5095, -91.9806], 'Ocosingo': [16.9069, -92.0931]
     };
     for (let key in coordsMunicipios) mapCoordsDictionary[normalizeName(key)] = coordsMunicipios[key];
+    
     let map, chartInstAvance, chartInstSexo, chartInstSimpatia;
+    let marcadoresDashboard = [];
+    let heatmapAFavor = null;
+    let heatmapEnContra = null;
+    let heatmapIndecisos = null;
+    let modoMapaDashboard = 'pines'; // 'pines' o 'calor'
 
     function initMap() {
       const mapEl = document.getElementById('mapGrid');
       if (!mapEl) return;
-      // Prevenir duplicidad si Google Maps ya fue instanciado
       if (map && typeof map.setCenter === 'function') return;
 
-      // Coordenadas geográficas exactas del centro de Las Rosas, Chiapas
       const posicionLasRosas = { lat: 16.3575, lng: -92.3672 };
 
-      // Inicialización nativa del objeto Google Maps
       map = new google.maps.Map(mapEl, {
         center: posicionLasRosas,
         zoom: 14,
@@ -2926,7 +2937,6 @@
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: true,
-        // Estilo de mapa minimalista plateado y limpio para no saturar la vista corporativa
         styles: [
           { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
           { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
@@ -2934,14 +2944,128 @@
         ]
       });
 
-      // Marcador institucional principal en la cabecera municipal
-      new google.maps.Marker({
-        position: posicionLasRosas,
-        map: map,
-        title: "Municipio de Las Rosas, Chiapas",
-        animation: google.maps.event.addDomListener ? google.maps.Animation.DROP : null
-      });
+      setTimeout(() => {
+          if(typeof actualizarMapaDashboard === 'function') actualizarMapaDashboard();
+      }, 800);
     }
+
+    window.actualizarMapaDashboard = function() {
+        if (!map) return; 
+
+        // 1. Limpiar TODAS las capas (Pines y Heatmaps) para que no queden restos al refrescar
+        marcadoresDashboard.forEach(m => m.setMap(null));
+        marcadoresDashboard = [];
+        
+        if (heatmapAFavor) { heatmapAFavor.setMap(null); heatmapAFavor = null; }
+        if (heatmapEnContra) { heatmapEnContra.setMap(null); heatmapEnContra = null; }
+        if (heatmapIndecisos) { heatmapIndecisos.setMap(null); heatmapIndecisos = null; }
+
+        const registros = Object.values(window.registrosGlobalesMemoria || {});
+
+        // Arreglos de coordenadas para el motor térmico
+        const puntosAFavor = [];
+        const puntosEnContra = [];
+        const puntosIndecisos = [];
+
+        registros.forEach(d => {
+            if (d.coordenadas && typeof d.coordenadas.lat === 'number') {
+                const simpatia = (d.nivel_simpatia || 'NO VISITADO').toUpperCase();
+                
+                // Conversión al objeto interno LatLng de Google Maps
+                const latLngObj = new google.maps.LatLng(d.coordenadas.lat, d.coordenadas.lng);
+                
+                if (simpatia === 'A FAVOR') puntosAFavor.push(latLngObj);
+                else if (simpatia === 'EN CONTRA') puntosEnContra.push(latLngObj);
+                else if (simpatia === 'INDECISO') puntosIndecisos.push(latLngObj);
+
+                // Si estamos en MODO PINES, dibujamos cada uno
+                if (modoMapaDashboard === 'pines') {
+                    let colorFill = '%23ffffff'; 
+                    let colorStroke = '%2394a3b8'; 
+                    
+                    if (simpatia === 'A FAVOR') { colorFill = '%2310b981'; colorStroke = '%23047857'; } 
+                    else if (simpatia === 'EN CONTRA') { colorFill = '%23ef4444'; colorStroke = '%23b91c1c'; } 
+                    else if (simpatia === 'INDECISO') { colorFill = '%23f59e0b'; colorStroke = '%23b45309'; }
+
+                    const svgIcon = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='${colorFill}' stroke='${colorStroke}' stroke-width='3'/%3E%3C/svg%3E`;
+
+                    const marker = new google.maps.Marker({
+                        position: d.coordenadas,
+                        map: map,
+                        icon: { url: svgIcon, anchor: new google.maps.Point(7, 7) },
+                        title: d.nombre
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="font-family:'DM Sans',sans-serif; padding:4px; text-align:center; min-width:120px;">
+                                    <strong style="font-size:12px; color:#1e293b;">${d.nombre}</strong><br>
+                                    <span style="font-size:10px; color:#64748b;">${d.direccion || 'Sin dirección'}</span><br>
+                                    <div style="margin-top:6px; font-size:9px; font-weight:900; background:${colorFill.replace('%23','#')}25; color:${colorStroke.replace('%23','#')}; padding:3px 6px; border-radius:4px; display:inline-block; letter-spacing:0.5px;">${simpatia}</div>
+                                  </div>`
+                    });
+
+                    marker.addListener("click", () => {
+                        infoWindow.open({ anchor: marker, map, shouldFocus: false });
+                    });
+
+                    marcadoresDashboard.push(marker);
+                }
+            }
+        });
+
+        // Si estamos en MODO CALOR, inicializamos e inyectamos las capas térmicas
+        if (modoMapaDashboard === 'calor') {
+            // Gradiente Color Esmeralda
+            heatmapAFavor = new google.maps.visualization.HeatmapLayer({
+                data: puntosAFavor,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(16, 185, 129, 0)', 'rgba(16, 185, 129, 0.5)', 'rgba(16, 185, 129, 0.8)', 'rgba(5, 150, 105, 1)']
+            });
+
+            // Gradiente Color Rojo
+            heatmapEnContra = new google.maps.visualization.HeatmapLayer({
+                data: puntosEnContra,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(239, 68, 68, 0)', 'rgba(239, 68, 68, 0.5)', 'rgba(239, 68, 68, 0.8)', 'rgba(185, 28, 28, 1)']
+            });
+
+            // Gradiente Color Ámbar/Amarillo
+            heatmapIndecisos = new google.maps.visualization.HeatmapLayer({
+                data: puntosIndecisos,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(245, 158, 11, 0)', 'rgba(245, 158, 11, 0.5)', 'rgba(245, 158, 11, 0.8)', 'rgba(217, 119, 6, 1)']
+            });
+        }
+    };
+
+    window.toggleModoMapa = function(modo) {
+        modoMapaDashboard = modo;
+        
+        const btnPines = document.getElementById('btnModoPines');
+        const btnCalor = document.getElementById('btnModoCalor');
+
+        // Lógica de estilos de botones
+        if (modo === 'pines') {
+            btnPines.className = "px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm";
+            btnCalor.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent";
+        } else {
+            btnCalor.className = "px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm";
+            btnPines.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent";
+        }
+        
+        // Disparamos la limpieza y reconstrucción del mapa
+        actualizarMapaDashboard();
+        lucide.createIcons();
+    };
 
     function initDashboardCharts() {
       const canvasAvance = document.getElementById('chartAvance');
