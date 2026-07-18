@@ -1607,13 +1607,16 @@
         <div class="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row">
           
           <div class="w-full lg:w-7/12 min-h-[350px] lg:h-full flex flex-col relative border-b lg:border-b-0 lg:border-r border-slate-100 shrink-0 lg:shrink">
-            <div class="absolute top-4 left-4 right-4 z-10 flex gap-2">
+                        <div class="absolute top-4 left-4 right-4 z-10 flex gap-2">
               <div class="bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-lg border border-slate-200 flex-1 flex items-center gap-2 transition-all focus-within:ring-2 focus-within:ring-indigo-500">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 ml-2 shrink-0"></i>
                 <input type="text" id="geo_buscador_places" class="w-full bg-transparent text-xs sm:text-sm font-bold text-slate-700 outline-none placeholder:font-medium placeholder:text-slate-400" placeholder="Buscar dirección o colonia...">
               </div>
-              <button onclick="obtenerUbicacionGPS()" class="w-10 h-10 sm:w-11 sm:h-11 bg-white/95 backdrop-blur-md hover:bg-indigo-50 text-indigo-600 rounded-xl shadow-lg border border-slate-200 flex items-center justify-center shrink-0 transition-colors" title="Usar mi ubicación GPS actual">
-                <i data-lucide="navigation" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            </div>
+            
+                        <div class="absolute bottom-6 left-4 z-10">
+              <button onclick="obtenerUbicacionGPS()" class="w-12 h-12 bg-white/95 backdrop-blur-md hover:bg-indigo-50 text-indigo-600 rounded-full shadow-lg border border-slate-200 flex items-center justify-center transition-transform hover:scale-105" title="Ubicarme en el mapa">
+                <i data-lucide="crosshair" class="w-6 h-6"></i>
               </button>
             </div>
             
@@ -7835,6 +7838,14 @@
                     const nuevaPos = markerGeoModal.getPosition();
                     document.getElementById('geo_coords_display').textContent = `Lat: ${nuevaPos.lat().toFixed(5)} | Lng: ${nuevaPos.lng().toFixed(5)}`;
                     decodificarUbicacionGPS(nuevaPos); // Llama al traductor de calles
+                });
+
+                // AL HACER CLIC EN EL MAPA: Mover el marcador ahí y decodificar
+                mapaGeoModal.addListener('click', function(e) {
+                    const nuevaPos = e.latLng;
+                    markerGeoModal.setPosition(nuevaPos);
+                    document.getElementById('geo_coords_display').textContent = `Lat: ${nuevaPos.lat().toFixed(5)} | Lng: ${nuevaPos.lng().toFixed(5)}`;
+                    decodificarUbicacionGPS(nuevaPos);
                 });
 
                 // BUSCADOR PREDICTIVO (Google Places)
