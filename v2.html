@@ -12,7 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initMap" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHuCOIlcaqylLlveecH32DqTKA10jPW54&libraries=places,visualization&callback=initMap" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
@@ -231,15 +231,20 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden">
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden relative">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                     <h3 class="text-sm font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                         <div class="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg"><i data-lucide="map-pin" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i></div>
                         Despliegue Territorial Geográfico
                     </h3>
-                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-md shadow-sm">Google Maps API</span>
+                    <div class="flex items-center gap-2">
+                      <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-sm flex items-center gap-1 z-10">
+                          <button onclick="toggleModoMapa('pines')" id="btnModoPines" class="px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm"><i data-lucide="map-pin" class="w-3 h-3"></i> Pines</button>
+                          <button onclick="toggleModoMapa('calor')" id="btnModoCalor" class="px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent"><i data-lucide="flame" class="w-3 h-3"></i> Mapa de Calor</button>
+                      </div>
+                    </div>
                 </div>
-                <div id="mapGrid" class="flex-1 w-full min-h-[400px] bg-slate-100"></div>
+                <div id="mapGrid" class="flex-1 w-full min-h-[400px] bg-slate-100 relative z-0"></div>
             </div>
 
             <div class="lg:col-span-1 flex flex-col gap-6">
@@ -355,9 +360,9 @@
               </div>
             </div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left">
-                <thead class="bg-black text-white">
+            <div class="w-full md:overflow-x-auto">
+              <table class="w-full text-xs text-left block md:table">
+                <thead class="bg-black text-white hidden md:table-header-group">
                   <tr>
                     <th class="px-4 py-3 font-bold">Nombre del Beneficiario</th>
                     <th class="px-4 py-3 font-bold">Casilla / Clave</th>
@@ -367,7 +372,7 @@
                     <th class="px-4 py-3 font-bold text-center">Gestión</th>
                   </tr>
                 </thead>
-                <tbody id="tableRegistros" class="divide-y divide-slate-100 bg-white"></tbody>
+                <tbody id="tableRegistros" class="block md:table-row-group bg-transparent md:bg-white divide-y-0 md:divide-y divide-slate-100"></tbody>
               </table>
             </div>
             
@@ -445,23 +450,23 @@
             <span id="pe_total_resultados" class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-white border-b border-slate-200">
-                <tr>
+          <div class="w-full md:overflow-x-auto">
+            <table class="w-full text-sm text-left block md:table">
+              <thead class="bg-white border-b border-slate-200 block md:table-header-group">
+                <tr class="hidden md:table-row">
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nombre Completo</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-32">Sección</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Barrio / Localidad</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-40">Casilla</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-32">Acción</th>
                 </tr>
-                <tr class="bg-slate-50/50 border-b border-slate-200">
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODOS">Filtrar Barrio...</option></select></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODAS">Todas</option></select></td>
-                  <td class="px-4 py-2 text-center">
-                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white">
+                <tr class="bg-slate-50/50 border-b border-slate-200 flex flex-col md:table-row p-3 md:p-0 gap-2 md:gap-0">
+                  <td class="px-1 md:px-4 py-1 md:py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar Sección..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"><option value="TODOS">Filtrar Barrio...</option></select></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"><option value="TODAS">Casilla (Todas)</option></select></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2 text-center">
+                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none">
                       <option value="TODAS">Simpatía</option>
                       <option value="A FAVOR">A Favor</option>
                       <option value="INDECISO">Indeciso</option>
@@ -470,7 +475,7 @@
                   </td>
                 </tr>
               </thead>
-              <tbody id="tablePadronElectoral" class="divide-y divide-slate-100 bg-white">
+              <tbody id="tablePadronElectoral" class="block md:table-row-group bg-transparent md:bg-white divide-y-0 md:divide-y divide-slate-100">
               </tbody>
             </table>
           </div>
@@ -2847,6 +2852,9 @@
       }
 
       if(typeof calcularYRenderizarRanking === 'function') calcularYRenderizarRanking(); 
+      
+      // 🔥 Llama a repintar los pines del mapa automáticamente cada vez que se detecte un cambio
+      if(typeof actualizarMapaDashboard === 'function') actualizarMapaDashboard();
     }
 
     // LÓGICA DE RENDIMIENTO DE CAPTURISTAS MOVIDA A CONFIGURACIÓN
@@ -2906,18 +2914,21 @@
       'Comitán de Domínguez': [16.2519, -92.1340], 'Palenque': [17.5095, -91.9806], 'Ocosingo': [16.9069, -92.0931]
     };
     for (let key in coordsMunicipios) mapCoordsDictionary[normalizeName(key)] = coordsMunicipios[key];
+    
     let map, chartInstAvance, chartInstSexo, chartInstSimpatia;
+    let marcadoresDashboard = [];
+    let heatmapAFavor = null;
+    let heatmapEnContra = null;
+    let heatmapIndecisos = null;
+    let modoMapaDashboard = 'pines'; // 'pines' o 'calor'
 
     function initMap() {
       const mapEl = document.getElementById('mapGrid');
       if (!mapEl) return;
-      // Prevenir duplicidad si Google Maps ya fue instanciado
       if (map && typeof map.setCenter === 'function') return;
 
-      // Coordenadas geográficas exactas del centro de Las Rosas, Chiapas
       const posicionLasRosas = { lat: 16.3575, lng: -92.3672 };
 
-      // Inicialización nativa del objeto Google Maps
       map = new google.maps.Map(mapEl, {
         center: posicionLasRosas,
         zoom: 14,
@@ -2926,7 +2937,6 @@
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: true,
-        // Estilo de mapa minimalista plateado y limpio para no saturar la vista corporativa
         styles: [
           { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
           { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
@@ -2934,14 +2944,128 @@
         ]
       });
 
-      // Marcador institucional principal en la cabecera municipal
-      new google.maps.Marker({
-        position: posicionLasRosas,
-        map: map,
-        title: "Municipio de Las Rosas, Chiapas",
-        animation: google.maps.event.addDomListener ? google.maps.Animation.DROP : null
-      });
+      setTimeout(() => {
+          if(typeof actualizarMapaDashboard === 'function') actualizarMapaDashboard();
+      }, 800);
     }
+
+    window.actualizarMapaDashboard = function() {
+        if (!map) return; 
+
+        // 1. Limpiar TODAS las capas (Pines y Heatmaps) para que no queden restos al refrescar
+        marcadoresDashboard.forEach(m => m.setMap(null));
+        marcadoresDashboard = [];
+        
+        if (heatmapAFavor) { heatmapAFavor.setMap(null); heatmapAFavor = null; }
+        if (heatmapEnContra) { heatmapEnContra.setMap(null); heatmapEnContra = null; }
+        if (heatmapIndecisos) { heatmapIndecisos.setMap(null); heatmapIndecisos = null; }
+
+        const registros = Object.values(window.registrosGlobalesMemoria || {});
+
+        // Arreglos de coordenadas para el motor térmico
+        const puntosAFavor = [];
+        const puntosEnContra = [];
+        const puntosIndecisos = [];
+
+        registros.forEach(d => {
+            if (d.coordenadas && typeof d.coordenadas.lat === 'number') {
+                const simpatia = (d.nivel_simpatia || 'NO VISITADO').toUpperCase();
+                
+                // Conversión al objeto interno LatLng de Google Maps
+                const latLngObj = new google.maps.LatLng(d.coordenadas.lat, d.coordenadas.lng);
+                
+                if (simpatia === 'A FAVOR') puntosAFavor.push(latLngObj);
+                else if (simpatia === 'EN CONTRA') puntosEnContra.push(latLngObj);
+                else if (simpatia === 'INDECISO') puntosIndecisos.push(latLngObj);
+
+                // Si estamos en MODO PINES, dibujamos cada uno
+                if (modoMapaDashboard === 'pines') {
+                    let colorFill = '%23ffffff'; 
+                    let colorStroke = '%2394a3b8'; 
+                    
+                    if (simpatia === 'A FAVOR') { colorFill = '%2310b981'; colorStroke = '%23047857'; } 
+                    else if (simpatia === 'EN CONTRA') { colorFill = '%23ef4444'; colorStroke = '%23b91c1c'; } 
+                    else if (simpatia === 'INDECISO') { colorFill = '%23f59e0b'; colorStroke = '%23b45309'; }
+
+                    const svgIcon = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='${colorFill}' stroke='${colorStroke}' stroke-width='3'/%3E%3C/svg%3E`;
+
+                    const marker = new google.maps.Marker({
+                        position: d.coordenadas,
+                        map: map,
+                        icon: { url: svgIcon, anchor: new google.maps.Point(7, 7) },
+                        title: d.nombre
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="font-family:'DM Sans',sans-serif; padding:4px; text-align:center; min-width:120px;">
+                                    <strong style="font-size:12px; color:#1e293b;">${d.nombre}</strong><br>
+                                    <span style="font-size:10px; color:#64748b;">${d.direccion || 'Sin dirección'}</span><br>
+                                    <div style="margin-top:6px; font-size:9px; font-weight:900; background:${colorFill.replace('%23','#')}25; color:${colorStroke.replace('%23','#')}; padding:3px 6px; border-radius:4px; display:inline-block; letter-spacing:0.5px;">${simpatia}</div>
+                                  </div>`
+                    });
+
+                    marker.addListener("click", () => {
+                        infoWindow.open({ anchor: marker, map, shouldFocus: false });
+                    });
+
+                    marcadoresDashboard.push(marker);
+                }
+            }
+        });
+
+        // Si estamos en MODO CALOR, inicializamos e inyectamos las capas térmicas
+        if (modoMapaDashboard === 'calor') {
+            // Gradiente Color Esmeralda
+            heatmapAFavor = new google.maps.visualization.HeatmapLayer({
+                data: puntosAFavor,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(16, 185, 129, 0)', 'rgba(16, 185, 129, 0.5)', 'rgba(16, 185, 129, 0.8)', 'rgba(5, 150, 105, 1)']
+            });
+
+            // Gradiente Color Rojo
+            heatmapEnContra = new google.maps.visualization.HeatmapLayer({
+                data: puntosEnContra,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(239, 68, 68, 0)', 'rgba(239, 68, 68, 0.5)', 'rgba(239, 68, 68, 0.8)', 'rgba(185, 28, 28, 1)']
+            });
+
+            // Gradiente Color Ámbar/Amarillo
+            heatmapIndecisos = new google.maps.visualization.HeatmapLayer({
+                data: puntosIndecisos,
+                map: map,
+                radius: 35,
+                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
+                opacity: 0.9,
+                gradient: ['rgba(245, 158, 11, 0)', 'rgba(245, 158, 11, 0.5)', 'rgba(245, 158, 11, 0.8)', 'rgba(217, 119, 6, 1)']
+            });
+        }
+    };
+
+    window.toggleModoMapa = function(modo) {
+        modoMapaDashboard = modo;
+        
+        const btnPines = document.getElementById('btnModoPines');
+        const btnCalor = document.getElementById('btnModoCalor');
+
+        // Lógica de estilos de botones
+        if (modo === 'pines') {
+            btnPines.className = "px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm";
+            btnCalor.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent";
+        } else {
+            btnCalor.className = "px-3 py-1.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm";
+            btnPines.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all flex items-center gap-1.5 bg-transparent";
+        }
+        
+        // Disparamos la limpieza y reconstrucción del mapa
+        actualizarMapaDashboard();
+        lucide.createIcons();
+    };
 
     function initDashboardCharts() {
       const canvasAvance = document.getElementById('chartAvance');
@@ -3465,26 +3589,38 @@
         : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
 
         tbCenso.innerHTML += `
-        <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-          <td class="px-4 py-3">
+        <tr class="block md:table-row bg-white border md:border-b border-slate-200 md:border-slate-100 mb-4 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none hover:bg-slate-50 transition-colors p-4 md:p-0">
+          <td class="block md:table-cell px-0 md:px-4 py-2 md:py-3 border-b md:border-none border-slate-100 pb-3 md:pb-3 mb-2 md:mb-0">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+              <div class="w-10 h-10 md:w-9 md:h-9 rounded-full bg-slate-100 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
                 ${miniaturaHtml}
               </div>
-              <span class="font-bold text-slate-800">${d.nombre || '--'}</span>
+              <div class="flex flex-col">
+                 <span class="font-black md:font-bold text-slate-800 text-sm md:text-xs">${d.nombre || '--'}</span>
+                 <span class="md:hidden text-[10px] text-slate-500 font-mono mt-0.5">${identificador}</span>
+              </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-xs font-mono text-slate-500">${identificador}</td>
-          <td class="px-4 py-3 text-center text-xs font-bold text-slate-700">${seccionMostrar}</td>
-          <td class="px-4 py-3">
-            <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
-            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
+          <td class="hidden md:table-cell px-4 py-3 text-xs font-mono text-slate-500">${identificador}</td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center text-xs font-bold text-slate-700">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sección</span>
+             <span>${seccionMostrar}</span>
           </td>
-          <td class="px-4 py-3 text-center"><span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span></td>
-          <td class="px-4 py-3 flex items-center justify-center gap-2">
-            <button onclick="abrirModalMapa('${d.id}')" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
-            <button onclick="abrirPerfil('${d.id}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm">VER</button>
-            <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm">BORRAR</button>
+          <td class="flex justify-between items-center md:items-start md:table-cell px-0 md:px-4 py-1.5 md:py-3">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ubicación</span>
+             <div class="text-right md:text-left">
+                <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
+             </div>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center items-center">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
+             <span class="px-3 py-1.5 md:py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span>
+          </td>
+          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 text-center border-t md:border-none border-slate-100 justify-end gap-2">
+            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 flex items-center justify-center gap-1.5" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i> <span class="md:hidden">Mapa</span></button>
+            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="user" class="w-4 h-4 md:hidden"></i> VER</button>
+            <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="trash" class="w-4 h-4 md:hidden"></i> BORRAR</button>
           </td>
         </tr>`;
       });
@@ -4833,24 +4969,33 @@
         : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
 
         tbody.innerHTML += `
-        <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-          <td class="px-4 py-3">
+        <tr class="block md:table-row bg-white border md:border-b border-slate-200 md:border-slate-100 mb-4 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none hover:bg-slate-50 transition-colors p-4 md:p-0">
+          <td class="block md:table-cell px-0 md:px-4 py-2 md:py-3 border-b md:border-none border-slate-100 mb-2 md:mb-0">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+              <div class="w-10 h-10 md:w-8 md:h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                 ${miniaturaHtml}
               </div>
-              <span class="font-bold text-slate-700 text-xs">${d.nombre || '--'}</span>
+              <span class="font-black md:font-bold text-slate-800 md:text-slate-700 text-sm md:text-xs">${d.nombre || '--'}</span>
             </div>
           </td>
-          <td class="px-4 py-3 text-xs font-medium text-slate-600">${d.seccion || '--'}</td>
-          <td class="px-4 py-3 text-xs text-slate-500">${d.barrio || '--'}</td>
-          <td class="px-4 py-3 text-xs text-slate-500">${d.casilla || '--'}</td>
-          <td class="px-4 py-3 flex items-center justify-center gap-2">
-            <button onclick="abrirModalMapa('${d.id}')" class="w-7 h-7 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-md hover:scale-110" title="Ubicación y Evidencias">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-bold md:font-medium text-slate-700 md:text-slate-600">
+             <span class="md:hidden text-[10px] text-slate-400 uppercase tracking-widest">Sección</span>
+             <span>${d.seccion || '--'}</span>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-medium md:font-normal text-slate-600 md:text-slate-500">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Barrio</span>
+             <span>${d.barrio || '--'}</span>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-medium md:font-normal text-slate-600 md:text-slate-500">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Casilla</span>
+             <span>${d.casilla || '--'}</span>
+          </td>
+          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 items-center justify-end md:justify-center gap-3 border-t md:border-none border-slate-100">
+            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ubicación y Evidencias">
+              <i data-lucide="map-pin" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Mapa</span>
             </button>
-            <button onclick="abrirPerfil('${d.id}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md hover:scale-110" title="Ver Información">
-              <i data-lucide="user" class="w-3.5 h-3.5"></i>
+            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ver Información">
+              <i data-lucide="user" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Perfil</span>
             </button>
           </td>
         </tr>

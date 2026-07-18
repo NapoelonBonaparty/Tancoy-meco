@@ -360,9 +360,9 @@
               </div>
             </div>
 
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left">
-                <thead class="bg-black text-white">
+            <div class="w-full md:overflow-x-auto">
+              <table class="w-full text-xs text-left block md:table">
+                <thead class="bg-black text-white hidden md:table-header-group">
                   <tr>
                     <th class="px-4 py-3 font-bold">Nombre del Beneficiario</th>
                     <th class="px-4 py-3 font-bold">Casilla / Clave</th>
@@ -372,7 +372,7 @@
                     <th class="px-4 py-3 font-bold text-center">Gestión</th>
                   </tr>
                 </thead>
-                <tbody id="tableRegistros" class="divide-y divide-slate-100 bg-white"></tbody>
+                <tbody id="tableRegistros" class="block md:table-row-group bg-transparent md:bg-white divide-y-0 md:divide-y divide-slate-100"></tbody>
               </table>
             </div>
             
@@ -450,23 +450,23 @@
             <span id="pe_total_resultados" class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-white border-b border-slate-200">
-                <tr>
+          <div class="w-full md:overflow-x-auto">
+            <table class="w-full text-sm text-left block md:table">
+              <thead class="bg-white border-b border-slate-200 block md:table-header-group">
+                <tr class="hidden md:table-row">
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Nombre Completo</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-32">Sección</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs">Barrio / Localidad</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs w-40">Casilla</th>
                   <th class="px-4 py-3 font-semibold text-slate-600 text-xs text-center w-32">Acción</th>
                 </tr>
-                <tr class="bg-slate-50/50 border-b border-slate-200">
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODOS">Filtrar Barrio...</option></select></td>
-                  <td class="px-4 py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"><option value="TODAS">Todas</option></select></td>
-                  <td class="px-4 py-2 text-center">
-                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white">
+                <tr class="bg-slate-50/50 border-b border-slate-200 flex flex-col md:table-row p-3 md:p-0 gap-2 md:gap-0">
+                  <td class="px-1 md:px-4 py-1 md:py-2"><input type="text" id="pe_filtro_nombre" onkeyup="aplicarFiltrosPE()" placeholder="Buscar nombre..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><input type="text" id="pe_filtro_seccion" onkeyup="aplicarFiltrosPE()" placeholder="Filtrar Sección..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><select id="pe_filtro_barrio" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"><option value="TODOS">Filtrar Barrio...</option></select></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2"><select id="pe_filtro_casilla" onchange="aplicarFiltrosPE()" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none"><option value="TODAS">Casilla (Todas)</option></select></td>
+                  <td class="px-1 md:px-4 py-1 md:py-2 text-center">
+                    <select id="pe_filtro_simpatia" onchange="aplicarFiltrosPE()" class="w-full text-xs px-2 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white shadow-sm md:shadow-none">
                       <option value="TODAS">Simpatía</option>
                       <option value="A FAVOR">A Favor</option>
                       <option value="INDECISO">Indeciso</option>
@@ -475,7 +475,7 @@
                   </td>
                 </tr>
               </thead>
-              <tbody id="tablePadronElectoral" class="divide-y divide-slate-100 bg-white">
+              <tbody id="tablePadronElectoral" class="block md:table-row-group bg-transparent md:bg-white divide-y-0 md:divide-y divide-slate-100">
               </tbody>
             </table>
           </div>
@@ -3589,26 +3589,38 @@
         : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
 
         tbCenso.innerHTML += `
-        <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-          <td class="px-4 py-3">
+        <tr class="block md:table-row bg-white border md:border-b border-slate-200 md:border-slate-100 mb-4 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none hover:bg-slate-50 transition-colors p-4 md:p-0">
+          <td class="block md:table-cell px-0 md:px-4 py-2 md:py-3 border-b md:border-none border-slate-100 pb-3 md:pb-3 mb-2 md:mb-0">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+              <div class="w-10 h-10 md:w-9 md:h-9 rounded-full bg-slate-100 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden shrink-0">
                 ${miniaturaHtml}
               </div>
-              <span class="font-bold text-slate-800">${d.nombre || '--'}</span>
+              <div class="flex flex-col">
+                 <span class="font-black md:font-bold text-slate-800 text-sm md:text-xs">${d.nombre || '--'}</span>
+                 <span class="md:hidden text-[10px] text-slate-500 font-mono mt-0.5">${identificador}</span>
+              </div>
             </div>
           </td>
-          <td class="px-4 py-3 text-xs font-mono text-slate-500">${identificador}</td>
-          <td class="px-4 py-3 text-center text-xs font-bold text-slate-700">${seccionMostrar}</td>
-          <td class="px-4 py-3">
-            <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
-            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
+          <td class="hidden md:table-cell px-4 py-3 text-xs font-mono text-slate-500">${identificador}</td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center text-xs font-bold text-slate-700">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sección</span>
+             <span>${seccionMostrar}</span>
           </td>
-          <td class="px-4 py-3 text-center"><span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span></td>
-          <td class="px-4 py-3 flex items-center justify-center gap-2">
-            <button onclick="abrirModalMapa('${d.id}')" class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
-            <button onclick="abrirPerfil('${d.id}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm">VER</button>
-            <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm">BORRAR</button>
+          <td class="flex justify-between items-center md:items-start md:table-cell px-0 md:px-4 py-1.5 md:py-3">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ubicación</span>
+             <div class="text-right md:text-left">
+                <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
+             </div>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center items-center">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
+             <span class="px-3 py-1.5 md:py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span>
+          </td>
+          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 text-center border-t md:border-none border-slate-100 justify-end gap-2">
+            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 flex items-center justify-center gap-1.5" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i> <span class="md:hidden">Mapa</span></button>
+            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="user" class="w-4 h-4 md:hidden"></i> VER</button>
+            <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="trash" class="w-4 h-4 md:hidden"></i> BORRAR</button>
           </td>
         </tr>`;
       });
@@ -4957,24 +4969,33 @@
         : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
 
         tbody.innerHTML += `
-        <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-          <td class="px-4 py-3">
+        <tr class="block md:table-row bg-white border md:border-b border-slate-200 md:border-slate-100 mb-4 md:mb-0 rounded-xl md:rounded-none shadow-sm md:shadow-none hover:bg-slate-50 transition-colors p-4 md:p-0">
+          <td class="block md:table-cell px-0 md:px-4 py-2 md:py-3 border-b md:border-none border-slate-100 mb-2 md:mb-0">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+              <div class="w-10 h-10 md:w-8 md:h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                 ${miniaturaHtml}
               </div>
-              <span class="font-bold text-slate-700 text-xs">${d.nombre || '--'}</span>
+              <span class="font-black md:font-bold text-slate-800 md:text-slate-700 text-sm md:text-xs">${d.nombre || '--'}</span>
             </div>
           </td>
-          <td class="px-4 py-3 text-xs font-medium text-slate-600">${d.seccion || '--'}</td>
-          <td class="px-4 py-3 text-xs text-slate-500">${d.barrio || '--'}</td>
-          <td class="px-4 py-3 text-xs text-slate-500">${d.casilla || '--'}</td>
-          <td class="px-4 py-3 flex items-center justify-center gap-2">
-            <button onclick="abrirModalMapa('${d.id}')" class="w-7 h-7 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-md hover:scale-110" title="Ubicación y Evidencias">
-              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-bold md:font-medium text-slate-700 md:text-slate-600">
+             <span class="md:hidden text-[10px] text-slate-400 uppercase tracking-widest">Sección</span>
+             <span>${d.seccion || '--'}</span>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-medium md:font-normal text-slate-600 md:text-slate-500">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Barrio</span>
+             <span>${d.barrio || '--'}</span>
+          </td>
+          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-xs font-medium md:font-normal text-slate-600 md:text-slate-500">
+             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Casilla</span>
+             <span>${d.casilla || '--'}</span>
+          </td>
+          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 items-center justify-end md:justify-center gap-3 border-t md:border-none border-slate-100">
+            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ubicación y Evidencias">
+              <i data-lucide="map-pin" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Mapa</span>
             </button>
-            <button onclick="abrirPerfil('${d.id}')" class="w-7 h-7 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md hover:scale-110" title="Ver Información">
-              <i data-lucide="user" class="w-3.5 h-3.5"></i>
+            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ver Información">
+              <i data-lucide="user" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Perfil</span>
             </button>
           </td>
         </tr>
