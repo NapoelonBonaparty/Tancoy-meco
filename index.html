@@ -6620,7 +6620,7 @@
         }
     }
 
-    // 5. Gestión del Catálogo (Crear, Editar, Listar, Buscar)
+   // 5. Gestión del Catálogo (Crear, Editar, Listar, Buscar)
     let idGrupoEditando = null;
     const formNuevoGrupo = document.getElementById('formNuevoGrupo');
     
@@ -6647,6 +6647,7 @@
         e.preventDefault();
         const btn = document.getElementById('btnGuardarGrupo');
         const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
+        const meta = parseInt(document.getElementById('grupo_meta').value) || 0;
         const desc = document.getElementById('grupo_desc').value.trim();
         const coordinador = document.getElementById('grupo_coordinador').value.trim().toUpperCase();
         const representante = document.getElementById('grupo_representante').value.trim().toUpperCase();
@@ -6670,9 +6671,9 @@
               nombre, 
               descripcion: desc,
               coordinador: coordinador,
-              representante: representante
+              representante: representante,
+              meta_afiliados: meta
             });
-            // Autoafiliar nuevos roles en edición
             await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
             await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
 
@@ -6684,10 +6685,10 @@
               descripcion: desc, 
               coordinador: coordinador,
               representante: representante,
+              meta_afiliados: meta,
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            // Autoafiliar nuevos roles en creación
             await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
             await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
 
@@ -6707,12 +6708,11 @@
     }
 
     window.abrirGrupoDesdeSidebar = function(nombreGrupo) {
-        navigate('grupos'); // Te envía a la página principal de grupos
-        switchGruposTab('estructura'); // Mueve la pestaña activa a "Integrantes"
-        grupoSeleccionadoParaEstructura = nombreGrupo; // Define globalmente qué grupo mostrar
-        cargarEstructuraGrupo(true); // Recrea el Select y carga la tabla
+        navigate('grupos');
+        switchGruposTab('estructura');
+        grupoSeleccionadoParaEstructura = nombreGrupo;
+        cargarEstructuraGrupo(true);
         
-        // Cierra el menú lateral automáticamente si estás en un celular
         if (window.innerWidth < 768) {
             document.getElementById('sidebar').classList.add('-translate-x-full');
             document.getElementById('sidebarBackdrop').classList.add('hidden');
@@ -6900,290 +6900,6 @@
         }
     }
 
-    // JS Guardar Formulario
-    if(formNuevoGrupo) {
-      formNuevoGrupo.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnGuardarGrupo');
-        const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
-        const meta = parseInt(document.getElementById('grupo_meta').value) || 0;
-        const desc = document.getElementById('grupo_desc').value.trim();
-        const coordinador = document.getElementById('grupo_coordinador').value.trim().toUpperCase();
-        const representante = document.getElementById('grupo_representante').value.trim().toUpperCase();
-        
-        const coordId = document.getElementById('grupo_coordinador_id').value;
-        const repId = document.getElementById('grupo_representante_id').value;
-
-        const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
-        if (nombreExiste) {
-            alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
-            return;
-        }
-
-        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
-        btn.disabled = true;
-
-        try {
-          if(idGrupoEditando) {
-            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
-              nombre, 
-              descripcion: desc,
-              coordinador: coordinador,
-              representante: representante,
-              meta_afiliados: meta
-            });
-            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
-            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
-
-            alert("Grupo actualizado.");
-            cancelarEdicionGrupo();
-          } else {
-            await db.collection('catalogo_grupos').add({
-              nombre, 
-              descripcion: desc, 
-              coordinador: coordinador,
-              representante: representante,
-              meta_afiliados: meta,
-              fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
-            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
-
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
-            this.reset();
-            document.getElementById('grupo_coordinador_id').value = '';
-            document.getElementById('grupo_representante_id').value = '';
-          }
-        } catch(e) {
-          alert("Error al guardar grupo.");
-        } finally {
-          btn.innerHTML = idGrupoEditando ? '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios' : '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
-          btn.disabled = false;
-          lucide.createIcons();
-        }
-      });
-    }
-
-    window.editarGrupoCatalogo = function(id, nombre, descripcion, coordinador = '', representante = '', meta = 0) {
-      idGrupoEditando = id;
-      document.getElementById('grupo_nombre').value = nombre;
-      document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
-      document.getElementById('grupo_desc').value = descripcion;
-      document.getElementById('grupo_coordinador').value = coordinador;
-      document.getElementById('grupo_representante').value = representante;
-
-      const lblSeccion = document.getElementById('lbl_seccion_coordinador');
-      if(lblSeccion) {
-          if (coordinador !== '') {
-              const coordData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre === coordinador);
-              const seccion = coordData && coordData.seccion ? coordData.seccion : '--';
-              lblSeccion.innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 inline"></i> Sección: <span class="text-slate-800">${seccion}</span>`;
-              lblSeccion.classList.remove('hidden');
-          } else {
-              lblSeccion.classList.add('hidden');
-          }
-      }
-
-      const tituloForm = document.getElementById('tituloFormGrupo');
-      tituloForm.innerHTML = `
-        <div class="p-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 rounded-lg"><i data-lucide="edit" class="w-4 h-4"></i></div>
-        <span>Editar Grupo</span>
-        <button onclick="cancelarEdicionGrupo()" type="button" class="ml-auto text-xs font-bold text-rose-500 hover:underline">Cancelar</button>
-      `;
-
-      document.getElementById('btnGuardarGrupo').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
-      document.getElementById('btnGuardarGrupo').className = "w-full px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-lg mt-2 transition-colors flex justify-center items-center gap-2 shadow-sm";
-      lucide.createIcons();
-    }
-
-    window.escucharCatalogoGrupos = function() {
-      db.collection('catalogo_grupos').orderBy('nombre').onSnapshot(snap => {
-        document.getElementById('totalGruposBadge').textContent = snap.size;
-        listaGruposCatalogo = [];
-
-        snap.forEach(doc => {
-          const d = doc.data();
-          listaGruposCatalogo.push({
-            id: doc.id, 
-            nombre: d.nombre, 
-            descripcion: d.descripcion,
-            coordinador: d.coordinador || '',
-            representante: d.representante || '',
-            meta_afiliados: d.meta_afiliados || 0
-          });
-        });
-        
-        renderizarTablaCatGrupos();
-        renderizarSubMenuGrupos(); 
-        
-        const selFiltro = document.getElementById('gr_filtro_grupo');
-        const valSel = selFiltro ? selFiltro.value : 'TODOS';
-        if(selFiltro) {
-          selFiltro.innerHTML = '<option value="TODOS">Todos los Grupos</option>';
-          listaGruposCatalogo.forEach(g => selFiltro.add(new Option(g.nombre, g.nombre)));
-          selFiltro.value = valSel;
-        }
-        
-        const tabStats = document.getElementById('tab-grupos-estadisticas');
-        if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
-        const tabCoord = document.getElementById('tab-grupos-coordinadores');
-        if (tabCoord && !tabCoord.classList.contains('hidden')) renderizarTabCoordinadores();
-      });
-    }
-
-    window.filtrarTablaGrupos = function() {
-        renderizarTablaCatGrupos();
-    }
-
-    function renderizarTablaCatGrupos() {
-        const query = document.getElementById('filtroBuscadorGrupos').value.trim().toUpperCase();
-        const tbody = document.getElementById('tablaGrupos');
-        tbody.innerHTML = '';
-
-        const gruposFiltrados = listaGruposCatalogo.filter(g => 
-          g.nombre.toUpperCase().includes(query) || 
-          (g.descripcion && g.descripcion.toUpperCase().includes(query)) ||
-          (g.coordinador && g.coordinador.toUpperCase().includes(query)) ||
-          (g.representante && g.representante.toUpperCase().includes(query))
-        );
-
-        if(gruposFiltrados.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No se encontraron grupos.</td></tr>';
-        } else {
-          gruposFiltrados.forEach(d => {
-            const conteo = conteoMiembrosPorGrupo[d.nombre] || 0;
-            const descLimpia = d.descripcion ? d.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
-            const coordLimpio = d.coordinador ? d.coordinador.replace(/`/g, '\\`') : '';
-            const repLimpio = d.representante ? d.representante.replace(/`/g, '\\`') : '';
-
-            let rolesHtml = '';
-            if (d.coordinador || d.representante) {
-              rolesHtml = '<div class="mt-2.5 flex flex-wrap gap-2">';
-              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
-              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
-              rolesHtml += '</div>';
-            }
-
-            // LÓGICA DE BARRA DE PROGRESO DE METAS
-            let progressHtml = `<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 shadow-sm">${conteo}</span>`;
-            if (d.meta_afiliados > 0) {
-                let pct = Math.min(100, Math.round((conteo / d.meta_afiliados) * 100));
-                let colorBar = pct >= 100 ? 'bg-emerald-500' : (pct >= 50 ? 'bg-indigo-500' : 'bg-amber-500');
-                progressHtml = `
-                    <div class="flex flex-col items-center justify-center w-full max-w-[120px] mx-auto group-hover:scale-105 transition-transform cursor-default" title="${conteo} afiliados de ${d.meta_afiliados} meta">
-                        <div class="flex justify-between w-full text-[10px] font-black text-slate-500 mb-1 tracking-wider">
-                            <span>${conteo}</span>
-                            <span>META: ${d.meta_afiliados}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 border border-slate-200 overflow-hidden shadow-inner">
-                            <div class="${colorBar} h-2.5 rounded-full transition-all duration-500 relative" style="width: ${pct}%">
-                              ${pct >= 100 ? '<div class="absolute inset-0 bg-white/20 animate-pulse"></div>' : ''}
-                            </div>
-                        </div>
-                        <span class="text-[9px] font-black text-slate-400 mt-0.5">${pct}%</span>
-                    </div>
-                `;
-            }
-
-            tbody.innerHTML += `
-              <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors group">
-                <td class="px-4 py-3">
-                  <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-0.5">
-                      <i data-lucide="network" class="w-4 h-4 text-indigo-500"></i>
-                    </div>
-                    <div class="flex-1">
-                      <p class="font-bold text-slate-800 text-xs">${d.nombre}</p>
-                      <p class="text-[10px] text-slate-500 mt-0.5 leading-tight">${d.descripcion || 'Sin descripción.'}</p>
-                      ${rolesHtml}
-                    </div>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-center align-middle">
-                  ${progressHtml}
-                </td>
-                <td class="px-4 py-3 text-center align-middle">
-                  <div class="flex items-center justify-center gap-2">
-                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, \`${coordLimpio}\`, \`${repLimpio}\`, ${d.meta_afiliados})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors shadow-sm" title="Editar Grupo">
-                      <i data-lucide="edit" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm" title="Eliminar Grupo">
-                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>`;
-          });
-          lucide.createIcons();
-        }
-    }
-
-    // JS Guardar Formulario
-    if(formNuevoGrupo) {
-      formNuevoGrupo.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnGuardarGrupo');
-        const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
-        const meta = parseInt(document.getElementById('grupo_meta').value) || 0;
-        const desc = document.getElementById('grupo_desc').value.trim();
-        const coordinador = document.getElementById('grupo_coordinador').value.trim().toUpperCase();
-        const representante = document.getElementById('grupo_representante').value.trim().toUpperCase();
-        
-        const coordId = document.getElementById('grupo_coordinador_id').value;
-        const repId = document.getElementById('grupo_representante_id').value;
-
-        const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
-        if (nombreExiste) {
-            alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
-            return;
-        }
-
-        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
-        btn.disabled = true;
-
-        try {
-          if(idGrupoEditando) {
-            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
-              nombre, 
-              descripcion: desc,
-              coordinador: coordinador,
-              representante: representante,
-              meta_afiliados: meta
-            });
-            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
-            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
-
-            alert("Grupo actualizado.");
-            cancelarEdicionGrupo();
-          } else {
-            await db.collection('catalogo_grupos').add({
-              nombre, 
-              descripcion: desc, 
-              coordinador: coordinador,
-              representante: representante,
-              meta_afiliados: meta,
-              fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            await afiliarLiderAutomaticamente(coordId, nombre, 'COORDINADOR');
-            await afiliarLiderAutomaticamente(repId, nombre, 'REPRESENTANTE');
-
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
-            this.reset();
-            document.getElementById('grupo_coordinador_id').value = '';
-            document.getElementById('grupo_representante_id').value = '';
-          }
-        } catch(e) {
-          alert("Error al guardar grupo.");
-        } finally {
-          btn.innerHTML = idGrupoEditando ? '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios' : '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
-          btn.disabled = false;
-          lucide.createIcons();
-        }
-      });
-    }
-
     window.editarGrupoCatalogo = function(id, nombre, descripcion, coordinador = '', representante = '', meta = 0) {
       idGrupoEditando = id;
       document.getElementById('grupo_nombre').value = nombre;
@@ -7239,35 +6955,26 @@
         return;
       }
 
-      // Si se está editando el mismo grupo que se va a borrar, cancelamos el modo edición
       if (idGrupoEditando === id) cancelarEdicionGrupo();
 
       try {
-        // Inicializamos un lote de escritura (Batch) atómico en Firestore
         let batch = db.batch();
-
-        // 1. Añadimos la orden de eliminación del documento principal del grupo
         const grupoRef = db.collection('catalogo_grupos').doc(id);
         batch.delete(grupoRef);
 
-        // 2. Buscamos y añadimos la orden de eliminación de todos los integrantes vinculados a este grupo
         const snapshotMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
-        
         snapshotMiembros.forEach(docMiembro => {
             batch.delete(docMiembro.ref);
         });
 
-        // 3. Ejecutamos la operación atómica completa en Firebase en un solo bloque de red
         await batch.commit();
 
-        // 4. Registramos el movimiento en la bitácora de auditoría de seguridad
         if(typeof registrarAuditoria === 'function') {
             registrarAuditoria('SISTEMA', `Eliminó permanentemente el grupo: ${nombre} y purgó a todos sus miembros afiliados.`);
         }
 
         alert(`El grupo "${nombre}" y sus afiliaciones han sido eliminados correctamente de Firebase.`);
 
-        // Si el usuario estaba viendo la pestaña de estructuras e integrantes de ese grupo, reseteamos la vista
         if(typeof grupoSeleccionadoParaEstructura !== 'undefined' && grupoSeleccionadoParaEstructura === nombre) {
             grupoSeleccionadoParaEstructura = '';
             const selectEstruc = document.getElementById('selectEstructuraGrupo');
