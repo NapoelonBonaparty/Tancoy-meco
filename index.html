@@ -3617,10 +3617,12 @@
              <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
              <span class="px-3 py-1.5 md:py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span>
           </td>
-          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 text-center border-t md:border-none border-slate-100 justify-end gap-2">
-            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 flex items-center justify-center gap-1.5" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i> <span class="md:hidden">Mapa</span></button>
-            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="user" class="w-4 h-4 md:hidden"></i> VER</button>
-            <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="flex-1 md:flex-none py-2.5 md:py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="trash" class="w-4 h-4 md:hidden"></i> BORRAR</button>
+          <td class="block md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 border-t md:border-none border-slate-100 align-middle">
+            <div class="flex flex-row items-center justify-end md:justify-center gap-3">
+                <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none py-2 md:py-1.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 flex items-center justify-center gap-1.5" title="Ubicación y Evidencias"><i data-lucide="map-pin" class="w-4 h-4"></i> <span class="md:hidden">Mapa</span></button>
+                <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none py-2 md:py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg text-xs font-bold transition-colors shadow-sm hover:scale-105 flex items-center justify-center gap-1.5"><i data-lucide="user" class="w-4 h-4 md:hidden"></i> VER</button>
+                <button onclick="eliminarRegistro('${d.id}', '${d.nombre}')" class="flex-1 md:flex-none py-2 md:py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm hover:scale-105 flex items-center justify-center gap-1.5"><i data-lucide="trash" class="w-4 h-4 md:hidden"></i> BORRAR</button>
+            </div>
           </td>
         </tr>`;
       });
@@ -4990,13 +4992,15 @@
              <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Casilla</span>
              <span>${d.casilla || '--'}</span>
           </td>
-          <td class="flex md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 items-center justify-end md:justify-center gap-3 border-t md:border-none border-slate-100">
-            <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ubicación y Evidencias">
-              <i data-lucide="map-pin" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Mapa</span>
-            </button>
-            <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none h-9 md:w-7 md:h-7 rounded-lg md:rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md hover:scale-110 gap-1.5 font-bold text-xs" title="Ver Información">
-              <i data-lucide="user" class="w-4 h-4 md:w-3.5 md:h-3.5"></i> <span class="md:hidden">Perfil</span>
-            </button>
+          <td class="block md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 border-t md:border-none border-slate-100 align-middle">
+            <div class="flex flex-row items-center justify-end md:justify-center gap-4">
+              <button onclick="abrirModalMapa('${d.id}')" class="flex-1 md:flex-none h-9 md:w-8 md:h-8 rounded-lg md:rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition shadow-sm hover:shadow-md hover:scale-110 font-bold text-xs" title="Ubicación y Evidencias">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> <span class="md:hidden ml-1.5">Mapa</span>
+              </button>
+              <button onclick="abrirPerfil('${d.id}')" class="flex-1 md:flex-none h-9 md:w-8 md:h-8 rounded-lg md:rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition shadow-sm hover:shadow-md hover:scale-110 font-bold text-xs" title="Ver Información">
+                <i data-lucide="user" class="w-4 h-4"></i> <span class="md:hidden ml-1.5">Perfil</span>
+              </button>
+            </div>
           </td>
         </tr>
         `;
