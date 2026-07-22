@@ -7703,19 +7703,13 @@
     window.seleccionarCiudadanoModal = async function(nombre, idBeneficiario) {
       if (['seccionales', 'coordinadores', 'representantes'].includes(campoDestinoBusqueda)) {
         
-        // Restricción Exigida: Seccionales o Coordinadores no pueden ser agregados como Representantes
-        if (campoDestinoBusqueda === 'representantes') {
-            const esSec = window.lideresGrupoTemp.seccionales.some(s => s.id === idBeneficiario);
-            const esCoor = window.lideresGrupoTemp.coordinadores.some(c => c.id === idBeneficiario);
-            if (esSec || esCoor) {
-                alert("⚠️ Restricción del Sistema: Una persona marcada como 'Seccional' o 'Coordinador' no puede ser asignada como 'Representante'.");
-                return;
-            }
-        }
+        // REGLA ESTRICTA DE JERARQUÍA: Un ciudadano solo puede tener UN rol de liderazgo.
+        const esSec = window.lideresGrupoTemp.seccionales.some(s => s.id === idBeneficiario);
+        const esCoor = window.lideresGrupoTemp.coordinadores.some(c => c.id === idBeneficiario);
+        const esRep = window.lideresGrupoTemp.representantes.some(r => r.id === idBeneficiario);
 
-        // Evitar meter duplicados en la misma caja
-        if (window.lideresGrupoTemp[campoDestinoBusqueda].some(x => x.id === idBeneficiario)) {
-            alert("Este ciudadano ya está agregado en la lista.");
+        if (esSec || esCoor || esRep) {
+            alert("⚠️ REGLA DE JERARQUÍA: Este ciudadano ya tiene un cargo asignado en este grupo. Una persona no puede tener doble rol de liderazgo.");
             return;
         }
 
@@ -8895,13 +8889,13 @@
             const imgUrl = (persona.foto_url && persona.foto_url.trim() !== "") ? persona.foto_url : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
             return `
                 <div class="flex flex-col items-center group relative z-10 cursor-pointer hover:-translate-y-1 transition-transform m-2" onclick="abrirPerfil('${persona.id_beneficiario}')">
-                    <div class="w-12 h-12 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ring-${color}-200 bg-white">
+                    <div class="w-14 h-14 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ring-${color}-200 bg-white">
                         <img src="${imgUrl}" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute top-8 -right-1 bg-${color}-500 text-white rounded-full p-1 shadow-sm border-2 border-white">
-                        <i data-lucide="${icon}" class="w-2.5 h-2.5"></i>
+                    <div class="absolute top-9 -right-1 bg-${color}-500 text-white rounded-full p-1 shadow-sm border-2 border-white">
+                        <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
                     </div>
-                    <div class="bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm text-center min-w-[120px] max-w-[140px] relative">
+                    <div class="bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm text-center min-w-[130px] max-w-[150px] relative">
                         <p class="text-[10px] font-black text-slate-800 uppercase leading-tight truncate w-full" title="${persona.nombre}">${persona.nombre}</p>
                         <p class="text-[8.5px] font-bold text-${color}-600 uppercase tracking-widest mt-0.5">${persona.rol}</p>
                     </div>
@@ -8909,75 +8903,49 @@
             `;
         };
 
+        // Renderizador de Capas Seguro (Evita que las líneas se rompan al bajar de fila)
+        const renderizarNivel = (nodos, color, icon) => {
+            if (nodos.length === 0) return '';
+            return `
+            <div class="flex flex-col items-center w-full relative">
+                <div class="flex flex-wrap justify-center gap-2 lg:gap-4 w-full max-w-5xl pt-2">
+                    ${nodos.map(n => crearNodo(n, color, icon)).join('')}
+                </div>
+            </div>
+            `;
+        };
+
         let html = '<div class="flex flex-col items-center w-full pb-10 pt-4">';
+        
+        // Conector Vertical Limpio
+        const conector = `<div class="w-0.5 h-10 bg-slate-300 rounded-full my-2"></div>`;
+
+        let previos = false;
 
         // 1. NIVEL SUPREMO (SECCIONALES)
         if (seccionales.length > 0) {
-            html += `<div class="relative flex justify-center w-full">`;
-            if (seccionales.length > 1) html += `<div class="absolute top-0 border-t-2 border-amber-200 left-8 right-8 h-4"></div>`;
-            html += `<div class="flex flex-wrap justify-center w-full px-4">`;
-            seccionales.forEach(s => {
-                html += `
-                <div class="flex flex-col items-center relative">
-                    ${seccionales.length > 1 ? '<div class="w-px h-4 bg-amber-200 absolute top-0"></div>' : ''}
-                    <div class="pt-4">${crearNodo(s, 'amber', 'crown')}</div>
-                </div>`;
-            });
-            html += `</div></div>`;
-            if (coordinadores.length > 0 || representantes.length > 0 || bases.length > 0) {
-                html += `<div class="w-px h-8 bg-slate-300 mt-2"></div>`;
-            }
+            html += renderizarNivel(seccionales, 'amber', 'crown');
+            previos = true;
         }
 
         // 2. NIVEL CÚSPIDE (COORDINADORES)
         if (coordinadores.length > 0) {
-            html += `<div class="relative flex justify-center w-full">`;
-            if (coordinadores.length > 1) html += `<div class="absolute top-0 border-t-2 border-slate-300 left-8 right-8 h-4"></div>`;
-            html += `<div class="flex flex-wrap justify-center w-full px-4">`;
-            coordinadores.forEach(c => {
-                html += `
-                <div class="flex flex-col items-center relative">
-                    ${coordinadores.length > 1 ? '<div class="w-px h-4 bg-slate-300 absolute top-0"></div>' : ''}
-                    <div class="pt-4">${crearNodo(c, 'indigo', 'user-check')}</div>
-                </div>`;
-            });
-            html += `</div></div>`;
-            if (representantes.length > 0 || bases.length > 0) {
-                html += `<div class="w-px h-8 bg-slate-300 mt-2"></div>`;
-            }
+            if (previos) html += conector;
+            html += renderizarNivel(coordinadores, 'indigo', 'user-check');
+            previos = true;
         }
 
         // 3. NIVEL MEDIO (REPRESENTANTES)
         if (representantes.length > 0) {
-            html += `<div class="relative flex justify-center w-full">`;
-            if (representantes.length > 1) html += `<div class="absolute top-0 border-t-2 border-slate-300 left-8 right-8 h-4"></div>`;
-            html += `<div class="flex flex-wrap justify-center w-full px-4">`;
-            representantes.forEach(r => {
-                html += `
-                <div class="flex flex-col items-center relative">
-                    ${representantes.length > 1 ? '<div class="w-px h-4 bg-slate-300 absolute top-0"></div>' : ''}
-                    <div class="pt-4">${crearNodo(r, 'emerald', 'users')}</div>
-                </div>`;
-            });
-            html += `</div></div>`;
-            if (bases.length > 0) {
-                html += `<div class="w-px h-8 bg-slate-300 mt-2"></div>`;
-            }
+            if (previos) html += conector;
+            html += renderizarNivel(representantes, 'emerald', 'users');
+            previos = true;
         }
 
-        // 4. NIVEL BASE (INTEGRANTES EN REJILLA)
+        // 4. NIVEL BASE (INTEGRANTES)
         if (bases.length > 0) {
-            html += `<div class="relative flex flex-col items-center w-full max-w-4xl px-4">`;
-            if (bases.length > 1) html += `<div class="absolute top-0 border-t-2 border-slate-300 left-10 right-10 h-4"></div>`;
-            html += `<div class="flex flex-wrap justify-center gap-2 pt-4">`;
-            bases.forEach(b => {
-                html += `
-                <div class="flex flex-col items-center relative">
-                    ${bases.length > 1 ? '<div class="w-px h-4 bg-slate-300 absolute top-0"></div>' : ''}
-                    <div class="pt-4">${crearNodo(b, 'slate', 'user')}</div>
-                </div>`;
-            });
-            html += `</div></div>`;
+            if (previos) html += conector;
+            html += renderizarNivel(bases, 'slate', 'user');
         }
 
         html += '</div>';
