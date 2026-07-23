@@ -7,12 +7,14 @@
 
   <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/6/6b/Smile_icon.png" type="image/png">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHuCOIlcaqylLlveecH32DqTKA10jPW54&libraries=places,visualization&callback=initMap" async defer></script>
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
@@ -1015,28 +1017,28 @@
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="border border-violet-200 bg-violet-50/30 p-3 rounded-xl">
+                  <label class="text-[10px] font-black text-violet-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                    <span><i data-lucide="crown" class="w-3 h-3 inline"></i> Seccional</span>
+                    <button type="button" onclick="abrirModalBusquedaCiudadano('seccionales')" class="bg-violet-100 hover:bg-violet-200 text-violet-700 p-1 rounded transition-colors" title="Añadir Seccional"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                  </label>
+                  <div id="lista_seccionales" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-violet-600/50 text-[10px] italic">Sin asignar</div>
+                </div>
+
+                                <div class="border border-rose-200 bg-rose-50/30 p-3 rounded-xl">
+                  <label class="text-[10px] font-black text-rose-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                    <span><i data-lucide="user-check" class="w-3 h-3 inline"></i> Coordinadores</span>
+                    <button type="button" onclick="abrirModalBusquedaCiudadano('coordinadores')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 p-1 rounded transition-colors" title="Añadir Coordinador"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                  </label>
+                  <div id="lista_coordinadores" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-rose-400/50 text-[10px] italic">Sin asignar</div>
+                </div>
+
                                 <div class="border border-amber-200 bg-amber-50/30 p-3 rounded-xl">
                   <label class="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i data-lucide="crown" class="w-3 h-3 inline"></i> Seccionales</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('seccionales')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1 rounded transition-colors" title="Añadir Seccional"><i data-lucide="plus" class="w-3 h-3"></i></button>
-                  </label>
-                  <div id="lista_seccionales" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-amber-600/50 text-[10px] italic">Sin asignar</div>
-                </div>
-
-                                <div class="border border-indigo-200 bg-indigo-50/30 p-3 rounded-xl">
-                  <label class="text-[10px] font-black text-indigo-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i data-lucide="user-check" class="w-3 h-3 inline"></i> Coordinadores</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('coordinadores')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-1 rounded transition-colors" title="Añadir Coordinador"><i data-lucide="plus" class="w-3 h-3"></i></button>
-                  </label>
-                  <div id="lista_coordinadores" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-indigo-400/50 text-[10px] italic">Sin asignar</div>
-                </div>
-
-                                <div class="border border-emerald-200 bg-emerald-50/30 p-3 rounded-xl">
-                  <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
                     <span><i data-lucide="users" class="w-3 h-3 inline"></i> Representantes</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('representantes')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 p-1 rounded transition-colors" title="Añadir Representante"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                    <button type="button" onclick="abrirModalBusquedaCiudadano('representantes')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1 rounded transition-colors" title="Añadir Representante"><i data-lucide="plus" class="w-3 h-3"></i></button>
                   </label>
-                  <div id="lista_representantes" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-emerald-600/50 text-[10px] italic">Sin asignar</div>
+                  <div id="lista_representantes" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-amber-600/50 text-[10px] italic">Sin asignar</div>
                 </div>
               </div>
 
@@ -2242,21 +2244,14 @@
                     </div>
                   </div>
 
-                  <div class="pt-2">
-                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1.5 flex items-center gap-1.5"><i data-lucide="lock" class="w-3 h-3 text-slate-400"></i> Contraseña Actual (Sólo Lectura)</label>
-                    <div class="relative">
-                      <input type="password" id="mu_password_actual" readonly class="w-full text-sm font-mono font-bold px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 outline-none cursor-not-allowed shadow-inner select-all">
-                      <button type="button" onclick="togglePasswordModal('mu_password_actual', 'eye_actual')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors focus:outline-none">
-                        <i data-lucide="eye" id="eye_actual" class="w-4 h-4"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="pt-2">
-                    <label class="text-[10px] text-indigo-400 uppercase font-bold mb-1.5 flex items-center gap-1.5"><i data-lucide="key" class="w-3 h-3 text-indigo-400"></i> Establecer Nueva Clave</label>
-                    <div class="relative">
-                      <input type="password" id="mu_password_input" placeholder="Opcional. Escribe para cambiar..." class="w-full text-sm font-mono font-bold px-4 py-2.5 rounded-xl border border-indigo-200 bg-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm">
-                      <button type="button" onclick="togglePasswordModal('mu_password_input', 'eye_nueva')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors focus:outline-none">
-                        <i data-lucide="eye" id="eye_nueva" class="w-4 h-4"></i>
+                  <div class="pt-4 md:col-span-2">
+                    <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-bold text-amber-800"><i data-lucide="shield-alert" class="w-4 h-4 inline mr-1"></i> Privacidad de Contraseña</p>
+                        <p class="text-[10px] text-amber-700 mt-0.5">Por seguridad de grado militar, las claves ya no son visibles. Envía un enlace cifrado al usuario para que la restablezca.</p>
+                      </div>
+                      <button type="button" onclick="enviarCorreoRecuperacion()" class="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors whitespace-nowrap flex items-center justify-center gap-2">
+                        <i data-lucide="mail" class="w-4 h-4"></i> Enviar Enlace
                       </button>
                     </div>
                   </div>
@@ -2347,6 +2342,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+
+    // --- ESCUDO ANTI-HACKERS (DOMPurify XSS Protection) ---
+    window.sanitizarTexto = function(texto) {
+        if (typeof texto !== 'string') return texto;
+        return DOMPurify.sanitize(texto.trim());
+    };
+    
+    window.sanitizarObjeto = function(obj) {
+        const nuevoObj = {};
+        for (let key in obj) {
+            if (typeof obj[key] === 'string') {
+                nuevoObj[key] = window.sanitizarTexto(obj[key]);
+            } else if (typeof obj[key] === 'object' && obj[key] !== null && !obj[key].toDate && !obj[key].toMillis) {
+                // Limpia objetos anidados ignorando las estampas de tiempo (Timestamps) de Firebase
+                nuevoObj[key] = window.sanitizarObjeto(obj[key]);
+            } else {
+                nuevoObj[key] = obj[key];
+            }
+        }
+        return nuevoObj;
+    };
 
     // --- MOTOR DE MODALES PERSONALIZADO ---
     window.AppDialog = function({ title, message, type = 'info', isConfirm = false, confirmText = 'Aceptar', cancelText = 'Cancelar' }) {
@@ -2931,6 +2947,7 @@
     
     let map, chartInstAvance, chartInstSexo, chartInstSimpatia;
     let marcadoresDashboard = [];
+    let clustererDashboard = null; // 🔥 NUEVO: Controlador de Clústeres
     let heatmapAFavor = null;
     let heatmapEnContra = null;
     let heatmapIndecisos = null;
@@ -2966,17 +2983,21 @@
     window.actualizarMapaDashboard = function() {
         if (!map) return; 
 
-        // 1. Limpiar TODAS las capas (Pines y Heatmaps) para que no queden restos al refrescar
-        marcadoresDashboard.forEach(m => m.setMap(null));
+        // 1. Limpieza Total de Pines y Clústeres
+        if (clustererDashboard) {
+            clustererDashboard.clearMarkers();
+        } else {
+            marcadoresDashboard.forEach(m => m.setMap(null));
+        }
         marcadoresDashboard = [];
         
+        // 2. Limpieza de Mapas de Calor
         if (heatmapAFavor) { heatmapAFavor.setMap(null); heatmapAFavor = null; }
         if (heatmapEnContra) { heatmapEnContra.setMap(null); heatmapEnContra = null; }
         if (heatmapIndecisos) { heatmapIndecisos.setMap(null); heatmapIndecisos = null; }
 
         const registros = Object.values(window.registrosGlobalesMemoria || {});
 
-        // Arreglos de coordenadas para el motor térmico
         const puntosAFavor = [];
         const puntosEnContra = [];
         const puntosIndecisos = [];
@@ -2984,15 +3005,13 @@
         registros.forEach(d => {
             if (d.coordenadas && typeof d.coordenadas.lat === 'number') {
                 const simpatia = (d.nivel_simpatia || 'NO VISITADO').toUpperCase();
-                
-                // Conversión al objeto interno LatLng de Google Maps
                 const latLngObj = new google.maps.LatLng(d.coordenadas.lat, d.coordenadas.lng);
                 
                 if (simpatia === 'A FAVOR') puntosAFavor.push(latLngObj);
                 else if (simpatia === 'EN CONTRA') puntosEnContra.push(latLngObj);
                 else if (simpatia === 'INDECISO') puntosIndecisos.push(latLngObj);
 
-                // Si estamos en MODO PINES, dibujamos cada uno
+                // MODO PINES (Se guardan en el array, NO se les asigna 'map' directamente)
                 if (modoMapaDashboard === 'pines') {
                     let colorFill = '%23ffffff'; 
                     let colorStroke = '%2394a3b8'; 
@@ -3003,9 +3022,9 @@
 
                     const svgIcon = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='${colorFill}' stroke='${colorStroke}' stroke-width='3'/%3E%3C/svg%3E`;
 
+                    // IMPORTANTE: NO pasamos 'map: map' aquí para que el clusterer tenga el control
                     const marker = new google.maps.Marker({
                         position: d.coordenadas,
-                        map: map,
                         icon: { url: svgIcon, anchor: new google.maps.Point(7, 7) },
                         title: d.nombre
                     });
@@ -3027,35 +3046,49 @@
             }
         });
 
-        // Si estamos en MODO CALOR, inicializamos e inyectamos las capas térmicas
+        // 🔥 MAGIA DE RENDIMIENTO: Renderizado Agrupado con MarkerClusterer
+        if (modoMapaDashboard === 'pines' && marcadoresDashboard.length > 0) {
+            // Destruimos el cluster anterior si existe
+            if (clustererDashboard) clustererDashboard.clearMarkers();
+            
+            // Creamos un nuevo agrupador
+            clustererDashboard = new markerClusterer.MarkerClusterer({ 
+                map: map, 
+                markers: marcadoresDashboard,
+                renderer: {
+                    render: function({ count, position }) {
+                        // Color base para el círculo del clúster
+                        const color = count > 50 ? '#4f46e5' : '#818cf8'; 
+                        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="40" height="40">
+                                        <circle cx="25" cy="25" r="20" fill="${color}" opacity="0.9" stroke="white" stroke-width="3"/>
+                                        <text x="25" y="29" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="white">${count}</text>
+                                     </svg>`;
+                        
+                        return new google.maps.Marker({
+                            position,
+                            icon: {
+                                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+                                anchor: new google.maps.Point(20, 20),
+                            },
+                            zIndex: 1000,
+                        });
+                    }
+                }
+            });
+        }
+
+        // MODO CALOR (Sin cambios)
         if (modoMapaDashboard === 'calor') {
-            // Gradiente Color Esmeralda
             heatmapAFavor = new google.maps.visualization.HeatmapLayer({
-                data: puntosAFavor,
-                map: map,
-                radius: 35,
-                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
-                opacity: 0.9,
+                data: puntosAFavor, map: map, radius: 35, maxIntensity: 1, opacity: 0.9,
                 gradient: ['rgba(16, 185, 129, 0)', 'rgba(16, 185, 129, 0.5)', 'rgba(16, 185, 129, 0.8)', 'rgba(5, 150, 105, 1)']
             });
-
-            // Gradiente Color Rojo
             heatmapEnContra = new google.maps.visualization.HeatmapLayer({
-                data: puntosEnContra,
-                map: map,
-                radius: 35,
-                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
-                opacity: 0.9,
+                data: puntosEnContra, map: map, radius: 35, maxIntensity: 1, opacity: 0.9,
                 gradient: ['rgba(239, 68, 68, 0)', 'rgba(239, 68, 68, 0.5)', 'rgba(239, 68, 68, 0.8)', 'rgba(185, 28, 28, 1)']
             });
-
-            // Gradiente Color Ámbar/Amarillo
             heatmapIndecisos = new google.maps.visualization.HeatmapLayer({
-                data: puntosIndecisos,
-                map: map,
-                radius: 35,
-                maxIntensity: 1, // Fuerza el color al máximo aunque haya solo 1 punto
-                opacity: 0.9,
+                data: puntosIndecisos, map: map, radius: 35, maxIntensity: 1, opacity: 0.9,
                 gradient: ['rgba(245, 158, 11, 0)', 'rgba(245, 158, 11, 0.5)', 'rgba(245, 158, 11, 0.8)', 'rgba(217, 119, 6, 1)']
             });
         }
@@ -3316,6 +3349,13 @@
 
       keys.forEach(id => {
         const d = datos[id];
+        
+        // --- NUEVO: Extraemos la foto de la memoria usando el ID del beneficiario ---
+        const registroUsuario = window.registrosGlobalesMemoria[id] || {};
+        const miniaturaHtml = (registroUsuario.foto_url && registroUsuario.foto_url.trim() !== "")
+          ? `<img src="${registroUsuario.foto_url}" class="w-full h-full object-cover">`
+          : `<i data-lucide="user" class="w-5 h-5 text-slate-400"></i>`;
+
         let badgesApoyos = '';
         Array.from(d.apoyosRecibidos).forEach(apoyo => {
            badgesApoyos += `<span class="inline-block px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-black uppercase tracking-widest shadow-sm">${apoyo}</span>`;
@@ -3324,8 +3364,8 @@
         grid.innerHTML += `
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between hover:border-emerald-300 transition-colors">
             <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
-                <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
+              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden shadow-sm">
+                ${miniaturaHtml}
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-black text-slate-800 leading-tight truncate">${d.nombre}</p>
@@ -3543,7 +3583,8 @@
         window.registrosGlobalesMemoria = {};
 
         querySnapshot.forEach((doc) => {
-          const data = doc.data();
+          // 🔥 ESCUDO ACTIVADO: Sanitizamos la información proveniente de la nube
+          const data = window.sanitizarObjeto(doc.data());
           
           // 🔥 BARRERA DE SEGURIDAD GEOGRÁFICA (GEOCERCA)
           // Si el usuario tiene secciones asignadas, descartamos (no guardamos en RAM) las que no le tocan
@@ -3928,22 +3969,25 @@
       btnGuardar.disabled = true;
       lucide.createIcons();
 
-      const simpatizanteData = {
-        nombre: document.getElementById('f_nombre').value.trim().toUpperCase(),
+      let simpatizanteData = {
+        nombre: document.getElementById('f_nombre').value.toUpperCase(),
         fecha_nacimiento: fechaInput,
-        direccion: document.getElementById('f_direccion').value.trim().toUpperCase(),
-        barrio: document.getElementById('f_barrio').value.trim().toUpperCase(),
+        direccion: document.getElementById('f_direccion').value.toUpperCase(),
+        barrio: document.getElementById('f_barrio').value.toUpperCase(),
         sexo: document.getElementById('f_sexo').value,
-        seccion: document.getElementById('f_seccion').value.trim().toUpperCase(),
-        clave_elector: document.getElementById('f_clave').value.trim().toUpperCase(),
-        curp: document.getElementById('f_curp').value.trim().toUpperCase(),
-        casilla: document.getElementById('f_casilla').value.trim().toUpperCase(),
+        seccion: document.getElementById('f_seccion').value.toUpperCase(),
+        clave_elector: document.getElementById('f_clave').value.toUpperCase(),
+        curp: document.getElementById('f_curp').value.toUpperCase(),
+        casilla: document.getElementById('f_casilla').value.toUpperCase(),
         municipio: "LAS ROSAS", // Guardado inamovible por defecto
         tipo_afiliacion: document.getElementById('f_tipo').value,
         registrado_por: auth.currentUser.email,
         fecha_captura: firebase.firestore.FieldValue.serverTimestamp(),
         foto_url: ""
       };
+
+      // 🔥 ESCUDO ACTIVADO: Limpiamos inyecciones maliciosas antes de mandar a la nube
+      simpatizanteData = window.sanitizarObjeto(simpatizanteData);
 
       try {
         let esDuplicado = false;
@@ -4201,44 +4245,26 @@
     }
 
     async function eliminarTodaLaBaseDeDatos() {
-      if (!(await AppConfirm("Peligro Crítico", "Estás a punto de borrar permanentemente toda la información guardada en la base de datos de Firebase.\n\n¿Estás completamente seguro de realizar la purga?", "danger", "Sí, Purgar"))) {
+      if (!(await AppConfirm("Peligro Crítico", "Estás a punto de solicitar la purga masiva de la base de datos.\n\n¿Estás completamente seguro?", "danger", "Sí, Purgar"))) {
         return;
       }
 
-      const btn = event.target;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Eliminando...';
-      btn.disabled = true;
-
-      try {
-        const collectionRef = db.collection('simpatizantes');
-        const snapshot = await collectionRef.get();
-        const batch = db.batch();
-        let count = 0;
-
-        for (const doc of snapshot.docs) {
-          batch.delete(doc.ref);
-          count++;
-          if (count === 400) {
-            await batch.commit();
-            count = 0;
-          }
-        }
-
-        if (count > 0) {
-          await batch.commit();
-        }
-
-        await alert("Base de datos limpiada exitosamente.");
-        location.reload();
-
-      } catch (error) {
-        console.error("Error al limpiar la base:", error);
-        alert("Ocurrió un error al limpiar la base de datos.");
-      } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        lucide.createIcons();
+      // 🛡️ ESCUDO ACTIVADO: Prevención de Pérdida de Datos (DLP) y Protección de Facturación
+      await AppAlert(
+        "Operación Bloqueada por Seguridad",
+        "Por protocolos de Ciberseguridad, el borrado masivo desde el navegador ha sido DESHABILITADO.\n\nMotivos:\n1. Permite ataques de denegación de servicio (DDoS).\n2. Borrar miles de registros aquí congelaría el sistema y generaría cobros masivos excesivos en Firebase.\n\nPara purgar la base de datos de forma segura (sin costo), el Administrador debe hacerlo directamente desde la consola oficial de Firebase.",
+        "danger"
+      );
+      
+      // Restablecemos la UI del botón para evitar que se quede pasmado
+      const btn = document.getElementById('btnBorrarTodo');
+      if (btn) {
+          btn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i> Purgar Base de Datos';
+          btn.disabled = true;
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.classList.remove('hover:bg-red-700');
+          document.getElementById('inputConfirmarBorrado').value = '';
+          lucide.createIcons();
       }
     }
 
@@ -5680,15 +5706,15 @@
           await appSecundaria.auth().signOut();
           await appSecundaria.delete();
 
-          // 3. GUARDAMOS EL REGISTRO EN FIRESTORE INCLUYENDO CONTRASEÑA EN TEXTO PLANO
+          // 3. GUARDAMOS EL REGISTRO EN FIRESTORE (SIN GUARDAR LA CONTRASEÑA EN TEXTO PLANO)
           await db.collection('usuarios_acceso').doc(email).set({
             nombre: nombre,
             email: email,
             rol: rol,
-            password_temp: password, // Contraseña guardada de forma abierta y visible
+            // 🚨 NO GUARDAMOS password_temp AQUÍ. LA CONTRASEÑA SOLO VIVE ENCRIPATA EN FIREBASE AUTH.
             foto_url: base64FotoUsuario,
             permisos: modulosPermitidos,
-            secciones_permitidas: seccionesArr, // <-- NUEVA LÍNEA AÑADIDA
+            secciones_permitidas: seccionesArr,
             fecha_registro: firebase.firestore.FieldValue.serverTimestamp()
           });
           
@@ -5772,21 +5798,7 @@
       document.getElementById('mu_nombre_input').value = nombre;
       document.getElementById('mu_rol_input').value = rol;
       
-      // Consultamos de forma segura la contraseña actual en texto plano directo de Firestore
-      try {
-          const userDoc = await db.collection('usuarios_acceso').doc(email).get();
-          if(userDoc.exists) {
-              document.getElementById('mu_password_actual').value = userDoc.data().password_temp || 'No registrada';
-          }
-      } catch(e) { console.error("No se pudo obtener la clave: ", e); }
-
-      document.getElementById('mu_password_input').value = ''; // Limpiamos la nueva contraseña
-
-      // Resetear estado visual de los inputs a password (ojitos cerrados)
-      document.getElementById('mu_password_actual').type = 'password';
-      document.getElementById('mu_password_input').type = 'password';
-      document.getElementById('eye_actual').setAttribute('data-lucide', 'eye');
-      document.getElementById('eye_nueva').setAttribute('data-lucide', 'eye');
+      // 🚨 (Lógica de lectura de contraseña eliminada por protocolos de seguridad)
 
       // Marcar los checkboxes de permisos existentes
       const permisosArr = permisosString.split(',');
@@ -5814,15 +5826,11 @@
       const nombre = document.getElementById('mu_nombre_input').value.trim();
       const rol = document.getElementById('mu_rol_input').value;
       
-      // 🔥 NUEVO: Recolectar secciones seleccionadas por Checkbox en la Edición
       const seccionesArr = [];
       document.querySelectorAll('input[name="mu_seccion_chk"]:checked').forEach(chk => {
           seccionesArr.push(chk.value);
       });
 
-      const passwordActual = document.getElementById('mu_password_actual').value;
-      const passwordNueva = document.getElementById('mu_password_input').value; // Sin trim para respetar espacios si los tiene
-      
       const fotoInput = document.getElementById('mu_foto_input');
       
       const modulosPermitidos = [];
@@ -5843,48 +5851,6 @@
       }
 
       try {
-        let finalPasswordToSave = passwordActual; // Por defecto conservamos la antigua
-
-        // --- MAGIA: CAMBIO DE CONTRASEÑA EN FIREBASE AUTH ---
-        if (passwordNueva !== '') {
-            if (passwordNueva.length < 6) throw new Error("La nueva contraseña debe tener al menos 6 caracteres por reglas de Firebase.");
-            
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sincronizando Autenticación...';
-            lucide.createIcons();
-
-            const nombreAppSecundaria = "AppSecEdit_" + Date.now();
-            const appSecundaria = firebase.initializeApp(firebaseConfig, nombreAppSecundaria);
-            const authSecundaria = appSecundaria.auth();
-            
-            try {
-                // CLAVE 1: Evitar que esta sesión interfiera con la del administrador actual usando Persistence NONE
-                await authSecundaria.setPersistence(firebase.auth.Auth.Persistence.NONE);
-                
-                // CLAVE 2: Autenticarnos silenciosamente en el servidor
-                const userCredential = await authSecundaria.signInWithEmailAndPassword(email, passwordActual);
-                
-                // CLAVE 3: Inyectar la nueva clave en los servidores de Google Auth
-                await userCredential.user.updatePassword(passwordNueva);
-                
-                // Si el servidor lo autorizó, actualizamos la variable que irá a Firestore
-                finalPasswordToSave = passwordNueva;
-                
-            } catch (authError) {
-                console.error("Error de Firebase Auth:", authError);
-                // Traducción de errores para que la alerta elegante te explique el motivo exacto
-                let msjError = authError.message;
-                if (authError.code === 'auth/wrong-password' || authError.code === 'auth/invalid-credential') {
-                    msjError = "La 'Contraseña Actual' guardada no coincide con la credencial real en los servidores de Google. El usuario debe restablecerla por correo.";
-                } else if (authError.code === 'auth/too-many-requests') {
-                    msjError = "Demasiados intentos fallidos. Firebase bloqueó temporalmente la cuenta por seguridad.";
-                }
-                throw new Error("No se pudo cambiar la clave de acceso:\n\n" + msjError);
-            } finally {
-                await authSecundaria.signOut();
-                await appSecundaria.delete();
-            }
-        }
-
         // --- GUARDADO DE IMAGEN ---
         let fotoUrlUpdate = document.getElementById('mu_foto_url_actual').value;
 
@@ -5901,15 +5867,17 @@
           });
         }
 
-        // --- ACTUALIZACIÓN DE FIRESTORE ---
+        // --- ACTUALIZACIÓN DE FIRESTORE (SIN EXPONER LA CONTRASEÑA) ---
         const datosActualizados = {
           nombre: nombre,
           rol: rol,
-          password_temp: finalPasswordToSave, // Guardamos en texto plano la clave que haya triunfado
           permisos: modulosPermitidos,
-          secciones_permitidas: seccionesArr, // <-- NUEVA LÍNEA AÑADIDA
+          secciones_permitidas: seccionesArr,
           foto_url: fotoUrlUpdate
         };
+
+        // Si existe un rastro de password_temp, lo eliminamos con un FieldValue.delete()
+        datosActualizados.password_temp = firebase.firestore.FieldValue.delete();
 
         await db.collection('usuarios_acceso').doc(email).update(datosActualizados);
         
@@ -5941,6 +5909,130 @@
         btn.innerHTML = originalText;
         btn.disabled = false;
         lucide.createIcons();
+      }
+    }
+
+    // --- NUEVO: FUNCIÓN PARA ENVIAR CORREO DE RECUPERACIÓN ---
+    window.enviarCorreoRecuperacion = async function() {
+      const email = document.getElementById('mu_id_doc').value;
+      if(!email) return;
+      try {
+        await firebase.auth().sendPasswordResetEmail(email);
+        AppAlert("Enlace Enviado", `Se ha enviado un correo electrónico a ${email} para que restablezca su contraseña de forma segura.`, "success");
+      } catch (error) {
+        console.error("Error al enviar correo:", error);
+        AppAlert("Aviso", "El correo fue enviado, o el usuario no está registrado en Authentication.", "warning");
+      }
+    };
+
+    // C) Tabla en tiempo real y Borrado Seguro de Usuarios
+    window.escucharUsuariosActivos = function() {
+      const tbody = document.getElementById('tableUsuarios');
+      if (!tbody) return;
+
+      db.collection('usuarios_acceso').orderBy('fecha_registro', 'desc').onSnapshot(snap => {
+        tbody.innerHTML = '';
+        if (snap.empty) {
+          tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500 font-medium">No hay usuarios registrados en el sistema.</td></tr>';
+          return;
+        }
+
+        snap.forEach(doc => {
+          const data = doc.data();
+          
+          // 👻 MAGIA: Ocultar al fantasma de la tabla de accesos
+          if (data.email.toLowerCase() === 'master@delta.com') return;
+
+          const permisosStr = data.permisos ? data.permisos.join(',') : '';
+          const secStr = data.secciones_permitidas ? data.secciones_permitidas.join(', ') : '';
+          
+          const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
+            ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
+            : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
+          
+          // --- ALGORITMO MATEMÁTICO DE VALIDACIÓN DE PRESENCIA REALTIME ---
+          let isOnline = data.estado_conexion === 'online';
+          const ahoraMs = Date.now();
+          const limiteToleranciaMs = 45000; // 45 segundos de tolerancia máxima sin latido
+          
+          if (data.ultima_actividad && data.ultima_actividad.toMillis) {
+              const ultimaActividadMs = data.ultima_actividad.toMillis();
+              if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
+                  isOnline = false;
+              }
+          } else if (!data.ultima_actividad) {
+              isOnline = false;
+          }
+          
+          const colorEstado = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
+          const textoEstado = isOnline ? 'En línea ahora' : (data.ultimo_acceso ? 'Últ. vez: ' + data.ultimo_acceso.toDate().toLocaleString('es-MX', {dateStyle: 'short', timeStyle: 'short'}) : 'Desconectado');
+          const anilloEstado = isOnline ? 'ring-2 ring-emerald-200' : '';
+          // -----------------------------------------------------------------
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${anilloEstado}">
+                      ${miniaturaUsuario}
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${colorEstado}" title="${textoEstado}"></div>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-800 text-xs leading-tight">${data.nombre}</span>
+                    <span class="text-[9px] font-bold ${isOnline ? 'text-emerald-500' : 'text-slate-400'}">${textoEstado}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-slate-500 text-xs font-medium">${data.email}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2 py-1 bg-slate-100 text-slate-600 border border-slate-200 rounded text-[10px] font-black uppercase tracking-wider">${data.rol}</span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}', '${data.foto_url || ''}', '${secStr}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                  </button>
+                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        lucide.createIcons(); 
+      });
+    }
+
+    window.eliminarUsuarioAcceso = async function(emailDoc) {
+      if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
+          await AppAlert("Acción Bloqueada", "No puedes eliminar tu propia cuenta de administrador mientras estás logueado en ella.", "warning");
+          return;
+      }
+      
+      // 👻 INMORTALIDAD FANTASMA
+      if (emailDoc.toLowerCase() === 'master@delta.com') {
+          await AppAlert("Acceso Denegado", "Entidad protegida del sistema.", "danger");
+          return;
+      }
+
+      if(await AppConfirm("Revocar Acceso", `¿Estás seguro de eliminar el acceso al sistema de la cuenta:\n${emailDoc}?\n\nEl usuario perderá acceso inmediatamente al panel. (Su registro en Authentication quedará huérfano por seguridad).`, "danger", "Sí, Revocar Acceso")) {
+        try {
+          // Ya no borramos de Authentication desde aquí por seguridad, 
+          // solo borramos el documento de acceso. Al no tener documento, el usuario es expulsado y bloqueado.
+          await db.collection('usuarios_acceso').doc(emailDoc).delete();
+          
+          if(typeof registrarAuditoria === 'function') {
+              registrarAuditoria('SISTEMA', `Eliminó el acceso y los permisos de: ${emailDoc}`);
+          }
+          
+          await AppAlert("Acceso Revocado", `El usuario ${emailDoc} ha perdido sus permisos y será expulsado del sistema en breve.`, "success");
+        } catch(e) {
+          console.error(e);
+          await AppAlert("Error del Sistema", "Ocurrió un problema al intentar revocar el acceso:\n" + e.message, "danger");
+        }
       }
     }
 
@@ -6462,7 +6554,10 @@
             
             let seccionGrupo = 'N/A';
             
-            const liderData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre && user.nombre.trim().toUpperCase() === liderPrincipal);
+            // 🔥 SOLUCIÓN MULTI-LÍDER: Cortamos el texto por las comas y tomamos solo al primer líder
+            let primerLider = liderPrincipal.split(',')[0].trim();
+            
+            const liderData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre && user.nombre.trim().toUpperCase() === primerLider);
             if (liderData && liderData.seccion) {
                 seccionGrupo = liderData.seccion;
             }
@@ -6534,7 +6629,8 @@
                         <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-300 transition-colors cursor-pointer group" onclick="abrirGrupoDesdeSidebar('${g.nombre}')">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="network" class="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-xs font-bold text-slate-700">${g.nombre}</span>
+                                <span class="text-xs font-bold text-slate-700 group-hover:text-emerald-700 transition-colors">${g.nombre}</span>
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors ml-1" title="Gestionar Grupo"></i>
                             </div>
                             ${progresoHtml}
                         </div>
@@ -6735,11 +6831,14 @@
     // Función auxiliar para afiliar y asignar roles a los líderes automáticamente
     async function afiliarLiderAutomaticamente(idBeneficiario, nombreGrupo, rol) {
         if (!idBeneficiario) return;
-        const misGrupos = window.miembrosGruposMemoria[idBeneficiario] || [];
-        const relacionExistente = misGrupos.find(g => g.nombre_grupo === nombreGrupo);
-        
-        if (relacionExistente) {
-            await db.collection('miembros_grupos').doc(relacionExistente.idRelacion).update({ rol_grupo: rol });
+        // SOLUCIÓN LÓGICA: Leer de Firebase en vivo para evitar la desincronización de la RAM al guardar múltiples líderes rápido
+        const snapshot = await db.collection('miembros_grupos')
+            .where('id_beneficiario', '==', idBeneficiario)
+            .where('nombre_grupo', '==', nombreGrupo)
+            .get();
+            
+        if (!snapshot.empty) {
+            await db.collection('miembros_grupos').doc(snapshot.docs[0].id).update({ rol_grupo: rol });
         } else {
             await db.collection('miembros_grupos').add({
                 id_beneficiario: idBeneficiario,
@@ -6763,7 +6862,7 @@
         const stringCoordinadores = window.lideresGrupoTemp.coordinadores.map(x => x.nombre).join(', ');
         const stringRepresentantes = window.lideresGrupoTemp.representantes.map(x => x.nombre).join(', ');
 
-        // CANDADO ANTIDUPLICADOS: Validación en memoria RAM local para mantener lecturas en 0
+        // CANDADO ANTIDUPLICADOS
         const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
         if (nombreExiste) {
             alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
@@ -6775,10 +6874,30 @@
 
         try {
           if(idGrupoEditando) {
+            // SOLUCIÓN LÓGICA: Si se edita el nombre del grupo, se actualiza el nombre a todos sus miembros afiliados
+            if (window.grupoNombreOriginalTemp && window.grupoNombreOriginalTemp !== nombre) {
+                const snapMiembrosViejos = await db.collection('miembros_grupos').where('nombre_grupo', '==', window.grupoNombreOriginalTemp).get();
+                if (!snapMiembrosViejos.empty) {
+                    let batchRenombrar = db.batch();
+                    let conteoRenombrar = 0;
+                    
+                    for (const docM of snapMiembrosViejos.docs) {
+                        batchRenombrar.update(docM.ref, { nombre_grupo: nombre });
+                        conteoRenombrar++;
+                        if (conteoRenombrar === 490) { // Prevención de colapso de Firestore por lotes grandes
+                            await batchRenombrar.commit();
+                            batchRenombrar = db.batch();
+                            conteoRenombrar = 0;
+                        }
+                    }
+                    if (conteoRenombrar > 0) await batchRenombrar.commit();
+                }
+            }
+
             await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
               nombre, 
               descripcion: desc,
-              seccional: stringSeccionales, // Para compatibilidad
+              seccional: stringSeccionales,
               coordinador: stringCoordinadores,
               representante: stringRepresentantes,
               meta_afiliados: meta
@@ -6789,7 +6908,28 @@
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
-            alert("Grupo actualizado.");
+            // SINCRONIZACIÓN INVERSA (Eliminar a los líderes fantasma que quitaste de las cajas degradándolos)
+            const snapMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
+            const idsLideresActivos = [
+                ...window.lideresGrupoTemp.seccionales.map(x=>x.id),
+                ...window.lideresGrupoTemp.coordinadores.map(x=>x.id),
+                ...window.lideresGrupoTemp.representantes.map(x=>x.id)
+            ];
+            
+            let batchLideres = db.batch();
+            let updatesLideres = 0;
+            snapMiembros.forEach(docMiembro => {
+                const mData = docMiembro.data();
+                if (['SECCIONAL', 'COORDINADOR', 'REPRESENTANTE'].includes(mData.rol_grupo)) {
+                    if (!idsLideresActivos.includes(mData.id_beneficiario)) {
+                        batchLideres.update(docMiembro.ref, { rol_grupo: 'INTEGRANTE' });
+                        updatesLideres++;
+                    }
+                }
+            });
+            if (updatesLideres > 0) await batchLideres.commit();
+
+            alert("Grupo actualizado correctamente.");
             cancelarEdicionGrupo();
           } else {
             await db.collection('catalogo_grupos').add({
@@ -6808,9 +6948,10 @@
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
-            cancelarEdicionGrupo(); // Reutilizamos esta función para resetear a cero
+            cancelarEdicionGrupo();
           }
         } catch(e) {
+          console.error(e);
           alert("Error al guardar grupo.");
         } finally {
           btn.innerHTML = idGrupoEditando ? '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios' : '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
@@ -6858,7 +6999,6 @@
 
       const gruposPorLider = {};
       listaGruposCatalogo.forEach(g => {
-        // LÓGICA ACTUALIZADA: Prioridad absoluta al SECCIONAL. Si no hay, toma al COORDINADOR.
         let liderPrincipal = 'SIN LÍDER';
         if (g.seccional && g.seccional.trim() !== '') liderPrincipal = g.seccional.toUpperCase();
         else if (g.coordinador && g.coordinador.trim() !== '') liderPrincipal = g.coordinador.toUpperCase();
@@ -6906,7 +7046,7 @@
             id: doc.id, 
             nombre: d.nombre, 
             descripcion: d.descripcion,
-            seccional: d.seccional || '', // <-- AHORA SÍ EXTRAEMOS EL SECCIONAL
+            seccional: d.seccional || '',
             coordinador: d.coordinador || '',
             representante: d.representante || '',
             meta_afiliados: d.meta_afiliados || 0
@@ -6935,7 +7075,19 @@
         renderizarTablaCatGrupos();
     }
 
-    function renderizarTablaCatGrupos() {
+   // 🔥 NUEVO HELPER BLINDADO: Cuenta los miembros en tiempo real desde la memoria RAM (Evita desincronizaciones por espacios o mayúsculas)
+    window.obtenerTotalMiembrosGrupo = function(nombreGrupo) {
+        let conteo = 0;
+        const nombreBusqueda = (nombreGrupo || '').trim().toUpperCase();
+        for (const gruposDelUsuario of Object.values(window.miembrosGruposMemoria || {})) {
+            if (gruposDelUsuario.some(g => (g.nombre_grupo || '').trim().toUpperCase() === nombreBusqueda)) {
+                conteo++;
+            }
+        }
+        return conteo;
+    };
+
+   function renderizarTablaCatGrupos() {
         const query = document.getElementById('filtroBuscadorGrupos').value.trim().toUpperCase();
         const tbody = document.getElementById('tablaGrupos');
         tbody.innerHTML = '';
@@ -6943,7 +7095,7 @@
         const gruposFiltrados = listaGruposCatalogo.filter(g => 
           g.nombre.toUpperCase().includes(query) || 
           (g.descripcion && g.descripcion.toUpperCase().includes(query)) ||
-          (g.seccional && g.seccional.toUpperCase().includes(query)) || // <-- BUSCADOR SOPORTA SECCIONAL
+          (g.seccional && g.seccional.toUpperCase().includes(query)) ||
           (g.coordinador && g.coordinador.toUpperCase().includes(query)) ||
           (g.representante && g.representante.toUpperCase().includes(query))
         );
@@ -6952,22 +7104,20 @@
           tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No se encontraron grupos.</td></tr>';
         } else {
           gruposFiltrados.forEach(d => {
-            const conteo = conteoMiembrosPorGrupo[d.nombre] || 0;
+            // 🔥 SOLUCIÓN: Usamos el contador en tiempo real en lugar de la variable global estática
+            const conteo = window.obtenerTotalMiembrosGrupo(d.nombre);
             const descLimpia = d.descripcion ? d.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
-            const coordLimpio = d.coordinador ? d.coordinador.replace(/`/g, '\\`') : '';
-            const repLimpio = d.representante ? d.representante.replace(/`/g, '\\`') : '';
 
             let rolesHtml = '';
             if (d.seccional || d.coordinador || d.representante) {
               rolesHtml = '<div class="mt-2.5 flex flex-wrap gap-2">';
-              // <-- PRIORIDAD VISUAL A LA TARJETA DEL SECCIONAL
-              if (d.seccional) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="crown" class="w-3 h-3"></i> Secc: ${d.seccional}</span>`;
-              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
-              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
+              if (d.seccional) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 text-violet-700 border border-violet-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="crown" class="w-3 h-3"></i> Secc: ${d.seccional}</span>`;
+              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
+              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
               rolesHtml += '</div>';
             }
 
-            // LÓGICA DE BARRA DE PROGRESO DE METAS
+            // LÓGICA DE BARRA DE PROGRESO DE METAS INTACTA CON TUS ESTILOS
             let progressHtml = `<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 shadow-sm">${conteo}</span>`;
             if (d.meta_afiliados > 0) {
                 let pct = Math.min(100, Math.round((conteo / d.meta_afiliados) * 100));
@@ -7007,11 +7157,11 @@
                 </td>
                 <td class="px-4 py-3 text-center align-middle">
                   <div class="flex items-center justify-center gap-2">
-                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, \`${coordLimpio}\`, \`${repLimpio}\`, ${d.meta_afiliados})" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-colors shadow-sm" title="Editar Grupo">
-                      <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, ${d.meta_afiliados})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Editar Grupo">
+                      <i data-lucide="edit-3" class="w-4 h-4"></i> Editar
                     </button>
-                    <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors shadow-sm" title="Eliminar Grupo">
-                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Eliminar Grupo">
+                      <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar
                     </button>
                   </div>
                 </td>
@@ -7023,11 +7173,11 @@
 
     window.editarGrupoCatalogo = function(id, nombre, descripcion, meta = 0) {
       idGrupoEditando = id;
+      window.grupoNombreOriginalTemp = nombre; // SOLUCIÓN LÓGICA PARA RENOMBRAR GRUPOS
       document.getElementById('grupo_nombre').value = nombre;
       document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
       document.getElementById('grupo_desc').value = descripcion;
 
-      // Limpiamos la caché visual y leemos los roles asignados directamente de Memoria
       window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
       
       for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
@@ -7057,6 +7207,7 @@
 
     window.cancelarEdicionGrupo = function() {
       idGrupoEditando = null;
+      window.grupoNombreOriginalTemp = null;
       document.getElementById('formNuevoGrupo').reset();
       
       window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
@@ -7082,15 +7233,28 @@
 
       try {
         let batch = db.batch();
+        let operaciones = 0;
+
         const grupoRef = db.collection('catalogo_grupos').doc(id);
         batch.delete(grupoRef);
+        operaciones++;
 
+        // SOLUCIÓN LÓGICA DE LOTES: Evita colapso si un grupo tiene cientos de integrantes
         const snapshotMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
-        snapshotMiembros.forEach(docMiembro => {
+        for (const docMiembro of snapshotMiembros.docs) {
             batch.delete(docMiembro.ref);
-        });
+            operaciones++;
 
-        await batch.commit();
+            if (operaciones >= 490) {
+                await batch.commit();
+                batch = db.batch();
+                operaciones = 0;
+            }
+        }
+        
+        if (operaciones > 0) {
+            await batch.commit();
+        }
 
         if(typeof registrarAuditoria === 'function') {
             registrarAuditoria('SISTEMA', `Eliminó permanentemente el grupo: ${nombre} y purgó a todos sus miembros afiliados.`);
@@ -7375,11 +7539,11 @@
         const bounds = new google.maps.LatLngBounds();
         let validCoords = 0;
 
-        // VECTORES SVG NATIVOS (Inyectados como Data URIs para máxima calidad)
+        // VECTORES SVG NATIVOS (Inyectados como Data URIs para máxima calidad con los nuevos colores)
         const svgBase = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23ef4444' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M17 18v-1.5a3 3 0 0 0-3-3H10a3 3 0 0 0-3 3V18' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='8.5' r='2.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
-        const svgRep = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%2310b981' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 19s6-3 6-7.5V6.5L12 4.25 6 6.5v5c0 4.5 6 7.5 6 7.5z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
-        const svgCoord = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%234f46e5' stroke='%23ffffff' stroke-width='2'/%3E%3Cpolygon points='12 5.5 13.85 9.6 18.31 10.12 14.97 13.12 15.88 17.5 12 15.33 8.12 17.5 9.03 13.12 5.69 10.12 10.15 9.6 12 5.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
-        const svgSeccional = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23f59e0b' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgRep = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23f59e0b' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 19s6-3 6-7.5V6.5L12 4.25 6 6.5v5c0 4.5 6 7.5 6 7.5z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgCoord = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23f43f5e' stroke='%23ffffff' stroke-width='2'/%3E%3Cpolygon points='12 5.5 13.85 9.6 18.31 10.12 14.97 13.12 15.88 17.5 12 15.33 8.12 17.5 9.03 13.12 5.69 10.12 10.15 9.6 12 5.5' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+        const svgSeccional = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%238b5cf6' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E";
 
         integrantes.forEach(i => {
             if(i.coordenadas) {
@@ -7412,9 +7576,9 @@
                     animation: google.maps.Animation.DROP
                 });
                 
-                // Diseño Premium de la Tarjeta al presionar el pin
+                // Diseño Premium de la Tarjeta al presionar el pin con la nueva paleta
                 const fotoSrc = (i.foto_url && i.foto_url.trim() !== "") ? i.foto_url : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
-                const colorTexto = i.rol === 'SECCIONAL' ? '#f59e0b' : (i.rol === 'COORDINADOR' ? '#4f46e5' : (i.rol === 'REPRESENTANTE' ? '#10b981' : '#ef4444'));
+                const colorTexto = i.rol === 'SECCIONAL' ? '#8b5cf6' : (i.rol === 'COORDINADOR' ? '#f43f5e' : (i.rol === 'REPRESENTANTE' ? '#f59e0b' : '#ef4444'));
                 
                 const infoWindow = new google.maps.InfoWindow({
                     content: `<div style="padding:8px; font-family:'DM Sans', sans-serif; text-align:center; min-width:130px;">
@@ -7452,7 +7616,9 @@
         if (reconstruirSelect) {
             select.innerHTML = '<option value="">Selecciona un grupo para ver sus integrantes...</option>';
             listaGruposCatalogo.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(g => {
-                select.add(new Option(`${g.nombre} (${conteoMiembrosPorGrupo[g.nombre] || 0} miembros)`, g.nombre));
+                // Usamos el Helper Blindado para el dropdown también
+                const totalMiembros = window.obtenerTotalMiembrosGrupo(g.nombre);
+                select.add(new Option(`${g.nombre} (${totalMiembros} miembros)`, g.nombre));
             });
             if(grupoSeleccionadoParaEstructura && Array.from(select.options).some(o=>o.value===grupoSeleccionadoParaEstructura)) {
                 select.value = grupoSeleccionadoParaEstructura;
@@ -7536,7 +7702,6 @@
             if (ctxChart) {
                 if (chartTermometroInst) chartTermometroInst.destroy();
                 
-                // Si el grupo tiene gente pero nadie tiene simpatía capturada, mostrarla gris
                 const sum = simpatiaCounts.aFavor + simpatiaCounts.indecisos + simpatiaCounts.enContra;
                 const dataChart = sum === 0 ? [1] : [simpatiaCounts.aFavor, simpatiaCounts.indecisos, simpatiaCounts.enContra];
                 const bgColors = sum === 0 ? ['#e2e8f0'] : ['#10b981', '#f59e0b', '#f43f5e'];
@@ -7562,10 +7727,7 @@
             }
         }
 
-        // Ejecutar el nuevo motor vectorial atómico de renderizado en mapa
         if (typeof dibujarPinesEstructura === 'function') dibujarPinesEstructura(integrantes);
-        
-        // Ejecutar motor de renderizado del Organigrama
         if (typeof renderizarOrganigramaVisual === 'function') renderizarOrganigramaVisual(integrantes);
 
         integrantes.forEach(i => {
@@ -7573,10 +7735,11 @@
                 ? `<img src="${i.foto_url}" class="w-full h-full object-cover">`
                 : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
             
+            // 🔥 COLORES ACTUALIZADOS PARA EL SELECT DESPLEGABLE
             let colorRol = 'text-slate-600 bg-slate-50 border-slate-200';
-            if (i.rol === 'SECCIONAL') colorRol = 'text-amber-600 bg-amber-50 border-amber-200';
-            else if (i.rol === 'COORDINADOR') colorRol = 'text-indigo-600 bg-indigo-50 border-indigo-200';
-            else if (i.rol === 'REPRESENTANTE') colorRol = 'text-emerald-600 bg-emerald-50 border-emerald-200';
+            if (i.rol === 'SECCIONAL') colorRol = 'text-violet-600 bg-violet-50 border-violet-200';
+            else if (i.rol === 'COORDINADOR') colorRol = 'text-rose-600 bg-rose-50 border-rose-200';
+            else if (i.rol === 'REPRESENTANTE') colorRol = 'text-amber-600 bg-amber-50 border-amber-200';
 
             tbody.innerHTML += `
                 <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
@@ -7613,12 +7776,71 @@
         lucide.createIcons();
     }
 
+    // NUEVA FUNCIÓN: Mantiene sincronizado el texto de los líderes en el Catálogo
+    window.sincronizarTextosCatalogo = async function(nombreGrupo) {
+        try {
+            const snap = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombreGrupo).get();
+            let seccionales = [], coordinadores = [], representantes = [];
+
+            snap.forEach(doc => {
+                const data = doc.data();
+                const persona = window.registrosGlobalesMemoria[data.id_beneficiario];
+                if(persona) {
+                    if (data.rol_grupo === 'SECCIONAL') seccionales.push(persona.nombre);
+                    if (data.rol_grupo === 'COORDINADOR') coordinadores.push(persona.nombre);
+                    if (data.rol_grupo === 'REPRESENTANTE') representantes.push(persona.nombre);
+                }
+            });
+
+            const grupoDoc = await db.collection('catalogo_grupos').where('nombre', '==', nombreGrupo).get();
+            if (!grupoDoc.empty) {
+                await db.collection('catalogo_grupos').doc(grupoDoc.docs[0].id).update({
+                    seccional: seccionales.join(', '),
+                    coordinador: coordinadores.join(', '),
+                    representante: representantes.join(', ')
+                });
+            }
+        } catch(e) { console.error("Error sincronizando catálogo:", e); }
+    }
+
     window.cambiarRolIntegrante = async function(idRelacion, nuevoRol, nombre) {
+        
+        // 🔥 BLINDAJE DE REGLA: Bloquear si intentan poner 2 seccionales desde el menú desplegable
+        if (nuevoRol === 'SECCIONAL') {
+            let yaExisteSeccional = false;
+            
+            // Buscamos en la memoria RAM si este grupo ya tiene un seccional que no sea el actual
+            for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+                const rel = grupos.find(g => g.nombre_grupo === grupoSeleccionadoParaEstructura);
+                if (rel && rel.rol === 'SECCIONAL' && rel.idRelacion !== idRelacion) {
+                    yaExisteSeccional = true;
+                    break;
+                }
+            }
+
+            if (yaExisteSeccional) {
+                alert("⚠️ REGLA ROTA: Este grupo ya tiene un Líder Seccional asignado. Debes degradar al actual antes de nombrar a uno nuevo.");
+                // Forzamos a que la tabla se recargue visualmente para deshacer el cambio del combobox
+                mostrarIntegrantesGrupo(grupoSeleccionadoParaEstructura);
+                return; // Cortamos el código para que no guarde en Firebase
+            }
+        }
+
         try {
             await db.collection('miembros_grupos').doc(idRelacion).update({ rol_grupo: nuevoRol });
+            
+            // DISPARAMOS LA SINCRONIZACIÓN OCULTA
+            await window.sincronizarTextosCatalogo(grupoSeleccionadoParaEstructura);
+            
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Modificó jerarquía a ${nuevoRol} para ${nombre} en el grupo ${grupoSeleccionadoParaEstructura}`);
+            
+            // FEEDBACK VISUAL Y RECARGA PARA APLICAR NUEVOS COLORES
+            if(typeof AppAlert === 'function') AppAlert('Actualizado', `La jerarquía de ${nombre} cambió a ${nuevoRol}`, 'success');
+            mostrarIntegrantesGrupo(grupoSeleccionadoParaEstructura);
+            
         } catch(e) {
             alert('Error de conexión al cambiar la jerarquía.');
+            mostrarIntegrantesGrupo(grupoSeleccionadoParaEstructura); // Deshace el cambio visual si falla internet
         }
     }
 
@@ -7626,6 +7848,10 @@
         if(await AppConfirm("Remover Integrante", `¿Seguro que deseas remover a ${nombre} de este grupo?`, "warning", "Sí, Remover")) {
             try {
                 await db.collection('miembros_grupos').doc(idRelacion).delete();
+                
+                // DISPARAMOS LA SINCRONIZACIÓN OCULTA
+                await window.sincronizarTextosCatalogo(grupoSeleccionadoParaEstructura);
+                
                 if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Removió a ${nombre} del grupo ${grupoSeleccionadoParaEstructura}`);
             } catch(e) {
                 alert("Error al remover integrante.");
@@ -7703,6 +7929,12 @@
     window.seleccionarCiudadanoModal = async function(nombre, idBeneficiario) {
       if (['seccionales', 'coordinadores', 'representantes'].includes(campoDestinoBusqueda)) {
         
+        // 🔥 NUEVA REGLA: Solo se permite 1 Líder Seccional por grupo
+        if (campoDestinoBusqueda === 'seccionales' && window.lideresGrupoTemp.seccionales.length >= 1) {
+            alert("⚠️ LÍMITE ALCANZADO: Solo se permite un (1) Líder Seccional por grupo.");
+            return;
+        }
+
         // REGLA ESTRICTA DE JERARQUÍA: Un ciudadano solo puede tener UN rol de liderazgo.
         const esSec = window.lideresGrupoTemp.seccionales.some(s => s.id === idBeneficiario);
         const esCoor = window.lideresGrupoTemp.coordinadores.some(c => c.id === idBeneficiario);
@@ -8884,20 +9116,30 @@
         const representantes = integrantes.filter(i => i.rol === 'REPRESENTANTE');
         const bases = integrantes.filter(i => i.rol === 'INTEGRANTE');
 
-        // Helper: Generador de Nodos Orgánicos
-        const crearNodo = (persona, color, icon) => {
+        // Helper: Generador de Nodos Orgánicos Seguro (Evita que Tailwind borre los colores)
+        const crearNodo = (persona, colorKey, icon) => {
             const imgUrl = (persona.foto_url && persona.foto_url.trim() !== "") ? persona.foto_url : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+            
+            // DICCIONARIO SEGURO PARA TAILWIND JIT
+            const paleta = {
+                'violet': { ring: 'ring-violet-200', bg: 'bg-violet-500', text: 'text-violet-600' },
+                'rose': { ring: 'ring-rose-200', bg: 'bg-rose-500', text: 'text-rose-600' },
+                'amber': { ring: 'ring-amber-200', bg: 'bg-amber-500', text: 'text-amber-600' },
+                'slate': { ring: 'ring-slate-200', bg: 'bg-slate-500', text: 'text-slate-600' }
+            };
+            const c = paleta[colorKey] || paleta['slate'];
+
             return `
                 <div class="flex flex-col items-center group relative z-10 cursor-pointer hover:-translate-y-1 transition-transform m-2" onclick="abrirPerfil('${persona.id_beneficiario}')">
-                    <div class="w-14 h-14 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ring-${color}-200 bg-white">
+                    <div class="w-14 h-14 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ${c.ring} bg-white">
                         <img src="${imgUrl}" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute top-9 -right-1 bg-${color}-500 text-white rounded-full p-1 shadow-sm border-2 border-white">
+                    <div class="absolute top-9 -right-1 ${c.bg} text-white rounded-full p-1 shadow-sm border-2 border-white">
                         <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
                     </div>
                     <div class="bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm text-center min-w-[130px] max-w-[150px] relative">
                         <p class="text-[10px] font-black text-slate-800 uppercase leading-tight truncate w-full" title="${persona.nombre}">${persona.nombre}</p>
-                        <p class="text-[8.5px] font-bold text-${color}-600 uppercase tracking-widest mt-0.5">${persona.rol}</p>
+                        <p class="text-[8.5px] font-bold ${c.text} uppercase tracking-widest mt-0.5">${persona.rol}</p>
                     </div>
                 </div>
             `;
@@ -8922,27 +9164,27 @@
 
         let previos = false;
 
-        // 1. NIVEL SUPREMO (SECCIONALES)
+        // 1. NIVEL SUPREMO (SECCIONALES) - VIOLETA
         if (seccionales.length > 0) {
-            html += renderizarNivel(seccionales, 'amber', 'crown');
+            html += renderizarNivel(seccionales, 'violet', 'crown');
             previos = true;
         }
 
-        // 2. NIVEL CÚSPIDE (COORDINADORES)
+        // 2. NIVEL CÚSPIDE (COORDINADORES) - ROSA
         if (coordinadores.length > 0) {
             if (previos) html += conector;
-            html += renderizarNivel(coordinadores, 'indigo', 'user-check');
+            html += renderizarNivel(coordinadores, 'rose', 'user-check');
             previos = true;
         }
 
-        // 3. NIVEL MEDIO (REPRESENTANTES)
+        // 3. NIVEL MEDIO (REPRESENTANTES) - AMBAR
         if (representantes.length > 0) {
             if (previos) html += conector;
-            html += renderizarNivel(representantes, 'emerald', 'users');
+            html += renderizarNivel(representantes, 'amber', 'users');
             previos = true;
         }
 
-        // 4. NIVEL BASE (INTEGRANTES)
+        // 4. NIVEL BASE (INTEGRANTES) - GRIS
         if (bases.length > 0) {
             if (previos) html += conector;
             html += renderizarNivel(bases, 'slate', 'user');
