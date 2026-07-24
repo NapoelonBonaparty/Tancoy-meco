@@ -575,7 +575,16 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div>
+                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Teléfono / WhatsApp</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                    <input type="tel" id="f_telefono" maxlength="10" class="w-full text-sm pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="10 DÍGITOS">
+                  </div>
+                </div>
                 <div>
                   <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Sexo</label>
                   <select id="f_sexo" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
@@ -588,11 +597,11 @@
                   <input type="date" id="f_fecha" min="1920-01-01" max="2008-12-31" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all" title="La edad debe ser válida.">
                 </div>
                 <div>
-                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Tipo de Alta</label>
-                  <select id="f_tipo" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                    <option value="PADRON">PADRÓN</option>
-                    <option value="SIMPATIZANTE">SIMPATIZANTE</option>
-                    <option value="AFILIADO">AFILIADO</option>
+                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider block mb-1.5">Nivel de Simpatía</label>
+                  <select id="f_simpatia" required class="w-full text-sm px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <option value="A FAVOR">🟢 A FAVOR</option>
+                    <option value="INDECISO">🟡 INDECISO</option>
+                    <option value="EN CONTRA">🔴 EN CONTRA</option>
                   </select>
                 </div>
               </div>
@@ -1953,6 +1962,11 @@
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">CURP / Referencia Foto</p>
                   <p id="mp_curp_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
                   <input type="text" id="mp_curp_input" class="hidden w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none uppercase">
+                </div>
+                <div>
+                  <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Teléfono / WhatsApp</p>
+                  <p id="mp_telefono_texto" class="font-mono text-sm font-bold text-slate-700">--</p>
+                  <input type="tel" id="mp_telefono_input" maxlength="10" class="hidden w-full text-xs font-mono font-bold px-3 py-2 rounded border border-indigo-300 bg-indigo-50 text-indigo-900 outline-none" placeholder="10 DÍGITOS">
                 </div>
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Sexo</p>
@@ -4118,8 +4132,10 @@
         clave_elector: document.getElementById('f_clave').value.toUpperCase(),
         curp: document.getElementById('f_curp').value.toUpperCase(),
         casilla: document.getElementById('f_casilla').value.toUpperCase(),
+        telefono: document.getElementById('f_telefono') ? document.getElementById('f_telefono').value.trim() : '',
+        nivel_simpatia: document.getElementById('f_simpatia') ? document.getElementById('f_simpatia').value : 'A FAVOR',
         municipio: "LAS ROSAS", // Guardado inamovible por defecto
-        tipo_afiliacion: document.getElementById('f_tipo').value,
+        tipo_afiliacion: "SIMPATIZANTE",
         registrado_por: auth.currentUser.email,
         fecha_captura: firebase.firestore.FieldValue.serverTimestamp(),
         foto_url: ""
@@ -4436,6 +4452,7 @@
       document.getElementById('mp_seccion_texto').textContent = data.seccion || '--';
       document.getElementById('mp_clave_texto').textContent = data.clave_elector || '--';
       document.getElementById('mp_curp_texto').textContent = data.curp || '--';
+      document.getElementById('mp_telefono_texto').textContent = data.telefono || '--';
       document.getElementById('mp_sexo_texto').textContent = data.sexo || '--';
       document.getElementById('mp_simpatia_texto').textContent = data.nivel_simpatia || 'INDECISO';
       document.getElementById('mp_barrio_texto').textContent = data.barrio || '--';
@@ -4684,11 +4701,12 @@
       { id: 'seccion', dbField: 'seccion' },
       { id: 'clave', dbField: 'clave_elector' },
       { id: 'curp', dbField: 'curp' },
+      { id: 'telefono', dbField: 'telefono' },
       { id: 'sexo', dbField: 'sexo' },
       { id: 'barrio', dbField: 'barrio' },
       { id: 'municipio', dbField: 'municipio' },
       { id: 'direccion', dbField: 'direccion' },
-      { id: 'simpatia', dbField: 'nivel_simpatia' } // Control en base de datos
+      { id: 'simpatia', dbField: 'nivel_simpatia' }
     ];
 
     function activarEdicionExpediente() {
