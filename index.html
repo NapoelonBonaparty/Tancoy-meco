@@ -344,12 +344,6 @@
                   <option value="HOMBRE">Hombre</option>
                   <option value="MUJER">Mujer</option>
                 </select>
-                <select id="filtroTipo" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                  <option value="TODOS">Tipo (Todos)</option>
-                  <option value="PADRON">Padrón</option>
-                  <option value="SIMPATIZANTE">Simpatizante</option>
-                  <option value="AFILIADO">Afiliado</option>
-                </select>
                 <select id="filtroSimpatia" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
                   <option value="TODAS">Simpatía (Todas)</option>
                   <option value="A FAVOR">A Favor</option>
@@ -370,7 +364,6 @@
                     <th class="px-4 py-3 font-bold">Casilla / Clave</th>
                     <th class="px-4 py-3 font-bold text-center">Sección</th>
                     <th class="px-4 py-3 font-bold">Ubicación / Origen</th>
-                    <th class="px-4 py-3 font-bold text-center">Tipo</th>
                     <th class="px-4 py-3 font-bold text-center">Gestión</th>
                   </tr>
                 </thead>
@@ -3602,8 +3595,7 @@
 
     // Esta función filtra los datos en la memoria RAM del navegador. CERO LECTURAS a Firebase.
     function aplicarFiltros() {
-      const tipo = document.getElementById('filtroTipo').value;
-      const simpatia = document.getElementById('filtroSimpatia').value; // <-- LÍNEA NUEVA
+      const simpatia = document.getElementById('filtroSimpatia').value; 
       const textoLimpio = document.getElementById('filtroTexto').value.trim().toUpperCase();
       const barrioLimpio = document.getElementById('filtroBarrio').value.trim().toUpperCase();
       const sexo = document.getElementById('filtroSexo').value;
@@ -3615,9 +3607,8 @@
         const d = window.registrosGlobalesMemoria[id];
 
         // Filtros estrictos
-        if (tipo !== 'TODOS' && d.tipo_afiliacion !== tipo) return;
         if (sexo !== 'TODOS' && d.sexo !== sexo) return;
-        if (simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== simpatia) return; // <-- LÍNEA NUEVA
+        if (simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== simpatia) return;
 
         // Búsqueda global por texto
         if (textoLimpio !== '') {
@@ -3718,13 +3709,7 @@
       const segmentoPagina = datosFiltradosMemoriaLocal.slice(indiceInicio, indiceFin);
 
       tbCenso.innerHTML = '';
-      segmentoPagina.forEach((d) => {
-        const tipoReal = d.tipo_afiliacion ? d.tipo_afiliacion.toUpperCase() : 'SIMPATIZANTE';
-        let badgeStyle = 'bg-indigo-100 text-indigo-700';
-        if(tipoReal === 'AFILIADO') badgeStyle = 'bg-emerald-100 text-emerald-700';
-        else if(tipoReal === 'ESTRUCTURA') badgeStyle = 'bg-violet-100 text-violet-700';
-        else if(tipoReal === 'PADRON') badgeStyle = 'bg-amber-100 text-amber-700 font-bold';
-
+     segmentoPagina.forEach((d) => {
         const identificador = d.casilla || d.clave_elector || d.curp || '--';
         const municipioMostrar = "LAS ROSAS";
         const origen = (d.registrado_por && d.registrado_por.includes('Excel')) ? 'Excel Masivo' : 'Captura Manual';
@@ -3759,10 +3744,6 @@
                 <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
                 <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
              </div>
-          </td>
-          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center items-center">
-             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
-             <span class="px-3 py-1.5 md:py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span>
           </td>
           <td class="block md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 border-t md:border-none border-slate-100 align-middle">
             <div class="flex flex-row items-center justify-end md:justify-center gap-3">
@@ -7218,7 +7199,8 @@
             seccional: d.seccional || '',
             coordinador: d.coordinador || '',
             representante: d.representante || '',
-            meta_afiliados: d.meta_afiliados || 0
+            meta_afiliados: d.meta_afiliados || 0,
+            foto_url: d.foto_url || '' // 🔥 SOLUCIÓN: Agregamos la extracción de la foto
           });
         });
         
@@ -9237,55 +9219,62 @@
         }
     }
     // Disparador inicial (Global)
-    // =====================================================================
+   // =====================================================================
     // MÓDULO: CAPTURA OFFLINE (ALMACENAMIENTO EN DISPOSITIVO)
     // =====================================================================
 
-    document.getElementById('formOffline').addEventListener('submit', function(e) {
+    document.getElementById('formOffline').addEventListener('submit', async function(e) {
       e.preventDefault();
       
       const nombres = document.getElementById('off_nombres').value.trim().toUpperCase();
       const apellidos = document.getElementById('off_apellidos').value.trim().toUpperCase();
-      
-      // Construimos el objeto exacto que requiere Firebase, pero lo guardamos en RAM temporal
-      const registroLocal = {
-        id_local: 'off_' + Date.now(), // ID temporal único para la cola
-        nombre: `${nombres} ${apellidos}`, // Fusionamos para el Padrón principal
-        seccion: document.getElementById('off_seccion').value.trim().toUpperCase(),
-        casilla: document.getElementById('off_casilla').value.trim().toUpperCase(),
-        clave_elector: document.getElementById('off_clave').value.trim().toUpperCase(),
-        barrio: document.getElementById('off_barrio').value.trim().toUpperCase(),
-        // Valores por defecto implícitos en campo
-        municipio: "LAS ROSAS",
-        tipo_afiliacion: "SIMPATIZANTE",
-        nivel_simpatia: "NO VISITADO",
-        registrado_por: (auth.currentUser ? auth.currentUser.email : 'Modo Offline'),
-        origen: "App_Offline"
-      };
-
-      // Extraer la cola actual de la memoria interna del teléfono
-      let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
-      colaOffline.push(registroLocal);
-      
-      // Guardar de vuelta al celular
-      localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
-
-      // Limpiar formulario y dar feedback visual
-      this.reset();
-      document.getElementById('off_nombres').focus();
-      
-      // Refrescar la UI
-      renderizarColaOffline();
-      
-      // Alerta de éxito elegante sin interrumpir el flujo
       const btnGuardar = document.getElementById('btnGuardarOffline');
       const textOriginal = btnGuardar.innerHTML;
-      btnGuardar.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ¡Guardado en Celular!';
+
+      btnGuardar.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+      btnGuardar.disabled = true;
       lucide.createIcons();
-      setTimeout(() => {
-          btnGuardar.innerHTML = textOriginal;
-          lucide.createIcons();
-      }, 2000);
+
+      try {
+        // Construimos el objeto exacto que requiere Firebase
+        const registroLocal = {
+          id_local: 'off_' + Date.now(), 
+          nombre: `${nombres} ${apellidos}`, 
+          seccion: document.getElementById('off_seccion').value.trim().toUpperCase(),
+          casilla: document.getElementById('off_casilla').value.trim().toUpperCase(),
+          clave_elector: document.getElementById('off_clave').value.trim().toUpperCase(),
+          barrio: document.getElementById('off_barrio').value.trim().toUpperCase(),
+          municipio: "LAS ROSAS",
+          tipo_afiliacion: "SIMPATIZANTE",
+          nivel_simpatia: "NO VISITADO",
+          registrado_por: (auth.currentUser ? auth.currentUser.email : 'Modo Offline'),
+          origen: "App_Offline"
+        };
+
+        // Extraer y guardar
+        let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+        colaOffline.push(registroLocal);
+        localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
+
+        this.reset();
+        document.getElementById('off_nombres').focus();
+        
+        renderizarColaOffline();
+
+        btnGuardar.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ¡Guardado en Celular!';
+        lucide.createIcons();
+        
+        setTimeout(() => {
+            btnGuardar.innerHTML = textOriginal;
+            btnGuardar.disabled = false;
+            lucide.createIcons();
+        }, 2000);
+      } catch (err) {
+        console.error("Error offline:", err);
+        btnGuardar.innerHTML = textOriginal;
+        btnGuardar.disabled = false;
+        lucide.createIcons();
+      }
     });
 
     window.renderizarColaOffline = function() {
@@ -9313,7 +9302,6 @@
       btnSincronizar.disabled = false;
       contenedor.innerHTML = '';
 
-      // Mostramos los más recientes arriba
       colaOffline.slice().reverse().forEach(reg => {
           contenedor.innerHTML += `
             <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between group hover:border-amber-300 transition-colors">
@@ -9335,8 +9323,8 @@
       lucide.createIcons();
     }
 
-    window.eliminarRegistroOffline = function(idLocal) {
-        if(confirm("¿Estás seguro de descartar este registro de la memoria local?")) {
+    window.eliminarRegistroOffline = async function(idLocal) {
+        if(await AppConfirm("Descartar Captura", "¿Estás seguro de eliminar este registro de la memoria local de tu dispositivo? No se ha subido a la nube.", "warning", "Sí, Descartar")) {
             let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
             colaOffline = colaOffline.filter(r => r.id_local !== idLocal);
             localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
@@ -9348,7 +9336,6 @@
         const colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
         if (colaOffline.length === 0) return;
 
-        // Validar si el dispositivo tiene internet físico
         if (!navigator.onLine) {
             return AppAlert("Sin Conexión", "Tu dispositivo no detecta internet. Conéctate a una red WiFi o activa tus datos móviles para poder subir la información a la nube.", "warning");
         }
@@ -9361,44 +9348,48 @@
         lucide.createIcons();
 
         try {
-            // Empaquetar todo en un Batch atómico de Firestore
             let batch = db.batch();
             let operaciones = 0;
             
-            colaOffline.forEach(registro => {
+            for (let i = 0; i < colaOffline.length; i++) {
+                const registro = colaOffline[i];
                 const docRef = db.collection('simpatizantes').doc();
-                // Limpiamos el ID temporal usado para la lista local
+                
                 delete registro.id_local;
-                // Inyectamos la estampa de tiempo oficial del servidor de Google
                 registro.fecha_captura = firebase.firestore.FieldValue.serverTimestamp();
                 
                 batch.set(docRef, registro);
                 operaciones++;
-            });
 
-            await batch.commit();
+                // Prevención de Lotes Masivos (> 490 para evitar colapso de Firestore)
+                if (operaciones % 490 === 0) {
+                    await batch.commit();
+                    batch = db.batch();
+                }
+            }
 
-            // Si todo salió bien, vaciamos la cola local
+            if (operaciones % 490 !== 0) {
+                await batch.commit();
+            }
+
             localStorage.removeItem('delta_offline_queue');
             
-            // Registramos la auditoría
             if(typeof registrarAuditoria === 'function') {
                 registrarAuditoria('CAPTURA', `Sincronizó un lote OFFLINE de ${operaciones} registros`);
             }
 
-            // Refrescamos la UI
             renderizarColaOffline();
-            AppAlert("Sincronización Exitosa", `Se han subido exitosamente ${operaciones} registros a la base de datos oficial.`, "success");
+            await AppAlert("Sincronización Exitosa", `Se han subido exitosamente ${operaciones} registros a la base de datos oficial.`, "success");
 
         } catch (error) {
             console.error("Error al sincronizar lote:", error);
-            AppAlert("Error de Red", "La red parpadeó o falló la conexión con Firebase a mitad del proceso. Los datos siguen seguros en tu teléfono. Intenta nuevamente cuando tengas mejor señal.", "danger");
+            AppAlert("Error de Red", "La red parpadeó o falló la conexión con Firebase a mitad del proceso. Los datos siguen seguros en tu teléfono. Intenta nuevamente.", "danger");
         } finally {
             btn.innerHTML = textOriginal;
             btn.disabled = false;
             lucide.createIcons();
             
-            // Forzar una descarga limpia de Firebase para actualizar las tablas principales si es necesario
+            // Forzamos reseteo RAM
             window.registrosGlobalesMemoria = {};
             if(typeof leerRegistrosEnTiempoReal === 'function') leerRegistrosEnTiempoReal();
         }
