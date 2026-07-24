@@ -3649,26 +3649,30 @@
       lucide.createIcons();
 
       try {
-        // Cambiamos onSnapshot por un .get() único para frenar la sangría de lecturas
-        const querySnapshot = await db.collection('simpatizantes').get({ source: 'default' });
-
         window.registrosGlobalesMemoria = {};
 
-        querySnapshot.forEach((doc) => {
-          // 🔥 ESCUDO ACTIVADO: Sanitizamos la información proveniente de la nube
-          const data = window.sanitizarObjeto(doc.data());
-          
-          // 🔥 BARRERA DE SEGURIDAD GEOGRÁFICA (GEOCERCA)
-          // Si el usuario tiene secciones asignadas, descartamos (no guardamos en RAM) las que no le tocan
-          if (window.usuarioSeccionesPermitidas && window.usuarioSeccionesPermitidas.length > 0) {
-              const seccionUsuario = (data.seccion || '').trim().toUpperCase();
-              if (!window.usuarioSeccionesPermitidas.includes(seccionUsuario)) {
-                  return; // Abortamos, este registro se vuelve INVISIBLE para este usuario
-              }
-          }
-
-          window.registrosGlobalesMemoria[doc.id] = data;
-        });
+        // 🔥 BARRERA DE SEGURIDAD GEOGRÁFICA EN EL SERVIDOR (Evita robos de datos y ahorra facturación)
+        if (window.usuarioSeccionesPermitidas && window.usuarioSeccionesPermitidas.length > 0) {
+            // Firebase permite máximo 10 elementos en una consulta 'in'. Dividimos el arreglo en bloques de 10.
+            const chunks = [];
+            for (let i = 0; i < window.usuarioSeccionesPermitidas.length; i += 10) {
+                chunks.push(window.usuarioSeccionesPermitidas.slice(i, i + 10));
+            }
+            
+            // Hacemos las consultas al servidor solo por las secciones estrictamente autorizadas
+            for (const chunk of chunks) {
+                const snap = await db.collection('simpatizantes').where('seccion', 'in', chunk).get({ source: 'default' });
+                snap.forEach((doc) => {
+                    window.registrosGlobalesMemoria[doc.id] = window.sanitizarObjeto(doc.data());
+                });
+            }
+        } else {
+            // Es un Admin (o no tiene restricciones de geocerca), le traemos todo el padrón
+            const snap = await db.collection('simpatizantes').get({ source: 'default' });
+            snap.forEach((doc) => {
+                window.registrosGlobalesMemoria[doc.id] = window.sanitizarObjeto(doc.data());
+            });
+        }
 
         calcularYRenderizarKPIs();
         aplicarFiltros();

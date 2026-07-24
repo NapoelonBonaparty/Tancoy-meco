@@ -3649,26 +3649,30 @@
       lucide.createIcons();
 
       try {
-        // Cambiamos onSnapshot por un .get() único para frenar la sangría de lecturas
-        const querySnapshot = await db.collection('simpatizantes').get({ source: 'default' });
-
         window.registrosGlobalesMemoria = {};
 
-        querySnapshot.forEach((doc) => {
-          // 🔥 ESCUDO ACTIVADO: Sanitizamos la información proveniente de la nube
-          const data = window.sanitizarObjeto(doc.data());
-          
-          // 🔥 BARRERA DE SEGURIDAD GEOGRÁFICA (GEOCERCA)
-          // Si el usuario tiene secciones asignadas, descartamos (no guardamos en RAM) las que no le tocan
-          if (window.usuarioSeccionesPermitidas && window.usuarioSeccionesPermitidas.length > 0) {
-              const seccionUsuario = (data.seccion || '').trim().toUpperCase();
-              if (!window.usuarioSeccionesPermitidas.includes(seccionUsuario)) {
-                  return; // Abortamos, este registro se vuelve INVISIBLE para este usuario
-              }
-          }
-
-          window.registrosGlobalesMemoria[doc.id] = data;
-        });
+        // 🔥 BARRERA DE SEGURIDAD GEOGRÁFICA EN EL SERVIDOR (Evita robos de datos y ahorra facturación)
+        if (window.usuarioSeccionesPermitidas && window.usuarioSeccionesPermitidas.length > 0) {
+            // Firebase permite máximo 10 elementos en una consulta 'in'. Dividimos el arreglo en bloques de 10.
+            const chunks = [];
+            for (let i = 0; i < window.usuarioSeccionesPermitidas.length; i += 10) {
+                chunks.push(window.usuarioSeccionesPermitidas.slice(i, i + 10));
+            }
+            
+            // Hacemos las consultas al servidor solo por las secciones estrictamente autorizadas
+            for (const chunk of chunks) {
+                const snap = await db.collection('simpatizantes').where('seccion', 'in', chunk).get({ source: 'default' });
+                snap.forEach((doc) => {
+                    window.registrosGlobalesMemoria[doc.id] = window.sanitizarObjeto(doc.data());
+                });
+            }
+        } else {
+            // Es un Admin (o no tiene restricciones de geocerca), le traemos todo el padrón
+            const snap = await db.collection('simpatizantes').get({ source: 'default' });
+            snap.forEach((doc) => {
+                window.registrosGlobalesMemoria[doc.id] = window.sanitizarObjeto(doc.data());
+            });
+        }
 
         calcularYRenderizarKPIs();
         aplicarFiltros();
@@ -4092,7 +4096,7 @@
         const nuevoDocRef = await db.collection('simpatizantes').add(simpatizanteData);
 
         // AUDITORÍA
-        if(typeof registrarAuditoria === 'function') registrarAuditoria('CAPTURA', `Registró a nuevo beneficiario: ${simpatizanteData.nombre}`);
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('PADRÓN', `Registró a nuevo beneficiario: ${simpatizanteData.nombre}`);
 
         // ACTUALIZAR MEMORIA LOCAL SIN LEER FIREBASE
         window.registrosGlobalesMemoria[nuevoDocRef.id] = simpatizanteData;
@@ -4494,7 +4498,7 @@
 
         // 🔥 NUEVO: REGISTRO DE AUDITORÍA AL BORRAR BENEFICIARIO
         if(typeof registrarAuditoria === 'function') {
-          registrarAuditoria('SISTEMA', `Eliminó del padrón permanentemente a: ${nombre}`);
+          registrarAuditoria('PADRÓN', `Eliminó del padrón permanentemente a: ${nombre}`);
         }
 
         // BORRAR DE MEMORIA Y ACTUALIZAR UI SIN LEER FIREBASE
@@ -4575,7 +4579,7 @@
 
           // 🔥 NUEVO: REGISTRO DE AUDITORÍA AL BORRAR APOYO
           if(typeof registrarAuditoria === 'function') {
-            registrarAuditoria('SISTEMA', `Eliminó un historial de entrega de apoyo`);
+            registrarAuditoria('APOYOS', `Eliminó un historial de entrega de apoyo`);
           }
 
           // Actualizar la tabla de forma automática para que desaparezca al instante
@@ -4709,7 +4713,7 @@
 
         // 🔥 AUDITORÍA UNIVERSAL: Registrar edición de expediente
         if(typeof registrarAuditoria === 'function') {
-            registrarAuditoria('EDICIÓN', `Actualizó el expediente del ciudadano: ${datosActualizados.nombre || idDoc}`);
+            registrarAuditoria('PADRÓN', `Actualizó el expediente del ciudadano: ${datosActualizados.nombre || idDoc}`);
         }
 
         // ACTUALIZAR TODOS LOS DATOS EN LA MEMORIA RAM LOCAL Y ESCONDER INPUTS
@@ -5222,7 +5226,7 @@
               fecha_ultima_modificacion: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Editó el apoyo del catálogo: ${nombre}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('APOYOS', `Editó el apoyo del catálogo: ${nombre}`);
             if(typeof AppAlert === 'function') await AppAlert("Éxito", "Apoyo actualizado correctamente.", "success");
 
             cancelarEdicionApoyo();
@@ -5240,7 +5244,7 @@
               creado_por: auth.currentUser ? auth.currentUser.email : 'Admin'
             });
 
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('CAPTURA', `Registró un nuevo apoyo en el catálogo: ${nombre}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('APOYOS', `Registró un nuevo apoyo en el catálogo: ${nombre}`);
             this.reset();
           }
         } catch (error) {
@@ -5369,7 +5373,7 @@
 
           // 🔥 NUEVO: Registrar auditoría al BORRAR
           if(typeof registrarAuditoria === 'function') {
-            registrarAuditoria('SISTEMA', `Eliminó del catálogo el apoyo: ${nombre}`);
+            registrarAuditoria('APOYOS', `Eliminó del catálogo el apoyo: ${nombre}`);
           }
         } catch(error) {
           console.error("Error al borrar apoyo", error);
@@ -5643,7 +5647,7 @@
                 fecha_asignada: dateStr,
                 observaciones: observaciones
             });
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('EDICIÓN', `Editó detalles del apoyo [${nombreApoyo}] de ${nombreBeneficiario}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('APOYOS', `Editó detalles del apoyo [${nombreApoyo}] de ${nombreBeneficiario}`);
             cancelarEdicionAsignacion(); // Reset
             cargarHistorialApoyos(idBeneficiario);
 
@@ -5671,7 +5675,7 @@
             }
 
             await batch.commit();
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Otorgó [${nombreApoyo}] a ${nombreBeneficiario}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('APOYOS', `Otorgó [${nombreApoyo}] a ${nombreBeneficiario}`);
 
             document.getElementById('ma_select_apoyo').value = '';
             document.getElementById('ma_observaciones').value = '';
@@ -5786,6 +5790,7 @@
           });
           
           alert("Cuenta de usuario creada exitosamente.");
+          if(typeof registrarAuditoria === 'function') registrarAuditoria('SEGURIDAD', `Creó la cuenta de usuario para: ${email}`);
           formUsuario.reset();
           
           // Limpiar preview de imagen
@@ -5948,6 +5953,8 @@
 
         await db.collection('usuarios_acceso').doc(email).update(datosActualizados);
         
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('SEGURIDAD', `Actualizó los permisos y accesos de: ${email}`);
+
         // --- ACTUALIZAR BARRA LATERAL SI EL ADMIN SE EDITÓ A SÍ MISMO ---
         if (auth.currentUser && email === auth.currentUser.email) {
             const sidebarImg = document.getElementById('sidebarAvatarImage');
@@ -6092,7 +6099,7 @@
           await db.collection('usuarios_acceso').doc(emailDoc).delete();
           
           if(typeof registrarAuditoria === 'function') {
-              registrarAuditoria('SISTEMA', `Eliminó el acceso y los permisos de: ${emailDoc}`);
+              registrarAuditoria('SEGURIDAD', `Eliminó el acceso y los permisos de: ${emailDoc}`);
           }
           
           await AppAlert("Acceso Revocado", `El usuario ${emailDoc} ha perdido sus permisos y será expulsado del sistema en breve.`, "success");
@@ -6234,7 +6241,7 @@
           
           // 5. Dejar rastro en la bitácora
           if(typeof registrarAuditoria === 'function') {
-              registrarAuditoria('SISTEMA', `Eliminó la cuenta y revocó accesos de: ${emailDoc}`);
+              registrarAuditoria('SEGURIDAD', `Eliminó la cuenta y revocó accesos de: ${emailDoc}`);
           }
           
           await AppAlert("Cuenta Eliminada", `El usuario ${emailDoc} ha sido borrado por completo del sistema y de Firebase. Ya puedes volver a usar ese correo si lo deseas.`, "success");
@@ -6479,12 +6486,12 @@
               `;
             } else {
               totalAcciones++;
-              let colorTipo = 'text-slate-600 bg-slate-100';
-              if (d.tipo === 'CAPTURA') colorTipo = 'text-emerald-700 bg-emerald-100 border border-emerald-200';
-              else if (d.tipo === 'ASIGNACIÓN') colorTipo = 'text-amber-700 bg-amber-100 border border-amber-200';
-              else if (d.tipo === 'APOYO') colorTipo = 'text-sky-700 bg-sky-100 border border-sky-200';
-              else if (d.tipo === 'GRUPO') colorTipo = 'text-indigo-700 bg-indigo-100 border border-indigo-200';
-              else if (d.tipo === 'EDICIÓN') colorTipo = 'text-orange-700 bg-orange-100 border border-orange-200';
+              let colorTipo = 'text-slate-600 bg-slate-100 border border-slate-200';
+              if (d.tipo === 'CAPTURA' || d.tipo === 'PADRÓN') colorTipo = 'text-emerald-700 bg-emerald-100 border border-emerald-200';
+              else if (d.tipo === 'ASIGNACIÓN' || d.tipo === 'APOYOS' || d.tipo === 'APOYO') colorTipo = 'text-sky-700 bg-sky-100 border border-sky-200';
+              else if (d.tipo === 'GRUPO' || d.tipo === 'GRUPOS') colorTipo = 'text-indigo-700 bg-indigo-100 border border-indigo-200';
+              else if (d.tipo === 'EDICIÓN' || d.tipo === 'MAPA') colorTipo = 'text-amber-700 bg-amber-100 border border-amber-200';
+              else if (d.tipo === 'SEGURIDAD') colorTipo = 'text-rose-700 bg-rose-100 border border-rose-200';
               else if (d.tipo === 'SISTEMA') colorTipo = 'text-red-700 bg-red-100 border border-red-200';
 
               tbActividad.innerHTML += `
@@ -7081,6 +7088,8 @@
             });
             if (updatesLideres > 0) await batchLideres.commit();
 
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Editó el grupo: ${nombre}`);
+
             // 🔥 Forzamos la actualización visual de la tabla inmediatamente
             renderizarTablaCatGrupos();
             cerrarModalGrupo();
@@ -7102,7 +7111,7 @@
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Creó el grupo: ${nombre}`);
             cerrarModalGrupo();
           }
         } catch(e) {
@@ -7580,7 +7589,7 @@
         }
 
         if(typeof registrarAuditoria === 'function') {
-            registrarAuditoria('SISTEMA', `Eliminó permanentemente el grupo: ${nombre} y purgó a todos sus miembros afiliados.`);
+            registrarAuditoria('GRUPOS', `Eliminó permanentemente el grupo: ${nombre} y purgó a todos sus miembros afiliados.`);
         }
 
         alert(`El grupo "${nombre}" y sus afiliaciones han sido eliminados correctamente de Firebase.`);
@@ -7785,6 +7794,8 @@
           fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
         });
         
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Asignó al ciudadano al grupo: ${nombreGrp}`);
+
         // Refresh de Modal
         setTimeout(() => actualizarListaGruposActuales(idBen), 500); 
       } catch(error) { 
@@ -7795,6 +7806,7 @@
     window.quitarDeGrupo = async function(idRelacion) {
       if(await AppConfirm("Remover del Grupo", "¿Seguro que deseas sacar al ciudadano de este grupo?", "warning", "Sí, Remover")) {
         await db.collection('miembros_grupos').doc(idRelacion).delete();
+        if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Removió a un ciudadano de su grupo`);
         const idBen = document.getElementById('mg_id_beneficiario').value;
         setTimeout(() => actualizarListaGruposActuales(idBen), 500);
       }
@@ -8155,7 +8167,7 @@
             // DISPARAMOS LA SINCRONIZACIÓN OCULTA
             await window.sincronizarTextosCatalogo(grupoSeleccionadoParaEstructura);
             
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Modificó jerarquía a ${nuevoRol} para ${nombre} en el grupo ${grupoSeleccionadoParaEstructura}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Modificó jerarquía a ${nuevoRol} para ${nombre} en el grupo ${grupoSeleccionadoParaEstructura}`);
             
             // FEEDBACK VISUAL Y RECARGA PARA APLICAR NUEVOS COLORES
             if(typeof AppAlert === 'function') AppAlert('Actualizado', `La jerarquía de ${nombre} cambió a ${nuevoRol}`, 'success');
@@ -8175,7 +8187,7 @@
                 // DISPARAMOS LA SINCRONIZACIÓN OCULTA
                 await window.sincronizarTextosCatalogo(grupoSeleccionadoParaEstructura);
                 
-                if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Removió a ${nombre} del grupo ${grupoSeleccionadoParaEstructura}`);
+                if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Removió a ${nombre} del grupo ${grupoSeleccionadoParaEstructura}`);
             } catch(e) {
                 alert("Error al remover integrante.");
             }
@@ -8285,7 +8297,7 @@
                 rol_grupo: 'INTEGRANTE', // Se inscribe como base
                 fecha_ingreso: firebase.firestore.FieldValue.serverTimestamp()
             });
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('ASIGNACIÓN', `Integró a ${nombre} al grupo ${grupoSeleccionadoParaEstructura}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('GRUPOS', `Integró a ${nombre} al grupo ${grupoSeleccionadoParaEstructura}`);
             cerrarModalBusquedaCiudadano();
         } catch(error) { 
             alert("Error de conexión al asignar integrante."); 
@@ -8463,7 +8475,7 @@
                 await batch.commit();
             }
 
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Dispersión Masiva: ${cantRequerida} [${nombreApoyo}] al grupo ${nombreGrupo}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('APOYOS', `Dispersión Masiva: ${cantRequerida} [${nombreApoyo}] al grupo ${nombreGrupo}`);
 
             await AppAlert("Dispersión Exitosa", `Se han registrado exitosamente ${cantRequerida} entregas en la base de datos y se actualizó el inventario.`, "success");
             cerrarModalAsignacionMasiva();
@@ -9029,7 +9041,7 @@
 
             if(typeof aplicarFiltros === 'function') aplicarFiltros();
             if(typeof calcularYRenderizarKPIs === 'function') calcularYRenderizarKPIs();
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('EDICIÓN', `Actualizó simpatía a [${nuevaSimpatia}] desde mapeo`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('MAPA', `Actualizó simpatía a [${nuevaSimpatia}] desde mapeo`);
         } catch(error) {
             console.error("Error actualizando simpatía desde mapa:", error);
             alert("Error de red: No se pudo guardar el estatus de simpatía en la nube.");
@@ -9109,7 +9121,7 @@
             // Actualizar la Tabla de Padrón que está de fondo
             if(typeof aplicarFiltros === 'function') aplicarFiltros();
 
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Actualizó la geolocalización de: ${window.registrosGlobalesMemoria[idBeneficiarioGeoActual].nombre}`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('MAPA', `Actualizó la geolocalización de: ${window.registrosGlobalesMemoria[idBeneficiarioGeoActual].nombre}`);
 
             AppAlert("Ubicación Guardada", "Coordenadas y Dirección registradas de forma exitosa.", "success");
         } catch(e) {
@@ -9156,7 +9168,7 @@
             }
             window.registrosGlobalesMemoria[idBeneficiarioGeoActual].evidencias_visita.push(downloadURL);
 
-            if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Adjuntó una fotografía de evidencia`);
+            if(typeof registrarAuditoria === 'function') registrarAuditoria('MAPA', `Adjuntó una fotografía de evidencia al expediente`);
 
             // Refrescar Galería
             renderizarGaleriaEvidencias(window.registrosGlobalesMemoria[idBeneficiarioGeoActual].evidencias_visita);
@@ -9383,7 +9395,7 @@
             localStorage.removeItem('delta_offline_queue');
             
             if(typeof registrarAuditoria === 'function') {
-                registrarAuditoria('CAPTURA', `Sincronizó un lote OFFLINE de ${operaciones} registros`);
+                registrarAuditoria('PADRÓN', `Sincronizó un lote OFFLINE de ${operaciones} registros`);
             }
 
             renderizarColaOffline();
