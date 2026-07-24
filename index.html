@@ -997,85 +997,140 @@
         </div>
 
         <!-- 2. CATÁLOGO DE GRUPOS -->
-        <div id="tab-grupos-catalogo" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm h-fit">
-            <h3 class="text-sm font-semibold mb-5 flex items-center gap-2 text-slate-800 dark:text-white" id="tituloFormGrupo">
-              <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-lg"><i data-lucide="network" class="w-4 h-4"></i></div>
-              <span>Nuevo Grupo</span>
-            </h3>
-
-            <form id="formNuevoGrupo" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2">
-                  <label class="text-xs font-bold text-slate-500 block mb-1">Nombre del Grupo</label>
-                  <input type="text" id="grupo_nombre" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 uppercase" placeholder="Ej. LÍDERES ZONA SUR">
+        <div id="tab-grupos-catalogo" class="hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800">
+                  <i data-lucide="folder-tree" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <label class="text-xs font-bold text-slate-500 block mb-1">Meta Afiliados</label>
-                  <input type="number" id="grupo_meta" min="0" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Ej. 50">
+                  <h3 class="text-base font-black text-slate-800 dark:text-white leading-tight">Grupos Institucionales Activos</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Directorio oficial, metas de afiliación y mandos territoriales.</p>
                 </div>
+                <span id="totalGruposBadge" class="bg-indigo-100 text-indigo-700 text-xs font-black px-3 py-1 rounded-full shadow-sm ml-2">0</span>
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="border border-violet-200 bg-violet-50/30 p-3 rounded-xl">
-                  <label class="text-[10px] font-black text-violet-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i data-lucide="crown" class="w-3 h-3 inline"></i> Seccional</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('seccionales')" class="bg-violet-100 hover:bg-violet-200 text-violet-700 p-1 rounded transition-colors" title="Añadir Seccional"><i data-lucide="plus" class="w-3 h-3"></i></button>
-                  </label>
-                  <div id="lista_seccionales" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-violet-600/50 text-[10px] italic">Sin asignar</div>
+              
+              <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="flex-1 md:w-64 relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-slate-400"></i></div>
+                  <input type="text" id="filtroBuscadorGrupos" onkeyup="filtrarTablaGrupos()" placeholder="Buscar grupo, líder o propósito..." class="w-full text-xs font-medium pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
                 </div>
-
-                                <div class="border border-rose-200 bg-rose-50/30 p-3 rounded-xl">
-                  <label class="text-[10px] font-black text-rose-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i data-lucide="user-check" class="w-3 h-3 inline"></i> Coordinadores</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('coordinadores')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 p-1 rounded transition-colors" title="Añadir Coordinador"><i data-lucide="plus" class="w-3 h-3"></i></button>
-                  </label>
-                  <div id="lista_coordinadores" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-rose-400/50 text-[10px] italic">Sin asignar</div>
-                </div>
-
-                                <div class="border border-amber-200 bg-amber-50/30 p-3 rounded-xl">
-                  <label class="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i data-lucide="users" class="w-3 h-3 inline"></i> Representantes</span>
-                    <button type="button" onclick="abrirModalBusquedaCiudadano('representantes')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1 rounded transition-colors" title="Añadir Representante"><i data-lucide="plus" class="w-3 h-3"></i></button>
-                  </label>
-                  <div id="lista_representantes" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-center text-amber-600/50 text-[10px] italic">Sin asignar</div>
-                </div>
-              </div>
-
-              <div>
-                <label class="text-xs font-bold text-slate-500 block mb-1">Descripción / Propósito</label>
-                <textarea id="grupo_desc" rows="2" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" placeholder="Detalles del grupo..."></textarea>
-              </div>
-              <button type="submit" id="btnGuardarGrupo" class="w-full px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg mt-2 transition-colors flex justify-center items-center gap-2 shadow-sm">
-                <i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo
-              </button>
-            </form>
-          </div>
-
-          <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
-            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-4">
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-slate-800">Grupos Activos</h3>
-                <span id="totalGruposBadge" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">0</span>
-              </div>
-              <div class="flex-1 w-full md:max-w-xs relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i></div>
-                <input type="text" id="filtroBuscadorGrupos" onkeyup="filtrarTablaGrupos()" placeholder="Buscar grupo o propósito..." class="w-full text-xs pl-9 pr-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500">
+                <button onclick="abrirModalGrupo()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-2 uppercase tracking-wide shrink-0">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i> Crear Nuevo Grupo
+                </button>
               </div>
             </div>
-            <div class="overflow-x-auto flex-1 max-h-[500px]">
+
+            <div class="overflow-x-auto flex-1 max-h-[600px]">
               <table class="w-full text-left text-sm" id="tablaContenedorGrupos">
-                <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
+                <thead class="text-xs text-slate-500 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 uppercase tracking-wider">
                   <tr>
-                    <th class="px-4 py-3 font-semibold">Grupo Institucional</th>
-                    <th class="px-4 py-3 font-semibold text-center w-28">Miembros</th>
-                    <th class="px-4 py-3 text-center font-semibold w-28">Acciones</th>
+                    <th class="px-5 py-3.5 font-bold">Grupo Institucional y Liderazgo</th>
+                    <th class="px-5 py-3.5 font-bold text-center w-44">Progreso / Meta</th>
+                    <th class="px-5 py-3.5 text-center font-bold w-64">Acciones y Gestión</th>
                   </tr>
                 </thead>
-                <tbody id="tablaGrupos" class="divide-y divide-slate-100 bg-white">
+                <tbody id="tablaGrupos" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <div id="modalCrearEditarGrupo" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 transition-opacity">
+          <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-100 dark:border-slate-700 animate-scaleIn">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800">
+                  <i data-lucide="network" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-slate-800 dark:text-white tracking-tight" id="modalGrupoTitulo">Nuevo Grupo Institucional</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Configure los datos generales, imagen y estructura de liderazgo.</p>
+                </div>
+              </div>
+              <button onclick="cerrarModalGrupo()" class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-500">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <form id="formNuevoGrupo" class="p-6 overflow-y-auto space-y-5 bg-white dark:bg-slate-800">
+              <input type="hidden" id="flag_borrar_foto_grupo" value="false">
+
+              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                
+                <div class="flex flex-col items-center shrink-0">
+                  <div id="mg_foto_preview_box" class="w-20 h-20 rounded-2xl bg-indigo-600 text-white font-black text-3xl flex items-center justify-center border-2 border-white dark:border-slate-700 shadow-md overflow-hidden relative group">
+                    <span id="mg_inicial_letra">G</span>
+                    <img id="mg_foto_img" src="" class="w-full h-full object-cover hidden">
+                  </div>
+                  
+                  <div class="mt-2.5 flex flex-col items-center gap-1.5 w-full">
+                    <label for="grupo_foto_input" class="cursor-pointer px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm text-center w-full">
+                      <i data-lucide="camera" class="w-3 h-3 inline mr-1"></i> Subir Foto
+                    </label>
+                    <input type="file" id="grupo_foto_input" accept="image/png, image/jpeg" class="hidden" onchange="previsualizarFotoGrupo(this)">
+                    
+                    <button type="button" id="btnEliminarFotoGrupo" onclick="eliminarFotoGrupoTemporal()" class="hidden px-3 py-1 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-[10px] font-bold uppercase transition-colors w-full">
+                      <i data-lucide="trash-2" class="w-3 h-3 inline mr-1"></i> Borrar Foto
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="sm:col-span-2">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Nombre del Grupo</label>
+                    <input type="text" id="grupo_nombre" required onkeyup="actualizarInicialGrupo(this.value)" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 uppercase transition-all shadow-sm" placeholder="Ej. LÍDERES ZONA SUR">
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Meta Afiliados</label>
+                    <input type="number" id="grupo_meta" min="0" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Ej. 50">
+                  </div>
+                  <div class="sm:col-span-3">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Descripción / Propósito</label>
+                    <textarea id="grupo_desc" rows="2" class="w-full text-sm font-medium px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Detalles u objetivos del grupo..."></textarea>
+                  </div>
+                </div>
+
+              </div>
+
+              <div>
+                <label class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5"><i data-lucide="crown" class="w-4 h-4"></i> Estructura de Liderazgo del Grupo</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="border border-violet-200 dark:border-violet-800/50 bg-violet-50/40 dark:bg-violet-900/10 p-3.5 rounded-2xl">
+                    <label class="text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                      <span><i data-lucide="crown" class="w-3 h-3 inline"></i> Seccional</span>
+                      <button type="button" onclick="abrirModalBusquedaCiudadano('seccionales')" class="bg-violet-100 dark:bg-violet-900/50 hover:bg-violet-200 text-violet-700 dark:text-violet-300 p-1 rounded-lg transition-colors" title="Añadir Seccional"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                    </label>
+                    <div id="lista_seccionales" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar text-center text-violet-600/50 text-[10px] italic">Sin asignar</div>
+                  </div>
+
+                  <div class="border border-rose-200 dark:border-rose-800/50 bg-rose-50/40 dark:bg-rose-900/10 p-3.5 rounded-2xl">
+                    <label class="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                      <span><i data-lucide="user-check" class="w-3 h-3 inline"></i> Coordinadores</span>
+                      <button type="button" onclick="abrirModalBusquedaCiudadano('coordinadores')" class="bg-rose-100 dark:bg-rose-900/50 hover:bg-rose-200 text-rose-700 dark:text-rose-300 p-1 rounded-lg transition-colors" title="Añadir Coordinador"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                    </label>
+                    <div id="lista_coordinadores" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar text-center text-rose-400/50 text-[10px] italic">Sin asignar</div>
+                  </div>
+
+                  <div class="border border-amber-200 dark:border-amber-800/50 bg-amber-50/40 dark:bg-amber-900/10 p-3.5 rounded-2xl">
+                    <label class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                      <span><i data-lucide="users" class="w-3 h-3 inline"></i> Representantes</span>
+                      <button type="button" onclick="abrirModalBusquedaCiudadano('representantes')" class="bg-amber-100 dark:bg-amber-900/50 hover:bg-amber-200 text-amber-700 dark:text-amber-300 p-1 rounded-lg transition-colors" title="Añadir Representante"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                    </label>
+                    <div id="lista_representantes" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar text-center text-amber-600/50 text-[10px] italic">Sin asignar</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-3">
+                <button type="button" onclick="cerrarModalGrupo()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors">Cancelar</button>
+                <button type="submit" id="btnGuardarGrupo" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide">
+                  <i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -1124,84 +1179,110 @@
         </div>
 
         <div id="tab-grupos-estructura" class="hidden space-y-6">
-          <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-4">
-            <div class="flex-1 w-full relative">
-              <label class="text-xs font-bold text-slate-500 mb-1.5 block">Selecciona un Grupo Activo</label>
-              <select id="selectEstructuraGrupo" onchange="mostrarIntegrantesGrupo(this.value)" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900">
-                <option value="">Selecciona un grupo...</option>
-              </select>
-            </div>
-            <div class="mt-5 md:mt-6">
-              <button onclick="abrirModalAgregarIntegranteEstructura()" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="user-plus" class="w-4 h-4"></i> Añadir Integrante
-              </button>
-            </div>
-          </div>
+          
+          <div class="flex flex-col lg:flex-row gap-6">
+            
+            <div class="w-full lg:w-2/3 flex flex-col gap-6">
+              
+              <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                  <i data-lucide="network" class="w-5 h-5 text-indigo-500"></i>
+                </div>
+                <div class="flex-1 w-full relative">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Explorar Grupo Activo</label>
+                  <select id="selectEstructuraGrupo" onchange="mostrarIntegrantesGrupo(this.value)" class="w-full text-sm px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-indigo-900 shadow-sm cursor-pointer">
+                    <option value="">Selecciona un grupo del catálogo...</option>
+                  </select>
+                </div>
+                <button onclick="abrirModalAgregarIntegranteEstructura()" class="w-full sm:w-auto px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wide rounded-xl shadow-md transition-colors flex items-center justify-center gap-2 shrink-0">
+                  <i data-lucide="user-plus" class="w-4 h-4"></i> Añadir Integrante
+                </button>
+              </div>
 
-          <!-- TERMÓMETRO DE SIMPATÍA INTERNO -->
-          <div id="panelTermometroSimpatia" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm p-5 grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
-            <div class="md:col-span-1 flex flex-col justify-center items-center relative h-32">
-                <canvas id="chartTermometroSimpatia"></canvas>
-            </div>
-            <div class="md:col-span-3 grid grid-cols-3 gap-4">
-                <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 text-center">
-                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Voto Duro</p>
-                    <h3 id="term_afavor" class="text-3xl font-black text-emerald-700 leading-none">0</h3>
+              <div id="panelTermometroSimpatia" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-5 grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+                <div class="md:col-span-1 flex flex-col justify-center items-center relative h-32">
+                    <canvas id="chartTermometroSimpatia"></canvas>
                 </div>
-                <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 text-center">
-                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="help-circle" class="w-4 h-4"></i> Indecisos</p>
-                    <h3 id="term_indecisos" class="text-3xl font-black text-amber-700 leading-none">0</h3>
-                </div>
-                <div class="bg-rose-50 rounded-xl p-4 border border-rose-100 text-center">
-                    <p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="x-circle" class="w-4 h-4"></i> Oposición</p>
-                    <h3 id="term_encontra" class="text-3xl font-black text-rose-700 leading-none">0</h3>
-                </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[400px] lg:h-[600px] relative">
-              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between z-10">
-                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-indigo-500"></i> Despliegue Territorial</h3>
-                <div class="flex gap-2">
-                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Coord</span>
-                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-emerald-500"></div> Rep</span>
-                    <span class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase"><div class="w-2 h-2 rounded-full bg-red-500"></div> Base</span>
+                <div class="md:col-span-3 grid grid-cols-3 gap-4">
+                    <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 text-center">
+                        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Voto Duro</p>
+                        <h3 id="term_afavor" class="text-3xl font-black text-emerald-700 leading-none">0</h3>
+                    </div>
+                    <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 text-center">
+                        <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="help-circle" class="w-4 h-4"></i> Indecisos</p>
+                        <h3 id="term_indecisos" class="text-3xl font-black text-amber-700 leading-none">0</h3>
+                    </div>
+                    <div class="bg-rose-50 rounded-xl p-4 border border-rose-100 text-center">
+                        <p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1 flex justify-center items-center gap-1"><i data-lucide="x-circle" class="w-4 h-4"></i> Oposición</p>
+                        <h3 id="term_encontra" class="text-3xl font-black text-rose-700 leading-none">0</h3>
+                    </div>
                 </div>
               </div>
-              <div id="mapaEstructuraGrupos" class="flex-1 w-full bg-slate-200 z-0"></div>
-            </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px] lg:h-[600px] relative">
-              <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3">
-                  <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Estructura</h3>
-                  <div class="bg-slate-200/50 p-1 rounded-lg flex items-center gap-1">
-                    <button onclick="toggleVistaEstructura('tabla')" id="btnVistaTabla" class="px-2.5 py-1 rounded shadow-sm bg-white text-slate-700 text-[10px] font-bold transition-all"><i data-lucide="list" class="w-3 h-3 inline"></i> Tabla</button>
-                    <button onclick="toggleVistaEstructura('org')" id="btnVistaOrg" class="px-2.5 py-1 rounded text-slate-500 hover:text-slate-700 text-[10px] font-bold transition-all"><i data-lucide="git-merge" class="w-3 h-3 inline"></i> Árbol</button>
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between shrink-0 gap-3">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Miembros del Grupo</h3>
+                    <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full shadow-sm">0 integr.</span>
+                  </div>
+                  
+                  <div class="bg-slate-200/60 p-1 rounded-lg flex items-center gap-1">
+                    <button onclick="toggleVistaEstructura('tabla')" id="btnVistaTabla" class="px-4 py-1.5 rounded-md shadow-sm bg-white text-slate-700 text-[10px] font-black tracking-wide transition-all flex items-center gap-1.5"><i data-lucide="list" class="w-3.5 h-3.5"></i> Ver Tabla</button>
+                    <button onclick="toggleVistaEstructura('org')" id="btnVistaOrg" class="px-4 py-1.5 rounded-md text-slate-500 hover:text-slate-700 text-[10px] font-black tracking-wide transition-all flex items-center gap-1.5"><i data-lucide="git-merge" class="w-3.5 h-3.5"></i> Ver Árbol</button>
                   </div>
                 </div>
-                <span id="badgeEstructuraTotal" class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">0 integrantes</span>
+                
+                <div id="vistaTablaEstructura" class="overflow-x-auto overflow-y-auto flex-1 custom-scrollbar block">
+                  <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="text-[10px] text-slate-500 font-bold bg-white border-b border-slate-200 sticky top-0 z-10 uppercase tracking-wider">
+                      <tr>
+                        <th class="px-5 py-3">Ciudadano y Nivel Jerárquico</th>
+                        <th class="px-5 py-3 text-center">Sección Electoral</th>
+                        <th class="px-5 py-3 text-center">Gestión</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
+                      <tr><td colspan="3" class="text-center py-12 text-slate-400 font-medium">Selecciona un grupo para cargar su estructura.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div id="vistaOrgEstructura" class="hidden overflow-auto flex-1 custom-scrollbar bg-slate-50/50 p-6 relative">
+                   <div id="canvasOrganigrama" class="flex flex-col items-center justify-start min-h-full min-w-max"></div>
+                </div>
               </div>
-              <div id="vistaTablaEstructura" class="overflow-y-auto flex-1 custom-scrollbar block">
-                <table class="w-full text-left text-sm">
-                  <thead class="text-xs text-slate-500 bg-white border-b border-slate-200 sticky top-0 z-10">
-                    <tr>
-                      <th class="px-4 py-3 font-semibold">Ciudadano / Rol</th>
-                      <th class="px-4 py-3 font-semibold text-center w-24">Sección</th>
-                      <th class="px-4 py-3 text-center font-semibold w-24">Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tablaEstructuraIntegrantes" class="divide-y divide-slate-100 bg-white">
-                    <tr><td colspan="3" class="text-center py-10 text-slate-400">Selecciona un grupo para ver sus integrantes.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div id="vistaOrgEstructura" class="hidden overflow-auto flex-1 custom-scrollbar bg-slate-50/50 p-6 relative">
-                 <div id="canvasOrganigrama" class="flex flex-col items-center justify-start min-h-full min-w-max">
-                 </div>
-              </div>
+
             </div>
+
+            <div class="w-full lg:w-1/3 flex flex-col gap-6">
+              
+              <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-500">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-black text-indigo-800 uppercase tracking-widest">Zona de Asignación</h4>
+                    <p class="text-[10px] text-indigo-600/80 font-bold mt-1">Este panel mostrará la jurisdicción oficial y colonia designada para este grupo próximamente.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col flex-1 min-h-[450px]">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 z-10">
+                  <h3 class="text-sm font-black text-slate-800 flex items-center gap-2 mb-2"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-500"></i> Despliegue Territorial</h3>
+                  
+                  <div class="flex flex-wrap gap-2 mt-2">
+                      <span class="flex items-center gap-1.5 text-[9px] font-black text-slate-600 uppercase bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm"><div class="w-2.5 h-2.5 rounded-full bg-[#f43f5e] border border-rose-300"></div> Coord</span>
+                      <span class="flex items-center gap-1.5 text-[9px] font-black text-slate-600 uppercase bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm"><div class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-amber-300"></div> Rep</span>
+                      <span class="flex items-center gap-1.5 text-[9px] font-black text-slate-600 uppercase bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm"><div class="w-2.5 h-2.5 rounded-full bg-[#ef4444] border border-red-300"></div> Base</span>
+                  </div>
+                </div>
+                <div id="mapaEstructuraGrupos" class="flex-1 w-full bg-slate-200 z-0"></div>
+              </div>
+
+            </div>
+
           </div>
         </div>
 
@@ -6487,21 +6568,23 @@
         conteoMiembrosPorGrupo[data.nombre_grupo] = (conteoMiembrosPorGrupo[data.nombre_grupo] || 0) + 1;
       });
       
-      const tabAsignacion = document.getElementById('tab-grupos-asignacion');
-      if(tabAsignacion && !tabAsignacion.classList.contains('hidden')) aplicarFiltrosGrAsignacion(false);
-      
-      const tabStats = document.getElementById('tab-grupos-estadisticas');
-      if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
-      
-      const tabEstructura = document.getElementById('tab-grupos-estructura');
-      if (tabEstructura && !tabEstructura.classList.contains('hidden')) {
-          cargarEstructuraGrupo(false); 
-      }
-      
-      renderizarTablaCatGrupos();
+      // 🔥 SOLUCIÓN 4: Prevención de Condición de Carrera (Debounce)
+      clearTimeout(window.timerRenderMembresias);
+      window.timerRenderMembresias = setTimeout(() => {
+          const tabAsignacion = document.getElementById('tab-grupos-asignacion');
+          if(tabAsignacion && !tabAsignacion.classList.contains('hidden')) aplicarFiltrosGrAsignacion(false);
+          
+          const tabStats = document.getElementById('tab-grupos-estadisticas');
+          if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
+          
+          const tabEstructura = document.getElementById('tab-grupos-estructura');
+          if (tabEstructura && !tabEstructura.classList.contains('hidden')) cargarEstructuraGrupo(false); 
+          
+          renderizarTablaCatGrupos();
+      }, 250);
     });
 
-    // 3. Control de Pestañas
+   // 3. Control de Pestañas
     window.switchGruposTab = function(tab) {
       document.getElementById('tab-grupos-estadisticas').classList.toggle('hidden', tab !== 'estadisticas');
       document.getElementById('tab-grupos-catalogo').classList.toggle('hidden', tab !== 'catalogo');
@@ -6525,6 +6608,11 @@
       if(btnEstruc) btnEstruc.className = tab === 'estructura' ? activeClass : inactiveClass;
       if(btnCoord) btnCoord.className = tab === 'coordinadores' ? activeClassEmerald : inactiveClass;
 
+      // 🔥 SOLUCIÓN 1: Prevenir Fuga de Estado (Evita sobrescribir grupos accidentalmente)
+      if (tab !== 'catalogo' && typeof cancelarEdicionGrupo === 'function') {
+          cancelarEdicionGrupo();
+      }
+
       if(tab === 'asignacion') aplicarFiltrosGrAsignacion(true);
       if(tab === 'estadisticas') calcularEstadisticasGrupos();
       if(tab === 'coordinadores') renderizarTabCoordinadores();
@@ -6547,19 +6635,32 @@
         const seccionesSet = new Set();
 
         listaGruposCatalogo.forEach(g => {
-            // LÓGICA ACTUALIZADA: Prioridad absoluta al SECCIONAL. Si no hay, toma al COORDINADOR.
             let liderPrincipal = 'SIN LÍDER';
             if (g.seccional && g.seccional.trim() !== '') liderPrincipal = g.seccional.toUpperCase();
             else if (g.coordinador && g.coordinador.trim() !== '') liderPrincipal = g.coordinador.toUpperCase();
             
+            // Limpiamos la cadena para que el acordeón lo agrupe bien visualmente
+            liderPrincipal = liderPrincipal.split(',')[0].trim();
+            
             let seccionGrupo = 'N/A';
             
-            // 🔥 SOLUCIÓN MULTI-LÍDER: Cortamos el texto por las comas y tomamos solo al primer líder
-            let primerLider = liderPrincipal.split(',')[0].trim();
-            
-            const liderData = Object.values(window.registrosGlobalesMemoria).find(user => user.nombre && user.nombre.trim().toUpperCase() === primerLider);
-            if (liderData && liderData.seccion) {
-                seccionGrupo = liderData.seccion;
+            // 🔥 SOLUCIÓN 3: Búsqueda Relacional Exacta (A prueba de errores ortográficos)
+            // Escaneamos la relación exacta ID-Grupo en memoria en lugar de adivinar por nombre
+            let idLiderEncontrado = null;
+            for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+                const rel = grupos.find(r => r.nombre_grupo === g.nombre && (r.rol === 'SECCIONAL' || r.rol === 'COORDINADOR'));
+                if (rel) {
+                    idLiderEncontrado = idBen;
+                    break;
+                }
+            }
+
+            // Si encontramos su ID exacto, extraemos su sección con 100% de precisión
+            if (idLiderEncontrado && window.registrosGlobalesMemoria[idLiderEncontrado]) {
+                const seccionReal = window.registrosGlobalesMemoria[idLiderEncontrado].seccion;
+                if (seccionReal && seccionReal.trim() !== '') {
+                    seccionGrupo = seccionReal.toUpperCase();
+                }
             }
 
             if (seccionGrupo !== 'N/A') seccionesSet.add(seccionGrupo);
@@ -6849,6 +6950,7 @@
         }
     }
 
+    // --- PROCESAMIENTO Y GUARDADO CON FIREBASE STORAGE ---
     if(formNuevoGrupo) {
       formNuevoGrupo.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -6856,25 +6958,72 @@
         const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
         const meta = parseInt(document.getElementById('grupo_meta').value) || 0;
         const desc = document.getElementById('grupo_desc').value.trim();
+        const fotoInput = document.getElementById('grupo_foto_input');
+        const flagBorrarFoto = document.getElementById('flag_borrar_foto_grupo').value === 'true';
 
-        // Extraer los textos en crudo para retrocompatibilidad visual en la tabla de catálogo principal
         const stringSeccionales = window.lideresGrupoTemp.seccionales.map(x => x.nombre).join(', ');
         const stringCoordinadores = window.lideresGrupoTemp.coordinadores.map(x => x.nombre).join(', ');
         const stringRepresentantes = window.lideresGrupoTemp.representantes.map(x => x.nombre).join(', ');
 
-        // CANDADO ANTIDUPLICADOS
         const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
         if (nombreExiste) {
             alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
             return;
         }
 
-        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Procesando...';
         btn.disabled = true;
+        lucide.createIcons();
 
         try {
+          // Subida / Gestión de Imagen de Grupo
+          let fotoUrlFinal = null;
+          let urlViejaParaBorrar = null;
+
+          // 1. Extraer la URL vieja si estamos editando
+          if (idGrupoEditando) {
+              const grupoPrevio = listaGruposCatalogo.find(g => g.id === idGrupoEditando);
+              // Validamos exhaustivamente que la URL sea un string válido y de Firebase
+              if (grupoPrevio && typeof grupoPrevio.foto_url === 'string' && grupoPrevio.foto_url.includes('firebasestorage')) {
+                  urlViejaParaBorrar = grupoPrevio.foto_url;
+              }
+          }
+
+          // 2. Si hay un archivo NUEVO seleccionado en el input
+          if (fotoInput && fotoInput.files.length > 0) {
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Subiendo Imagen...';
+            lucide.createIcons();
+
+            const blobComprimido = await comprimirImagenApp(fotoInput.files[0], 600, 600, 0.75);
+            const rutaStorage = `fotos_grupos/${Date.now()}_${nombre.replace(/\s+/g, '_')}.jpg`;
+            const uploadTask = await firebase.storage().ref().child(rutaStorage).put(blobComprimido);
+            fotoUrlFinal = await uploadTask.ref.getDownloadURL();
+            
+            // 🔥 SOLUCIÓN STORAGE: Destruimos la foto anterior físicamente (Reemplazo)
+            if (urlViejaParaBorrar) {
+                try { 
+                  await firebase.storage().refFromURL(urlViejaParaBorrar).delete(); 
+                  console.log("Foto vieja eliminada de Storage (Reemplazo)");
+                } catch(e) { console.warn("No se pudo borrar foto en reemplazo:", e); }
+            }
+
+          // 3. Si el usuario hizo clic explícito en el botón "Borrar Foto"
+          } else if (flagBorrarFoto) {
+            fotoUrlFinal = ""; // El string vacío indicará a Firestore que no hay foto
+            
+            // 🔥 SOLUCIÓN STORAGE: Destruimos la foto anterior físicamente (Borrado total)
+            if (urlViejaParaBorrar) {
+                try { 
+                  await firebase.storage().refFromURL(urlViejaParaBorrar).delete(); 
+                  console.log("Foto vieja eliminada de Storage (Borrado)");
+                } catch(e) { console.warn("No se pudo borrar foto explícitamente:", e); }
+            }
+          }
+
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+          lucide.createIcons();
+
           if(idGrupoEditando) {
-            // SOLUCIÓN LÓGICA: Si se edita el nombre del grupo, se actualiza el nombre a todos sus miembros afiliados
             if (window.grupoNombreOriginalTemp && window.grupoNombreOriginalTemp !== nombre) {
                 const snapMiembrosViejos = await db.collection('miembros_grupos').where('nombre_grupo', '==', window.grupoNombreOriginalTemp).get();
                 if (!snapMiembrosViejos.empty) {
@@ -6884,7 +7033,7 @@
                     for (const docM of snapMiembrosViejos.docs) {
                         batchRenombrar.update(docM.ref, { nombre_grupo: nombre });
                         conteoRenombrar++;
-                        if (conteoRenombrar === 490) { // Prevención de colapso de Firestore por lotes grandes
+                        if (conteoRenombrar === 490) {
                             await batchRenombrar.commit();
                             batchRenombrar = db.batch();
                             conteoRenombrar = 0;
@@ -6894,21 +7043,35 @@
                 }
             }
 
-            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
+            const datosUpdate = { 
               nombre, 
               descripcion: desc,
               seccional: stringSeccionales,
               coordinador: stringCoordinadores,
               representante: stringRepresentantes,
               meta_afiliados: meta
-            });
+            };
+
+            if (fotoUrlFinal !== null) datosUpdate.foto_url = fotoUrlFinal;
+
+            await db.collection('catalogo_grupos').doc(idGrupoEditando).update(datosUpdate);
             
-            // Actualizar a los líderes en batch/loop iterativo en la relación de miembros
+            // 🔥 SOLUCIÓN: Actualizar el arreglo de memoria RAM local (Evita esperar a Firebase)
+            const idxGrupo = listaGruposCatalogo.findIndex(g => g.id === idGrupoEditando);
+            if (idxGrupo !== -1) {
+                listaGruposCatalogo[idxGrupo].nombre = nombre;
+                listaGruposCatalogo[idxGrupo].descripcion = desc;
+                listaGruposCatalogo[idxGrupo].seccional = stringSeccionales;
+                listaGruposCatalogo[idxGrupo].coordinador = stringCoordinadores;
+                listaGruposCatalogo[idxGrupo].representante = stringRepresentantes;
+                listaGruposCatalogo[idxGrupo].meta_afiliados = meta;
+                if (fotoUrlFinal !== null) listaGruposCatalogo[idxGrupo].foto_url = fotoUrlFinal;
+            }
+
             for(let s of window.lideresGrupoTemp.seccionales) await afiliarLiderAutomaticamente(s.id, nombre, 'SECCIONAL');
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
-            // SINCRONIZACIÓN INVERSA (Eliminar a los líderes fantasma que quitaste de las cajas degradándolos)
             const snapMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
             const idsLideresActivos = [
                 ...window.lideresGrupoTemp.seccionales.map(x=>x.id),
@@ -6929,30 +7092,33 @@
             });
             if (updatesLideres > 0) await batchLideres.commit();
 
-            alert("Grupo actualizado correctamente.");
-            cancelarEdicionGrupo();
+            // 🔥 Forzamos la actualización visual de la tabla inmediatamente
+            renderizarTablaCatGrupos();
+            cerrarModalGrupo();
           } else {
-            await db.collection('catalogo_grupos').add({
+            const datosNuevoGrupo = {
               nombre, 
               descripcion: desc, 
               seccional: stringSeccionales,
               coordinador: stringCoordinadores,
               representante: stringRepresentantes,
               meta_afiliados: meta,
+              foto_url: fotoUrlFinal || "",
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+
+            await db.collection('catalogo_grupos').add(datosNuevoGrupo);
             
-            // Procesar Afiliación Automática
             for(let s of window.lideresGrupoTemp.seccionales) await afiliarLiderAutomaticamente(s.id, nombre, 'SECCIONAL');
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
-            cancelarEdicionGrupo();
+            cerrarModalGrupo();
           }
         } catch(e) {
-          console.error(e);
-          alert("Error al guardar grupo.");
+          console.error("Error al guardar grupo:", e);
+          alert("Ocurrió un error al intentar guardar la información del grupo.");
         } finally {
           btn.innerHTML = idGrupoEditando ? '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios' : '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
           btn.disabled = false;
@@ -6999,9 +7165,12 @@
 
       const gruposPorLider = {};
       listaGruposCatalogo.forEach(g => {
-        let liderPrincipal = 'SIN LÍDER';
-        if (g.seccional && g.seccional.trim() !== '') liderPrincipal = g.seccional.toUpperCase();
-        else if (g.coordinador && g.coordinador.trim() !== '') liderPrincipal = g.coordinador.toUpperCase();
+        let liderRaw = 'SIN LÍDER';
+        if (g.seccional && g.seccional.trim() !== '') liderRaw = g.seccional.toUpperCase();
+        else if (g.coordinador && g.coordinador.trim() !== '') liderRaw = g.coordinador.toUpperCase();
+
+        // 🔥 SOLUCIÓN 2: Extraer solo el primer líder si hay varios separados por coma para el Submenú
+        let liderPrincipal = liderRaw.split(',')[0].trim();
 
         if (!gruposPorLider[liderPrincipal]) gruposPorLider[liderPrincipal] = [];
         gruposPorLider[liderPrincipal].push(g);
@@ -7053,21 +7222,25 @@
           });
         });
         
-        renderizarTablaCatGrupos();
-        renderizarSubMenuGrupos(); 
-        
-        const selFiltro = document.getElementById('gr_filtro_grupo');
-        const valSel = selFiltro ? selFiltro.value : 'TODOS';
-        if(selFiltro) {
-          selFiltro.innerHTML = '<option value="TODOS">Todos los Grupos</option>';
-          listaGruposCatalogo.forEach(g => selFiltro.add(new Option(g.nombre, g.nombre)));
-          selFiltro.value = valSel;
-        }
-        
-        const tabStats = document.getElementById('tab-grupos-estadisticas');
-        if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
-        const tabCoord = document.getElementById('tab-grupos-coordinadores');
-        if (tabCoord && !tabCoord.classList.contains('hidden')) renderizarTabCoordinadores();
+        // 🔥 SOLUCIÓN 4: Prevención de Condición de Carrera (Debounce 2)
+        clearTimeout(window.timerRenderCatalogo);
+        window.timerRenderCatalogo = setTimeout(() => {
+            renderizarTablaCatGrupos();
+            renderizarSubMenuGrupos(); 
+            
+            const selFiltro = document.getElementById('gr_filtro_grupo');
+            const valSel = selFiltro ? selFiltro.value : 'TODOS';
+            if(selFiltro) {
+              selFiltro.innerHTML = '<option value="TODOS">Todos los Grupos</option>';
+              listaGruposCatalogo.forEach(g => selFiltro.add(new Option(g.nombre, g.nombre)));
+              selFiltro.value = valSel;
+            }
+            
+            const tabStats = document.getElementById('tab-grupos-estadisticas');
+            if (tabStats && !tabStats.classList.contains('hidden')) calcularEstadisticasGrupos();
+            const tabCoord = document.getElementById('tab-grupos-coordinadores');
+            if (tabCoord && !tabCoord.classList.contains('hidden')) renderizarTabCoordinadores();
+        }, 250);
       });
     }
 
@@ -7087,9 +7260,202 @@
         return conteo;
     };
 
-   function renderizarTablaCatGrupos() {
+   // --- LÓGICA DE CONTROL DEL MODAL DE CREACIÓN / EDICIÓN ---
+    window.abrirModalGrupo = function(id = null, nombre = '', descripcion = '', meta = 0) {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      const titulo = document.getElementById('modalGrupoTitulo');
+      const btn = document.getElementById('btnGuardarGrupo');
+
+      if (id) {
+        idGrupoEditando = id;
+        window.grupoNombreOriginalTemp = nombre;
+        document.getElementById('grupo_nombre').value = nombre;
+        document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
+        document.getElementById('grupo_desc').value = descripcion;
+
+        titulo.textContent = "Editar Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+        btn.className = "px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            const rel = grupos.find(g => g.nombre_grupo === nombre);
+            if(rel) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                if(dataBen) {
+                    if (rel.rol === 'SECCIONAL') window.lideresGrupoTemp.seccionales.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'COORDINADOR') window.lideresGrupoTemp.coordinadores.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'REPRESENTANTE') window.lideresGrupoTemp.representantes.push({ id: idBen, nombre: dataBen.nombre });
+                }
+            }
+        }
+        renderizarListasLideres();
+      } else {
+        idGrupoEditando = null;
+        window.grupoNombreOriginalTemp = null;
+        document.getElementById('formNuevoGrupo').reset();
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        renderizarListasLideres();
+
+        titulo.textContent = "Nuevo Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
+        btn.className = "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.cerrarModalGrupo = function() {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      if (modal) modal.classList.add('hidden');
+      idGrupoEditando = null;
+      window.grupoNombreOriginalTemp = null;
+      document.getElementById('formNuevoGrupo').reset();
+      window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+      renderizarListasLideres();
+    }
+
+   // --- MANEJO DE FOTO Y AVATAR PREDETERMINADO CON LA INICIAL DEL GRUPO ---
+    window.actualizarInicialGrupo = function(nombre) {
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      if (spanInicial) {
+        const letra = nombre.trim() ? nombre.trim().charAt(0).toUpperCase() : 'G';
+        spanInicial.textContent = letra;
+      }
+    }
+
+    window.previsualizarFotoGrupo = function(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('mg_foto_img');
+          const spanInicial = document.getElementById('mg_inicial_letra');
+          const btnDel = document.getElementById('btnEliminarFotoGrupo');
+          
+          if (img && spanInicial && btnDel) {
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            spanInicial.classList.add('hidden');
+            btnDel.classList.remove('hidden');
+            document.getElementById('flag_borrar_foto_grupo').value = 'false';
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    window.eliminarFotoGrupoTemporal = function() {
+      const input = document.getElementById('grupo_foto_input');
+      const img = document.getElementById('mg_foto_img');
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      const btnDel = document.getElementById('btnEliminarFotoGrupo');
+
+      if (input) input.value = '';
+      if (img) { img.src = ''; img.classList.add('hidden'); }
+      if (spanInicial) spanInicial.classList.remove('hidden');
+      if (btnDel) btnDel.classList.add('hidden');
+      
+      document.getElementById('flag_borrar_foto_grupo').value = 'true';
+    }
+
+    // --- LÓGICA DE CONTROL DEL MODAL DE CREACIÓN / EDICIÓN CON FOTO ---
+    window.abrirModalGrupo = function(id = null, nombre = '', descripcion = '', meta = 0, fotoUrl = '') {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      const titulo = document.getElementById('modalGrupoTitulo');
+      const btn = document.getElementById('btnGuardarGrupo');
+      const imgPreview = document.getElementById('mg_foto_img');
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      const btnDelFoto = document.getElementById('btnEliminarFotoGrupo');
+      const inputFoto = document.getElementById('grupo_foto_input');
+
+      if (inputFoto) inputFoto.value = '';
+      document.getElementById('flag_borrar_foto_grupo').value = 'false';
+
+      if (id) {
+        idGrupoEditando = id;
+        window.grupoNombreOriginalTemp = nombre;
+        document.getElementById('grupo_nombre').value = nombre;
+        document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
+        document.getElementById('grupo_desc').value = descripcion;
+
+        actualizarInicialGrupo(nombre);
+
+        if (fotoUrl && fotoUrl.trim() !== '') {
+          imgPreview.src = fotoUrl;
+          imgPreview.classList.remove('hidden');
+          spanInicial.classList.add('hidden');
+          btnDelFoto.classList.remove('hidden');
+        } else {
+          imgPreview.src = '';
+          imgPreview.classList.add('hidden');
+          spanInicial.classList.remove('hidden');
+          btnDelFoto.classList.add('hidden');
+        }
+
+        titulo.textContent = "Editar Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+        btn.className = "px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            const rel = grupos.find(g => g.nombre_grupo === nombre);
+            if(rel) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                if(dataBen) {
+                    if (rel.rol === 'SECCIONAL') window.lideresGrupoTemp.seccionales.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'COORDINADOR') window.lideresGrupoTemp.coordinadores.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'REPRESENTANTE') window.lideresGrupoTemp.representantes.push({ id: idBen, nombre: dataBen.nombre });
+                }
+            }
+        }
+        renderizarListasLideres();
+      } else {
+        idGrupoEditando = null;
+        window.grupoNombreOriginalTemp = null;
+        document.getElementById('formNuevoGrupo').reset();
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        renderizarListasLideres();
+
+        actualizarInicialGrupo('');
+        imgPreview.src = '';
+        imgPreview.classList.add('hidden');
+        spanInicial.classList.remove('hidden');
+        btnDelFoto.classList.add('hidden');
+
+        titulo.textContent = "Nuevo Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
+        btn.className = "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.cerrarModalGrupo = function() {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      if (modal) modal.classList.add('hidden');
+      idGrupoEditando = null;
+      window.grupoNombreOriginalTemp = null;
+      document.getElementById('formNuevoGrupo').reset();
+      window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+      renderizarListasLideres();
+    }
+
+    window.editarGrupoCatalogo = function(id, nombre, descripcion, meta = 0, fotoUrl = '') {
+      abrirModalGrupo(id, nombre, descripcion, meta, fotoUrl);
+    }
+
+    window.cancelarEdicionGrupo = function() {
+      cerrarModalGrupo();
+    }
+
+    function renderizarTablaCatGrupos() {
         const query = document.getElementById('filtroBuscadorGrupos').value.trim().toUpperCase();
         const tbody = document.getElementById('tablaGrupos');
+        if(!tbody) return;
         tbody.innerHTML = '';
 
         const gruposFiltrados = listaGruposCatalogo.filter(g => 
@@ -7101,67 +7467,77 @@
         );
 
         if(gruposFiltrados.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No se encontraron grupos.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3" class="px-5 py-10 text-center text-sm text-slate-400 font-medium">No se encontraron grupos en el catálogo.</td></tr>';
         } else {
           gruposFiltrados.forEach(d => {
-            // 🔥 SOLUCIÓN: Usamos el contador en tiempo real en lugar de la variable global estática
             const conteo = window.obtenerTotalMiembrosGrupo(d.nombre);
             const descLimpia = d.descripcion ? d.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
+
+            // Avatar Predeterminado con la Primera Letra o Imagen Real
+            const inicial = d.nombre.trim() ? d.nombre.trim().charAt(0).toUpperCase() : 'G';
+            let avatarHtml = `<div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shrink-0 shadow-sm border border-indigo-500">${inicial}</div>`;
+            
+            if (d.foto_url && d.foto_url.trim() !== '') {
+              avatarHtml = `
+                <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 shadow-sm cursor-pointer group/img relative" onclick="window.open('${d.foto_url}', '_blank')" title="Clic para ampliar imagen">
+                  <img src="${d.foto_url}" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform">
+                </div>`;
+            }
 
             let rolesHtml = '';
             if (d.seccional || d.coordinador || d.representante) {
               rolesHtml = '<div class="mt-2.5 flex flex-wrap gap-2">';
-              if (d.seccional) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-violet-50 text-violet-700 border border-violet-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="crown" class="w-3 h-3"></i> Secc: ${d.seccional}</span>`;
-              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
-              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
+              if (d.seccional) rolesHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 rounded-md text-[9px] font-bold uppercase shadow-sm"><i data-lucide="crown" class="w-3 h-3"></i> Secc: ${d.seccional}</span>`;
+              if (d.coordinador) rolesHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-md text-[9px] font-bold uppercase shadow-sm"><i data-lucide="user-check" class="w-3 h-3"></i> Coord: ${d.coordinador}</span>`;
+              if (d.representante) rolesHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-md text-[9px] font-bold uppercase shadow-sm"><i data-lucide="users" class="w-3 h-3"></i> Rep: ${d.representante}</span>`;
               rolesHtml += '</div>';
             }
 
-            // LÓGICA DE BARRA DE PROGRESO DE METAS INTACTA CON TUS ESTILOS
-            let progressHtml = `<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 shadow-sm">${conteo}</span>`;
+            let progressHtml = `<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-black border border-slate-200 dark:border-slate-700 shadow-sm">${conteo} miembros</span>`;
             if (d.meta_afiliados > 0) {
                 let pct = Math.min(100, Math.round((conteo / d.meta_afiliados) * 100));
                 let colorBar = pct >= 100 ? 'bg-emerald-500' : (pct >= 50 ? 'bg-indigo-500' : 'bg-amber-500');
                 progressHtml = `
-                    <div class="flex flex-col items-center justify-center w-full max-w-[120px] mx-auto group-hover:scale-105 transition-transform cursor-default" title="${conteo} afiliados de ${d.meta_afiliados} meta">
-                        <div class="flex justify-between w-full text-[10px] font-black text-slate-500 mb-1 tracking-wider">
+                    <div class="flex flex-col items-center justify-center w-full max-w-[140px] mx-auto cursor-default" title="${conteo} afiliados de ${d.meta_afiliados} meta">
+                        <div class="flex justify-between w-full text-[10px] font-black text-slate-500 dark:text-slate-400 mb-1 tracking-wider">
                             <span>${conteo}</span>
                             <span>META: ${d.meta_afiliados}</span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 border border-slate-200 overflow-hidden shadow-inner">
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 border border-slate-200 dark:border-slate-700 overflow-hidden shadow-inner">
                             <div class="${colorBar} h-2.5 rounded-full transition-all duration-500 relative" style="width: ${pct}%">
                               ${pct >= 100 ? '<div class="absolute inset-0 bg-white/20 animate-pulse"></div>' : ''}
                             </div>
                         </div>
-                        <span class="text-[9px] font-black text-slate-400 mt-0.5">${pct}%</span>
+                        <span class="text-[9px] font-black text-slate-400 mt-0.5">${pct}% completado</span>
                     </div>
                 `;
             }
 
             tbody.innerHTML += `
-              <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors group">
-                <td class="px-4 py-3">
-                  <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-0.5">
-                      <i data-lucide="network" class="w-4 h-4 text-indigo-500"></i>
-                    </div>
+              <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 transition-colors group">
+                <td class="px-5 py-4">
+                  <div class="flex items-start gap-3.5">
+                    ${avatarHtml}
                     <div class="flex-1">
-                      <p class="font-bold text-slate-800 text-xs">${d.nombre}</p>
-                      <p class="text-[10px] text-slate-500 mt-0.5 leading-tight">${d.descripcion || 'Sin descripción.'}</p>
+                      <p class="font-black text-slate-800 dark:text-white text-sm uppercase tracking-tight">${d.nombre}</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">${d.descripcion || 'Sin descripción o propósito registrado.'}</p>
                       ${rolesHtml}
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-center align-middle">
+                <td class="px-5 py-4 text-center align-middle">
                   ${progressHtml}
                 </td>
-                <td class="px-4 py-3 text-center align-middle">
+                <td class="px-5 py-4 text-center align-middle">
                   <div class="flex items-center justify-center gap-2">
-                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, ${d.meta_afiliados})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Editar Grupo">
-                      <i data-lucide="edit-3" class="w-4 h-4"></i> Editar
+                    <button onclick="abrirGrupoDesdeSidebar('${d.nombre}')" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Ver / Gestionar Integrantes">
+                      <i data-lucide="users" class="w-3.5 h-3.5"></i> Integrantes
                     </button>
-                    <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Eliminar Grupo">
-                      <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar
+                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, ${d.meta_afiliados}, '${d.foto_url || ''}')" class="bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Editar Grupo">
+                      <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                    </button>
+                    <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Eliminar Grupo">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar
                     </button>
                   </div>
                 </td>
@@ -7171,60 +7547,7 @@
         }
     }
 
-    window.editarGrupoCatalogo = function(id, nombre, descripcion, meta = 0) {
-      idGrupoEditando = id;
-      window.grupoNombreOriginalTemp = nombre; // SOLUCIÓN LÓGICA PARA RENOMBRAR GRUPOS
-      document.getElementById('grupo_nombre').value = nombre;
-      document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
-      document.getElementById('grupo_desc').value = descripcion;
-
-      window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
-      
-      for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
-          const rel = grupos.find(g => g.nombre_grupo === nombre);
-          if(rel) {
-              const dataBen = window.registrosGlobalesMemoria[idBen];
-              if(dataBen) {
-                  if (rel.rol === 'SECCIONAL') window.lideresGrupoTemp.seccionales.push({ id: idBen, nombre: dataBen.nombre });
-                  if (rel.rol === 'COORDINADOR') window.lideresGrupoTemp.coordinadores.push({ id: idBen, nombre: dataBen.nombre });
-                  if (rel.rol === 'REPRESENTANTE') window.lideresGrupoTemp.representantes.push({ id: idBen, nombre: dataBen.nombre });
-              }
-          }
-      }
-      renderizarListasLideres();
-
-      const tituloForm = document.getElementById('tituloFormGrupo');
-      tituloForm.innerHTML = `
-        <div class="p-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 rounded-lg"><i data-lucide="edit" class="w-4 h-4"></i></div>
-        <span>Editar Grupo</span>
-        <button onclick="cancelarEdicionGrupo()" type="button" class="ml-auto text-xs font-bold text-rose-500 hover:underline">Cancelar</button>
-      `;
-
-      document.getElementById('btnGuardarGrupo').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
-      document.getElementById('btnGuardarGrupo').className = "w-full px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-lg mt-2 transition-colors flex justify-center items-center gap-2 shadow-sm";
-      lucide.createIcons();
-    }
-
-    window.cancelarEdicionGrupo = function() {
-      idGrupoEditando = null;
-      window.grupoNombreOriginalTemp = null;
-      document.getElementById('formNuevoGrupo').reset();
-      
-      window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
-      renderizarListasLideres();
-
-      const tituloForm = document.getElementById('tituloFormGrupo');
-      tituloForm.innerHTML = `
-        <div class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-lg"><i data-lucide="network" class="w-4 h-4"></i></div>
-        <span>Nuevo Grupo</span>
-      `;
-
-      document.getElementById('btnGuardarGrupo').innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
-      document.getElementById('btnGuardarGrupo').className = "w-full px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg mt-2 transition-colors flex justify-center items-center gap-2 shadow-sm";
-      lucide.createIcons();
-    }
-
-    window.borrarGrupoCatalogo = async function(id, nombre) {
+   window.borrarGrupoCatalogo = async function(id, nombre) {
       if(!(await AppConfirm("Eliminar Grupo", `Estás a punto de eliminar el grupo "${nombre}" permanentemente.\n\nEsta acción borrará el grupo del catálogo y DESACOPLARÁ AUTOMÁTICAMENTE a todos sus integrantes de la base de datos de Firebase.\n\n¿Estás completamente seguro?`, "danger", "Sí, Eliminar Grupo"))){
         return;
       }
@@ -7232,6 +7555,16 @@
       if (idGrupoEditando === id) cancelarEdicionGrupo();
 
       try {
+        // 🔥 SOLUCIÓN STORAGE: Buscar si el grupo tenía foto y eliminar el archivo físico
+        const grupoData = listaGruposCatalogo.find(g => g.id === id);
+        if (grupoData && grupoData.foto_url && grupoData.foto_url.trim() !== '') {
+            try {
+                await firebase.storage().refFromURL(grupoData.foto_url).delete();
+            } catch (errStorage) {
+                console.warn("La foto ya no existía en Storage.", errStorage);
+            }
+        }
+
         let batch = db.batch();
         let operaciones = 0;
 
@@ -9116,11 +9449,10 @@
         const representantes = integrantes.filter(i => i.rol === 'REPRESENTANTE');
         const bases = integrantes.filter(i => i.rol === 'INTEGRANTE');
 
-        // Helper: Generador de Nodos Orgánicos Seguro (Evita que Tailwind borre los colores)
+        // Helper: Generador de Nodos Compactos (Micro-Vista para caber completo en pantalla)
         const crearNodo = (persona, colorKey, icon) => {
             const imgUrl = (persona.foto_url && persona.foto_url.trim() !== "") ? persona.foto_url : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
             
-            // DICCIONARIO SEGURO PARA TAILWIND JIT
             const paleta = {
                 'violet': { ring: 'ring-violet-200', bg: 'bg-violet-500', text: 'text-violet-600' },
                 'rose': { ring: 'ring-rose-200', bg: 'bg-rose-500', text: 'text-rose-600' },
@@ -9130,37 +9462,36 @@
             const c = paleta[colorKey] || paleta['slate'];
 
             return `
-                <div class="flex flex-col items-center group relative z-10 cursor-pointer hover:-translate-y-1 transition-transform m-2" onclick="abrirPerfil('${persona.id_beneficiario}')">
-                    <div class="w-14 h-14 rounded-full border-4 border-white shadow-md overflow-hidden relative mb-2 ring-2 ${c.ring} bg-white">
+                <div class="flex flex-col items-center group relative z-10 cursor-pointer hover:-translate-y-0.5 transition-transform m-1" onclick="abrirPerfil('${persona.id_beneficiario}')">
+                    <div class="w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden relative mb-1 ring-2 ${c.ring} bg-white shrink-0">
                         <img src="${imgUrl}" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute top-9 -right-1 ${c.bg} text-white rounded-full p-1 shadow-sm border-2 border-white">
-                        <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                    <div class="absolute top-6 -right-0.5 ${c.bg} text-white rounded-full p-0.5 shadow-sm border border-white">
+                        <i data-lucide="${icon}" class="w-2.5 h-2.5"></i>
                     </div>
-                    <div class="bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm text-center min-w-[130px] max-w-[150px] relative">
-                        <p class="text-[10px] font-black text-slate-800 uppercase leading-tight truncate w-full" title="${persona.nombre}">${persona.nombre}</p>
-                        <p class="text-[8.5px] font-bold ${c.text} uppercase tracking-widest mt-0.5">${persona.rol}</p>
+                    <div class="bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm text-center min-w-[95px] max-w-[110px] relative">
+                        <p class="text-[9px] font-black text-slate-800 uppercase leading-tight truncate w-full" title="${persona.nombre}">${persona.nombre}</p>
+                        <p class="text-[7.5px] font-bold ${c.text} uppercase tracking-wider mt-0.5">${persona.rol}</p>
                     </div>
                 </div>
             `;
         };
 
-        // Renderizador de Capas Seguro (Evita que las líneas se rompan al bajar de fila)
         const renderizarNivel = (nodos, color, icon) => {
             if (nodos.length === 0) return '';
             return `
             <div class="flex flex-col items-center w-full relative">
-                <div class="flex flex-wrap justify-center gap-2 lg:gap-4 w-full max-w-5xl pt-2">
+                <div class="flex flex-wrap justify-center gap-1.5 lg:gap-2.5 w-full max-w-5xl pt-1">
                     ${nodos.map(n => crearNodo(n, color, icon)).join('')}
                 </div>
             </div>
             `;
         };
 
-        let html = '<div class="flex flex-col items-center w-full pb-10 pt-4">';
+        let html = '<div class="flex flex-col items-center w-full pb-6 pt-2 scale-95 sm:scale-100 origin-top">';
         
-        // Conector Vertical Limpio
-        const conector = `<div class="w-0.5 h-10 bg-slate-300 rounded-full my-2"></div>`;
+        // Conector Vertical Compacto (Reducido de 40px a 16px)
+        const conector = `<div class="w-0.5 h-4 bg-slate-300 rounded-full my-1"></div>`;
 
         let previos = false;
 
