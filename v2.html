@@ -2761,11 +2761,12 @@
         setEstadoUsuario('online');
         iniciarLatidoPresencia();
 
-        // Escuchar en tiempo real si eliminan este mismo usuario desde otro panel para desloguearlo al instante
+        // Escuchar en tiempo real si eliminan o SUSPENDEN este mismo usuario desde otro panel para desloguearlo al instante
         db.collection('usuarios_acceso').doc(user.email).onSnapshot(doc => {
-            if(!doc.exists) {
+            if(!doc.exists || doc.data().estatus === 'suspendido') {
                 detenerLatidoPresencia();
                 auth.signOut();
+                alert("Tu sesión ha caducado o tu cuenta ha sido suspendida. Contacta a un administrador.");
                 location.reload();
             }
         });
@@ -5786,6 +5787,7 @@
             foto_url: base64FotoUsuario,
             permisos: modulosPermitidos,
             secciones_permitidas: seccionesArr,
+            estatus: 'activo', // <-- NUEVO: Estado por defecto
             fecha_registro: firebase.firestore.FieldValue.serverTimestamp()
           });
           
@@ -5999,7 +6001,7 @@
       }
     };
 
-    // C) Tabla en tiempo real y Borrado Seguro de Usuarios
+    // C) Tabla en tiempo real, Suspensión y Borrado Seguro de Usuarios
     window.escucharUsuariosActivos = function() {
       const tbody = document.getElementById('tableUsuarios');
       if (!tbody) return;
@@ -6024,8 +6026,11 @@
             ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
             : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
           
+          const estatus = data.estatus || 'activo';
+          const isSuspendido = estatus === 'suspendido';
+
           // --- ALGORITMO MATEMÁTICO DE VALIDACIÓN DE PRESENCIA REALTIME ---
-          let isOnline = data.estado_conexion === 'online';
+          let isOnline = data.estado_conexion === 'online' && !isSuspendido;
           const ahoraMs = Date.now();
           const limiteToleranciaMs = 45000; // 45 segundos de tolerancia máxima sin latido
           
@@ -6038,13 +6043,20 @@
               isOnline = false;
           }
           
-          const colorEstado = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
-          const textoEstado = isOnline ? 'En línea ahora' : (data.ultimo_acceso ? 'Últ. vez: ' + data.ultimo_acceso.toDate().toLocaleString('es-MX', {dateStyle: 'short', timeStyle: 'short'}) : 'Desconectado');
+          const colorEstado = isSuspendido ? 'bg-red-500' : (isOnline ? 'bg-emerald-500' : 'bg-slate-300');
+          const textoEstado = isSuspendido ? 'CUENTA SUSPENDIDA' : (isOnline ? 'En línea ahora' : (data.ultimo_acceso ? 'Últ. vez: ' + data.ultimo_acceso.toDate().toLocaleString('es-MX', {dateStyle: 'short', timeStyle: 'short'}) : 'Desconectado'));
           const anilloEstado = isOnline ? 'ring-2 ring-emerald-200' : '';
+          
+          const opacityClass = isSuspendido ? 'opacity-60 grayscale' : '';
+          const badgeSuspendido = isSuspendido ? `<span class="px-2 py-0.5 bg-red-100 text-red-700 border border-red-200 rounded text-[9px] font-black uppercase tracking-wider ml-2 shadow-sm"><i data-lucide="ban" class="w-2.5 h-2.5 inline mr-1"></i>Bloqueado</span>` : '';
+          
+          const btnToggleEstatus = isSuspendido 
+              ? `<button onclick="toggleEstatusUsuario('${doc.id}', 'activo', '${data.nombre}')" class="flex items-center justify-center w-7 h-7 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 rounded-lg transition-colors shadow-sm" title="Reactivar Usuario"><i data-lucide="play-circle" class="w-4 h-4"></i></button>`
+              : `<button onclick="toggleEstatusUsuario('${doc.id}', 'suspendido', '${data.nombre}')" class="flex items-center justify-center w-7 h-7 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg transition-colors shadow-sm" title="Suspender Usuario (Soft Delete)"><i data-lucide="pause-circle" class="w-4 h-4"></i></button>`;
           // -----------------------------------------------------------------
 
           tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 ${opacityClass}">
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   <div class="relative">
@@ -6054,8 +6066,8 @@
                     <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${colorEstado}" title="${textoEstado}"></div>
                   </div>
                   <div class="flex flex-col">
-                    <span class="font-bold text-slate-800 text-xs leading-tight">${data.nombre}</span>
-                    <span class="text-[9px] font-bold ${isOnline ? 'text-emerald-500' : 'text-slate-400'}">${textoEstado}</span>
+                    <span class="font-bold text-slate-800 text-xs leading-tight">${data.nombre} ${badgeSuspendido}</span>
+                    <span class="text-[9px] font-bold ${isSuspendido ? 'text-red-500' : (isOnline ? 'text-emerald-500' : 'text-slate-400')}">${textoEstado}</span>
                   </div>
                 </div>
               </td>
@@ -6068,7 +6080,8 @@
                   <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}', '${data.foto_url || ''}', '${secStr}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
                   </button>
-                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario">
+                  ${btnToggleEstatus}
+                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario Permanente">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
@@ -6077,117 +6090,6 @@
           `;
         });
         lucide.createIcons(); 
-      });
-    }
-
-    window.eliminarUsuarioAcceso = async function(emailDoc) {
-      if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
-          await AppAlert("Acción Bloqueada", "No puedes eliminar tu propia cuenta de administrador mientras estás logueado en ella.", "warning");
-          return;
-      }
-      
-      // 👻 INMORTALIDAD FANTASMA
-      if (emailDoc.toLowerCase() === 'master@delta.com') {
-          await AppAlert("Acceso Denegado", "Entidad protegida del sistema.", "danger");
-          return;
-      }
-
-      if(await AppConfirm("Revocar Acceso", `¿Estás seguro de eliminar el acceso al sistema de la cuenta:\n${emailDoc}?\n\nEl usuario perderá acceso inmediatamente al panel. (Su registro en Authentication quedará huérfano por seguridad).`, "danger", "Sí, Revocar Acceso")) {
-        try {
-          // Ya no borramos de Authentication desde aquí por seguridad, 
-          // solo borramos el documento de acceso. Al no tener documento, el usuario es expulsado y bloqueado.
-          await db.collection('usuarios_acceso').doc(emailDoc).delete();
-          
-          if(typeof registrarAuditoria === 'function') {
-              registrarAuditoria('SEGURIDAD', `Eliminó el acceso y los permisos de: ${emailDoc}`);
-          }
-          
-          await AppAlert("Acceso Revocado", `El usuario ${emailDoc} ha perdido sus permisos y será expulsado del sistema en breve.`, "success");
-        } catch(e) {
-          console.error(e);
-          await AppAlert("Error del Sistema", "Ocurrió un problema al intentar revocar el acceso:\n" + e.message, "danger");
-        }
-      }
-    }
-
-    // C) Tabla en tiempo real y Borrado de Usuarios
-    window.escucharUsuariosActivos = function() {
-      const tbody = document.getElementById('tableUsuarios');
-      if (!tbody) return;
-
-      db.collection('usuarios_acceso').orderBy('fecha_registro', 'desc').onSnapshot(snap => {
-        tbody.innerHTML = '';
-        if (snap.empty) {
-          tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500 font-medium">No hay usuarios registrados en el sistema.</td></tr>';
-          return;
-        }
-
-        snap.forEach(doc => {
-          const data = doc.data();
-          
-          // 👻 MAGIA: Ocultar al fantasma de la tabla de accesos
-          if (data.email.toLowerCase() === 'master@delta.com') return;
-
-          const permisosStr = data.permisos ? data.permisos.join(',') : '';
-          const secStr = data.secciones_permitidas ? data.secciones_permitidas.join(', ') : '';
-          
-          const miniaturaUsuario = (data.foto_url && data.foto_url.trim() !== "") 
-            ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
-            : `<i data-lucide="user" class="w-4 h-4 text-slate-400"></i>`;
-          
-          // --- ALGORITMO MATEMÁTICO DE VALIDACIÓN DE PRESENCIA REALTIME ---
-          let isOnline = data.estado_conexion === 'online';
-          const ahoraMs = Date.now();
-          const limiteToleranciaMs = 45000; // 45 segundos de tolerancia máxima sin latido
-          
-          if (data.ultima_actividad && data.ultima_actividad.toMillis) {
-              const ultimaActividadMs = data.ultima_actividad.toMillis();
-              if (ahoraMs - ultimaActividadMs > limiteToleranciaMs) {
-                  isOnline = false;
-              }
-          } else if (!data.ultima_actividad) {
-              isOnline = false;
-          }
-          
-          const colorEstado = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
-          const textoEstado = isOnline ? 'En línea ahora' : (data.ultimo_acceso ? 'Últ. vez: ' + data.ultimo_acceso.toDate().toLocaleString('es-MX', {dateStyle: 'short', timeStyle: 'short'}) : 'Desconectado');
-          const anilloEstado = isOnline ? 'ring-2 ring-emerald-200' : '';
-          // -----------------------------------------------------------------
-
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
-              <td class="px-4 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="relative">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${anilloEstado}">
-                      ${miniaturaUsuario}
-                    </div>
-                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${colorEstado}" title="${textoEstado}"></div>
-                  </div>
-                  <div class="flex flex-col">
-                    <span class="font-bold text-slate-800 text-xs leading-tight">${data.nombre}</span>
-                    <span class="text-[9px] font-bold ${isOnline ? 'text-emerald-500' : 'text-slate-400'}">${textoEstado}</span>
-                  </div>
-                </div>
-              </td>
-              <td class="px-4 py-3 text-slate-500 text-xs font-medium">${data.email}</td>
-              <td class="px-4 py-3 text-center">
-                <span class="px-2 py-1 bg-slate-100 text-slate-600 border border-slate-200 rounded text-[10px] font-black uppercase tracking-wider">${data.rol}</span>
-              </td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}', '${data.foto_url || ''}', '${secStr}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
-                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
-                  </button>
-                  <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        });
-        lucide.createIcons(); // Se asegura de que se pinten los iconos nuevos
       });
     }
     window.eliminarUsuarioAcceso = async function(emailDoc) {
@@ -6248,6 +6150,42 @@
         } catch(e) {
           console.error(e);
           await AppAlert("Error del Sistema", "Ocurrió un problema al intentar eliminar la cuenta:\n" + e.message, "danger");
+        }
+      }
+    }
+    window.toggleEstatusUsuario = async function(emailDoc, nuevoEstatus, nombre) {
+      if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
+          await AppAlert("Acción Bloqueada", "No puedes suspender tu propia cuenta de administrador.", "warning");
+          return;
+      }
+      
+      if (emailDoc.toLowerCase() === 'master@delta.com') {
+          await AppAlert("Acceso Denegado", "No puedes suspender la cuenta del propietario del sistema.", "danger");
+          return;
+      }
+
+      const accion = nuevoEstatus === 'suspendido' ? 'Suspender' : 'Reactivar';
+      const msj = nuevoEstatus === 'suspendido' 
+          ? `¿Estás seguro de SUSPENDER el acceso de ${nombre}?\n\nSerá expulsado de inmediato, pero todo su historial de captura quedará intacto.` 
+          : `¿Deseas REACTIVAR la cuenta de ${nombre}?\n\nVolverá a tener acceso al sistema con normalidad.`;
+      
+      const tipoAlerta = nuevoEstatus === 'suspendido' ? 'warning' : 'info';
+
+      if(await AppConfirm(`${accion} Usuario`, msj, tipoAlerta, `Sí, ${accion}`)) {
+        try {
+          await db.collection('usuarios_acceso').doc(emailDoc).update({ 
+            estatus: nuevoEstatus,
+            estado_conexion: 'offline' // Lo forzamos a verse offline
+          });
+          
+          if(typeof registrarAuditoria === 'function') {
+              registrarAuditoria('SEGURIDAD', `${accion} temporalmente la cuenta de: ${emailDoc}`);
+          }
+          
+          AppAlert("Estatus Actualizado", `La cuenta de ${nombre} ha sido ${nuevoEstatus === 'suspendido' ? 'suspendida y bloqueada' : 'reactivada'} exitosamente.`, "success");
+        } catch(e) {
+          console.error(e);
+          AppAlert("Error del Sistema", "Ocurrió un problema al cambiar el estatus:\n" + e.message, "danger");
         }
       }
     }
@@ -9535,6 +9473,42 @@
         html += '</div>';
         canvas.innerHTML = html;
         lucide.createIcons();
+    }
+    window.toggleEstatusUsuario = async function(emailDoc, nuevoEstatus, nombre) {
+      if (auth.currentUser && emailDoc.toLowerCase() === auth.currentUser.email.toLowerCase()) {
+          await AppAlert("Acción Bloqueada", "No puedes suspender tu propia cuenta de administrador.", "warning");
+          return;
+      }
+      
+      if (emailDoc.toLowerCase() === 'master@delta.com') {
+          await AppAlert("Acceso Denegado", "No puedes suspender la cuenta del propietario del sistema.", "danger");
+          return;
+      }
+
+      const accion = nuevoEstatus === 'suspendido' ? 'Suspender' : 'Reactivar';
+      const msj = nuevoEstatus === 'suspendido' 
+          ? `¿Estás seguro de SUSPENDER el acceso de ${nombre}?\n\nSerá expulsado de inmediato, pero todo su historial de captura quedará intacto.` 
+          : `¿Deseas REACTIVAR la cuenta de ${nombre}?\n\nVolverá a tener acceso al sistema con normalidad.`;
+      
+      const tipoAlerta = nuevoEstatus === 'suspendido' ? 'warning' : 'info';
+
+      if(await AppConfirm(`${accion} Usuario`, msj, tipoAlerta, `Sí, ${accion}`)) {
+        try {
+          await db.collection('usuarios_acceso').doc(emailDoc).update({ 
+            estatus: nuevoEstatus,
+            estado_conexion: 'offline' // Lo forzamos a verse offline
+          });
+          
+          if(typeof registrarAuditoria === 'function') {
+              registrarAuditoria('SEGURIDAD', `${accion} temporalmente la cuenta de: ${emailDoc}`);
+          }
+          
+          AppAlert("Estatus Actualizado", `La cuenta de ${nombre} ha sido ${nuevoEstatus === 'suspendido' ? 'suspendida y bloqueada' : 'reactivada'} exitosamente.`, "success");
+        } catch(e) {
+          console.error(e);
+          AppAlert("Error del Sistema", "Ocurrió un problema al cambiar el estatus:\n" + e.message, "danger");
+        }
+      }
     }
   </script>
 </body>
