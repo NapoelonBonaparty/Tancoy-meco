@@ -344,12 +344,6 @@
                   <option value="HOMBRE">Hombre</option>
                   <option value="MUJER">Mujer</option>
                 </select>
-                <select id="filtroTipo" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
-                  <option value="TODOS">Tipo (Todos)</option>
-                  <option value="PADRON">Padrón</option>
-                  <option value="SIMPATIZANTE">Simpatizante</option>
-                  <option value="AFILIADO">Afiliado</option>
-                </select>
                 <select id="filtroSimpatia" onchange="aplicarFiltros()" class="w-full md:w-32 text-xs px-3 py-2.5 rounded-lg border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all">
                   <option value="TODAS">Simpatía (Todas)</option>
                   <option value="A FAVOR">A Favor</option>
@@ -370,7 +364,6 @@
                     <th class="px-4 py-3 font-bold">Casilla / Clave</th>
                     <th class="px-4 py-3 font-bold text-center">Sección</th>
                     <th class="px-4 py-3 font-bold">Ubicación / Origen</th>
-                    <th class="px-4 py-3 font-bold text-center">Tipo</th>
                     <th class="px-4 py-3 font-bold text-center">Gestión</th>
                   </tr>
                 </thead>
@@ -1047,7 +1040,7 @@
                 </div>
                 <div>
                   <h3 class="text-base font-black text-slate-800 dark:text-white tracking-tight" id="modalGrupoTitulo">Nuevo Grupo Institucional</h3>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Configure los datos generales y la estructura de liderazgo.</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Configure los datos generales, imagen y estructura de liderazgo.</p>
                 </div>
               </div>
               <button onclick="cerrarModalGrupo()" class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-500">
@@ -1056,20 +1049,43 @@
             </div>
 
             <form id="formNuevoGrupo" class="p-6 overflow-y-auto space-y-5 bg-white dark:bg-slate-800">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div class="md:col-span-2">
-                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Nombre del Grupo</label>
-                  <input type="text" id="grupo_nombre" required class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 uppercase transition-all shadow-sm" placeholder="Ej. LÍDERES ZONA SUR">
-                </div>
-                <div>
-                  <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Meta Afiliados</label>
-                  <input type="number" id="grupo_meta" min="0" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Ej. 50">
-                </div>
-              </div>
+              <input type="hidden" id="flag_borrar_foto_grupo" value="false">
 
-              <div>
-                <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Descripción / Propósito</label>
-                <textarea id="grupo_desc" rows="2" class="w-full text-sm font-medium px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Detalles u objetivos del grupo..."></textarea>
+              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+                
+                <div class="flex flex-col items-center shrink-0">
+                  <div id="mg_foto_preview_box" class="w-20 h-20 rounded-2xl bg-indigo-600 text-white font-black text-3xl flex items-center justify-center border-2 border-white dark:border-slate-700 shadow-md overflow-hidden relative group">
+                    <span id="mg_inicial_letra">G</span>
+                    <img id="mg_foto_img" src="" class="w-full h-full object-cover hidden">
+                  </div>
+                  
+                  <div class="mt-2.5 flex flex-col items-center gap-1.5 w-full">
+                    <label for="grupo_foto_input" class="cursor-pointer px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-[10px] font-bold uppercase transition-colors shadow-sm text-center w-full">
+                      <i data-lucide="camera" class="w-3 h-3 inline mr-1"></i> Subir Foto
+                    </label>
+                    <input type="file" id="grupo_foto_input" accept="image/png, image/jpeg" class="hidden" onchange="previsualizarFotoGrupo(this)">
+                    
+                    <button type="button" id="btnEliminarFotoGrupo" onclick="eliminarFotoGrupoTemporal()" class="hidden px-3 py-1 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-[10px] font-bold uppercase transition-colors w-full">
+                      <i data-lucide="trash-2" class="w-3 h-3 inline mr-1"></i> Borrar Foto
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="sm:col-span-2">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Nombre del Grupo</label>
+                    <input type="text" id="grupo_nombre" required onkeyup="actualizarInicialGrupo(this.value)" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 uppercase transition-all shadow-sm" placeholder="Ej. LÍDERES ZONA SUR">
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Meta Afiliados</label>
+                    <input type="number" id="grupo_meta" min="0" class="w-full text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Ej. 50">
+                  </div>
+                  <div class="sm:col-span-3">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Descripción / Propósito</label>
+                    <textarea id="grupo_desc" rows="2" class="w-full text-sm font-medium px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" placeholder="Detalles u objetivos del grupo..."></textarea>
+                  </div>
+                </div>
+
               </div>
 
               <div>
@@ -3579,8 +3595,7 @@
 
     // Esta función filtra los datos en la memoria RAM del navegador. CERO LECTURAS a Firebase.
     function aplicarFiltros() {
-      const tipo = document.getElementById('filtroTipo').value;
-      const simpatia = document.getElementById('filtroSimpatia').value; // <-- LÍNEA NUEVA
+      const simpatia = document.getElementById('filtroSimpatia').value; 
       const textoLimpio = document.getElementById('filtroTexto').value.trim().toUpperCase();
       const barrioLimpio = document.getElementById('filtroBarrio').value.trim().toUpperCase();
       const sexo = document.getElementById('filtroSexo').value;
@@ -3592,9 +3607,8 @@
         const d = window.registrosGlobalesMemoria[id];
 
         // Filtros estrictos
-        if (tipo !== 'TODOS' && d.tipo_afiliacion !== tipo) return;
         if (sexo !== 'TODOS' && d.sexo !== sexo) return;
-        if (simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== simpatia) return; // <-- LÍNEA NUEVA
+        if (simpatia !== 'TODAS' && (d.nivel_simpatia || 'INDECISO').toUpperCase() !== simpatia) return;
 
         // Búsqueda global por texto
         if (textoLimpio !== '') {
@@ -3695,13 +3709,7 @@
       const segmentoPagina = datosFiltradosMemoriaLocal.slice(indiceInicio, indiceFin);
 
       tbCenso.innerHTML = '';
-      segmentoPagina.forEach((d) => {
-        const tipoReal = d.tipo_afiliacion ? d.tipo_afiliacion.toUpperCase() : 'SIMPATIZANTE';
-        let badgeStyle = 'bg-indigo-100 text-indigo-700';
-        if(tipoReal === 'AFILIADO') badgeStyle = 'bg-emerald-100 text-emerald-700';
-        else if(tipoReal === 'ESTRUCTURA') badgeStyle = 'bg-violet-100 text-violet-700';
-        else if(tipoReal === 'PADRON') badgeStyle = 'bg-amber-100 text-amber-700 font-bold';
-
+     segmentoPagina.forEach((d) => {
         const identificador = d.casilla || d.clave_elector || d.curp || '--';
         const municipioMostrar = "LAS ROSAS";
         const origen = (d.registrado_por && d.registrado_por.includes('Excel')) ? 'Excel Masivo' : 'Captura Manual';
@@ -3736,10 +3744,6 @@
                 <span class="block text-slate-700 font-medium">${municipioMostrar}</span>
                 <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Origen: ${origen}</span>
              </div>
-          </td>
-          <td class="flex justify-between md:table-cell px-0 md:px-4 py-1.5 md:py-3 text-left md:text-center items-center">
-             <span class="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tipo</span>
-             <span class="px-3 py-1.5 md:py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${badgeStyle}">${d.tipo_afiliacion || 'Simpatizante'}</span>
           </td>
           <td class="block md:table-cell px-0 md:px-4 pt-4 md:py-3 mt-2 md:mt-0 border-t md:border-none border-slate-100 align-middle">
             <div class="flex flex-row items-center justify-end md:justify-center gap-3">
@@ -4702,6 +4706,11 @@
         lucide.createIcons();
 
         await db.collection('simpatizantes').doc(idDoc).update(datosActualizados);
+
+        // 🔥 AUDITORÍA UNIVERSAL: Registrar edición de expediente
+        if(typeof registrarAuditoria === 'function') {
+            registrarAuditoria('EDICIÓN', `Actualizó el expediente del ciudadano: ${datosActualizados.nombre || idDoc}`);
+        }
 
         // ACTUALIZAR TODOS LOS DATOS EN LA MEMORIA RAM LOCAL Y ESCONDER INPUTS
         camposEdicion.forEach(campo => {
@@ -6473,6 +6482,9 @@
               let colorTipo = 'text-slate-600 bg-slate-100';
               if (d.tipo === 'CAPTURA') colorTipo = 'text-emerald-700 bg-emerald-100 border border-emerald-200';
               else if (d.tipo === 'ASIGNACIÓN') colorTipo = 'text-amber-700 bg-amber-100 border border-amber-200';
+              else if (d.tipo === 'APOYO') colorTipo = 'text-sky-700 bg-sky-100 border border-sky-200';
+              else if (d.tipo === 'GRUPO') colorTipo = 'text-indigo-700 bg-indigo-100 border border-indigo-200';
+              else if (d.tipo === 'EDICIÓN') colorTipo = 'text-orange-700 bg-orange-100 border border-orange-200';
               else if (d.tipo === 'SISTEMA') colorTipo = 'text-red-700 bg-red-100 border border-red-200';
 
               tbActividad.innerHTML += `
@@ -6927,6 +6939,7 @@
         }
     }
 
+    // --- PROCESAMIENTO Y GUARDADO CON FIREBASE STORAGE ---
     if(formNuevoGrupo) {
       formNuevoGrupo.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -6934,25 +6947,72 @@
         const nombre = document.getElementById('grupo_nombre').value.trim().toUpperCase();
         const meta = parseInt(document.getElementById('grupo_meta').value) || 0;
         const desc = document.getElementById('grupo_desc').value.trim();
+        const fotoInput = document.getElementById('grupo_foto_input');
+        const flagBorrarFoto = document.getElementById('flag_borrar_foto_grupo').value === 'true';
 
-        // Extraer los textos en crudo para retrocompatibilidad visual en la tabla de catálogo principal
         const stringSeccionales = window.lideresGrupoTemp.seccionales.map(x => x.nombre).join(', ');
         const stringCoordinadores = window.lideresGrupoTemp.coordinadores.map(x => x.nombre).join(', ');
         const stringRepresentantes = window.lideresGrupoTemp.representantes.map(x => x.nombre).join(', ');
 
-        // CANDADO ANTIDUPLICADOS
         const nombreExiste = listaGruposCatalogo.some(g => g.nombre === nombre && g.id !== idGrupoEditando);
         if (nombreExiste) {
             alert(`⚠️ ALERTA: Ya existe un grupo registrado con el nombre "${nombre}". Elige un nombre diferente.`);
             return;
         }
 
-        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Procesando...';
         btn.disabled = true;
+        lucide.createIcons();
 
         try {
+          // Subida / Gestión de Imagen de Grupo
+          let fotoUrlFinal = null;
+          let urlViejaParaBorrar = null;
+
+          // 1. Extraer la URL vieja si estamos editando
+          if (idGrupoEditando) {
+              const grupoPrevio = listaGruposCatalogo.find(g => g.id === idGrupoEditando);
+              // Validamos exhaustivamente que la URL sea un string válido y de Firebase
+              if (grupoPrevio && typeof grupoPrevio.foto_url === 'string' && grupoPrevio.foto_url.includes('firebasestorage')) {
+                  urlViejaParaBorrar = grupoPrevio.foto_url;
+              }
+          }
+
+          // 2. Si hay un archivo NUEVO seleccionado en el input
+          if (fotoInput && fotoInput.files.length > 0) {
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Subiendo Imagen...';
+            lucide.createIcons();
+
+            const blobComprimido = await comprimirImagenApp(fotoInput.files[0], 600, 600, 0.75);
+            const rutaStorage = `fotos_grupos/${Date.now()}_${nombre.replace(/\s+/g, '_')}.jpg`;
+            const uploadTask = await firebase.storage().ref().child(rutaStorage).put(blobComprimido);
+            fotoUrlFinal = await uploadTask.ref.getDownloadURL();
+            
+            // 🔥 SOLUCIÓN STORAGE: Destruimos la foto anterior físicamente (Reemplazo)
+            if (urlViejaParaBorrar) {
+                try { 
+                  await firebase.storage().refFromURL(urlViejaParaBorrar).delete(); 
+                  console.log("Foto vieja eliminada de Storage (Reemplazo)");
+                } catch(e) { console.warn("No se pudo borrar foto en reemplazo:", e); }
+            }
+
+          // 3. Si el usuario hizo clic explícito en el botón "Borrar Foto"
+          } else if (flagBorrarFoto) {
+            fotoUrlFinal = ""; // El string vacío indicará a Firestore que no hay foto
+            
+            // 🔥 SOLUCIÓN STORAGE: Destruimos la foto anterior físicamente (Borrado total)
+            if (urlViejaParaBorrar) {
+                try { 
+                  await firebase.storage().refFromURL(urlViejaParaBorrar).delete(); 
+                  console.log("Foto vieja eliminada de Storage (Borrado)");
+                } catch(e) { console.warn("No se pudo borrar foto explícitamente:", e); }
+            }
+          }
+
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+          lucide.createIcons();
+
           if(idGrupoEditando) {
-            // SOLUCIÓN LÓGICA: Si se edita el nombre del grupo, se actualiza el nombre a todos sus miembros afiliados
             if (window.grupoNombreOriginalTemp && window.grupoNombreOriginalTemp !== nombre) {
                 const snapMiembrosViejos = await db.collection('miembros_grupos').where('nombre_grupo', '==', window.grupoNombreOriginalTemp).get();
                 if (!snapMiembrosViejos.empty) {
@@ -6962,7 +7022,7 @@
                     for (const docM of snapMiembrosViejos.docs) {
                         batchRenombrar.update(docM.ref, { nombre_grupo: nombre });
                         conteoRenombrar++;
-                        if (conteoRenombrar === 490) { // Prevención de colapso de Firestore por lotes grandes
+                        if (conteoRenombrar === 490) {
                             await batchRenombrar.commit();
                             batchRenombrar = db.batch();
                             conteoRenombrar = 0;
@@ -6972,21 +7032,35 @@
                 }
             }
 
-            await db.collection('catalogo_grupos').doc(idGrupoEditando).update({ 
+            const datosUpdate = { 
               nombre, 
               descripcion: desc,
               seccional: stringSeccionales,
               coordinador: stringCoordinadores,
               representante: stringRepresentantes,
               meta_afiliados: meta
-            });
+            };
+
+            if (fotoUrlFinal !== null) datosUpdate.foto_url = fotoUrlFinal;
+
+            await db.collection('catalogo_grupos').doc(idGrupoEditando).update(datosUpdate);
             
-            // Actualizar a los líderes en batch/loop iterativo en la relación de miembros
+            // 🔥 SOLUCIÓN: Actualizar el arreglo de memoria RAM local (Evita esperar a Firebase)
+            const idxGrupo = listaGruposCatalogo.findIndex(g => g.id === idGrupoEditando);
+            if (idxGrupo !== -1) {
+                listaGruposCatalogo[idxGrupo].nombre = nombre;
+                listaGruposCatalogo[idxGrupo].descripcion = desc;
+                listaGruposCatalogo[idxGrupo].seccional = stringSeccionales;
+                listaGruposCatalogo[idxGrupo].coordinador = stringCoordinadores;
+                listaGruposCatalogo[idxGrupo].representante = stringRepresentantes;
+                listaGruposCatalogo[idxGrupo].meta_afiliados = meta;
+                if (fotoUrlFinal !== null) listaGruposCatalogo[idxGrupo].foto_url = fotoUrlFinal;
+            }
+
             for(let s of window.lideresGrupoTemp.seccionales) await afiliarLiderAutomaticamente(s.id, nombre, 'SECCIONAL');
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
-            // SINCRONIZACIÓN INVERSA (Eliminar a los líderes fantasma que quitaste de las cajas degradándolos)
             const snapMiembros = await db.collection('miembros_grupos').where('nombre_grupo', '==', nombre).get();
             const idsLideresActivos = [
                 ...window.lideresGrupoTemp.seccionales.map(x=>x.id),
@@ -7007,30 +7081,33 @@
             });
             if (updatesLideres > 0) await batchLideres.commit();
 
-            alert("Grupo actualizado correctamente.");
-            cancelarEdicionGrupo();
+            // 🔥 Forzamos la actualización visual de la tabla inmediatamente
+            renderizarTablaCatGrupos();
+            cerrarModalGrupo();
           } else {
-            await db.collection('catalogo_grupos').add({
+            const datosNuevoGrupo = {
               nombre, 
               descripcion: desc, 
               seccional: stringSeccionales,
               coordinador: stringCoordinadores,
               representante: stringRepresentantes,
               meta_afiliados: meta,
+              foto_url: fotoUrlFinal || "",
               fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+
+            await db.collection('catalogo_grupos').add(datosNuevoGrupo);
             
-            // Procesar Afiliación Automática
             for(let s of window.lideresGrupoTemp.seccionales) await afiliarLiderAutomaticamente(s.id, nombre, 'SECCIONAL');
             for(let c of window.lideresGrupoTemp.coordinadores) await afiliarLiderAutomaticamente(c.id, nombre, 'COORDINADOR');
             for(let r of window.lideresGrupoTemp.representantes) await afiliarLiderAutomaticamente(r.id, nombre, 'REPRESENTANTE');
 
             if(typeof registrarAuditoria === 'function') registrarAuditoria('SISTEMA', `Creó el grupo: ${nombre}`);
-            cancelarEdicionGrupo();
+            cerrarModalGrupo();
           }
         } catch(e) {
-          console.error(e);
-          alert("Error al guardar grupo.");
+          console.error("Error al guardar grupo:", e);
+          alert("Ocurrió un error al intentar guardar la información del grupo.");
         } finally {
           btn.innerHTML = idGrupoEditando ? '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios' : '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
           btn.disabled = false;
@@ -7130,7 +7207,8 @@
             seccional: d.seccional || '',
             coordinador: d.coordinador || '',
             representante: d.representante || '',
-            meta_afiliados: d.meta_afiliados || 0
+            meta_afiliados: d.meta_afiliados || 0,
+            foto_url: d.foto_url || '' // 🔥 SOLUCIÓN: Agregamos la extracción de la foto
           });
         });
         
@@ -7229,8 +7307,135 @@
       renderizarListasLideres();
     }
 
-    window.editarGrupoCatalogo = function(id, nombre, descripcion, meta = 0) {
-      abrirModalGrupo(id, nombre, descripcion, meta);
+   // --- MANEJO DE FOTO Y AVATAR PREDETERMINADO CON LA INICIAL DEL GRUPO ---
+    window.actualizarInicialGrupo = function(nombre) {
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      if (spanInicial) {
+        const letra = nombre.trim() ? nombre.trim().charAt(0).toUpperCase() : 'G';
+        spanInicial.textContent = letra;
+      }
+    }
+
+    window.previsualizarFotoGrupo = function(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('mg_foto_img');
+          const spanInicial = document.getElementById('mg_inicial_letra');
+          const btnDel = document.getElementById('btnEliminarFotoGrupo');
+          
+          if (img && spanInicial && btnDel) {
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            spanInicial.classList.add('hidden');
+            btnDel.classList.remove('hidden');
+            document.getElementById('flag_borrar_foto_grupo').value = 'false';
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    window.eliminarFotoGrupoTemporal = function() {
+      const input = document.getElementById('grupo_foto_input');
+      const img = document.getElementById('mg_foto_img');
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      const btnDel = document.getElementById('btnEliminarFotoGrupo');
+
+      if (input) input.value = '';
+      if (img) { img.src = ''; img.classList.add('hidden'); }
+      if (spanInicial) spanInicial.classList.remove('hidden');
+      if (btnDel) btnDel.classList.add('hidden');
+      
+      document.getElementById('flag_borrar_foto_grupo').value = 'true';
+    }
+
+    // --- LÓGICA DE CONTROL DEL MODAL DE CREACIÓN / EDICIÓN CON FOTO ---
+    window.abrirModalGrupo = function(id = null, nombre = '', descripcion = '', meta = 0, fotoUrl = '') {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      const titulo = document.getElementById('modalGrupoTitulo');
+      const btn = document.getElementById('btnGuardarGrupo');
+      const imgPreview = document.getElementById('mg_foto_img');
+      const spanInicial = document.getElementById('mg_inicial_letra');
+      const btnDelFoto = document.getElementById('btnEliminarFotoGrupo');
+      const inputFoto = document.getElementById('grupo_foto_input');
+
+      if (inputFoto) inputFoto.value = '';
+      document.getElementById('flag_borrar_foto_grupo').value = 'false';
+
+      if (id) {
+        idGrupoEditando = id;
+        window.grupoNombreOriginalTemp = nombre;
+        document.getElementById('grupo_nombre').value = nombre;
+        document.getElementById('grupo_meta').value = meta > 0 ? meta : '';
+        document.getElementById('grupo_desc').value = descripcion;
+
+        actualizarInicialGrupo(nombre);
+
+        if (fotoUrl && fotoUrl.trim() !== '') {
+          imgPreview.src = fotoUrl;
+          imgPreview.classList.remove('hidden');
+          spanInicial.classList.add('hidden');
+          btnDelFoto.classList.remove('hidden');
+        } else {
+          imgPreview.src = '';
+          imgPreview.classList.add('hidden');
+          spanInicial.classList.remove('hidden');
+          btnDelFoto.classList.add('hidden');
+        }
+
+        titulo.textContent = "Editar Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+        btn.className = "px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        
+        for (const [idBen, grupos] of Object.entries(window.miembrosGruposMemoria)) {
+            const rel = grupos.find(g => g.nombre_grupo === nombre);
+            if(rel) {
+                const dataBen = window.registrosGlobalesMemoria[idBen];
+                if(dataBen) {
+                    if (rel.rol === 'SECCIONAL') window.lideresGrupoTemp.seccionales.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'COORDINADOR') window.lideresGrupoTemp.coordinadores.push({ id: idBen, nombre: dataBen.nombre });
+                    if (rel.rol === 'REPRESENTANTE') window.lideresGrupoTemp.representantes.push({ id: idBen, nombre: dataBen.nombre });
+                }
+            }
+        }
+        renderizarListasLideres();
+      } else {
+        idGrupoEditando = null;
+        window.grupoNombreOriginalTemp = null;
+        document.getElementById('formNuevoGrupo').reset();
+        window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+        renderizarListasLideres();
+
+        actualizarInicialGrupo('');
+        imgPreview.src = '';
+        imgPreview.classList.add('hidden');
+        spanInicial.classList.remove('hidden');
+        btnDelFoto.classList.add('hidden');
+
+        titulo.textContent = "Nuevo Grupo Institucional";
+        btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Grupo';
+        btn.className = "px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition-colors shadow-sm flex items-center gap-2 uppercase tracking-wide";
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    window.cerrarModalGrupo = function() {
+      const modal = document.getElementById('modalCrearEditarGrupo');
+      if (modal) modal.classList.add('hidden');
+      idGrupoEditando = null;
+      window.grupoNombreOriginalTemp = null;
+      document.getElementById('formNuevoGrupo').reset();
+      window.lideresGrupoTemp = { seccionales: [], coordinadores: [], representantes: [] };
+      renderizarListasLideres();
+    }
+
+    window.editarGrupoCatalogo = function(id, nombre, descripcion, meta = 0, fotoUrl = '') {
+      abrirModalGrupo(id, nombre, descripcion, meta, fotoUrl);
     }
 
     window.cancelarEdicionGrupo = function() {
@@ -7257,6 +7462,17 @@
           gruposFiltrados.forEach(d => {
             const conteo = window.obtenerTotalMiembrosGrupo(d.nombre);
             const descLimpia = d.descripcion ? d.descripcion.replace(/`/g, '\\`').replace(/\n/g, '\\n') : '';
+
+            // Avatar Predeterminado con la Primera Letra o Imagen Real
+            const inicial = d.nombre.trim() ? d.nombre.trim().charAt(0).toUpperCase() : 'G';
+            let avatarHtml = `<div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shrink-0 shadow-sm border border-indigo-500">${inicial}</div>`;
+            
+            if (d.foto_url && d.foto_url.trim() !== '') {
+              avatarHtml = `
+                <div class="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 shadow-sm cursor-pointer group/img relative" onclick="window.open('${d.foto_url}', '_blank')" title="Clic para ampliar imagen">
+                  <img src="${d.foto_url}" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform">
+                </div>`;
+            }
 
             let rolesHtml = '';
             if (d.seccional || d.coordinador || d.representante) {
@@ -7291,9 +7507,7 @@
               <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 transition-colors group">
                 <td class="px-5 py-4">
                   <div class="flex items-start gap-3.5">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center shrink-0 mt-0.5 text-indigo-600 dark:text-indigo-400">
-                      <i data-lucide="network" class="w-4 h-4"></i>
-                    </div>
+                    ${avatarHtml}
                     <div class="flex-1">
                       <p class="font-black text-slate-800 dark:text-white text-sm uppercase tracking-tight">${d.nombre}</p>
                       <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">${d.descripcion || 'Sin descripción o propósito registrado.'}</p>
@@ -7309,7 +7523,7 @@
                     <button onclick="abrirGrupoDesdeSidebar('${d.nombre}')" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Ver / Gestionar Integrantes">
                       <i data-lucide="users" class="w-3.5 h-3.5"></i> Integrantes
                     </button>
-                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, ${d.meta_afiliados})" class="bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Editar Grupo">
+                    <button onclick="editarGrupoCatalogo('${d.id}', '${d.nombre}', \`${descLimpia}\`, ${d.meta_afiliados}, '${d.foto_url || ''}')" class="bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Editar Grupo">
                       <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
                     </button>
                     <button onclick="borrarGrupoCatalogo('${d.id}', '${d.nombre}')" class="bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Eliminar Grupo">
@@ -7323,7 +7537,7 @@
         }
     }
 
-    window.borrarGrupoCatalogo = async function(id, nombre) {
+   window.borrarGrupoCatalogo = async function(id, nombre) {
       if(!(await AppConfirm("Eliminar Grupo", `Estás a punto de eliminar el grupo "${nombre}" permanentemente.\n\nEsta acción borrará el grupo del catálogo y DESACOPLARÁ AUTOMÁTICAMENTE a todos sus integrantes de la base de datos de Firebase.\n\n¿Estás completamente seguro?`, "danger", "Sí, Eliminar Grupo"))){
         return;
       }
@@ -7331,6 +7545,16 @@
       if (idGrupoEditando === id) cancelarEdicionGrupo();
 
       try {
+        // 🔥 SOLUCIÓN STORAGE: Buscar si el grupo tenía foto y eliminar el archivo físico
+        const grupoData = listaGruposCatalogo.find(g => g.id === id);
+        if (grupoData && grupoData.foto_url && grupoData.foto_url.trim() !== '') {
+            try {
+                await firebase.storage().refFromURL(grupoData.foto_url).delete();
+            } catch (errStorage) {
+                console.warn("La foto ya no existía en Storage.", errStorage);
+            }
+        }
+
         let batch = db.batch();
         let operaciones = 0;
 
@@ -9003,55 +9227,62 @@
         }
     }
     // Disparador inicial (Global)
-    // =====================================================================
+   // =====================================================================
     // MÓDULO: CAPTURA OFFLINE (ALMACENAMIENTO EN DISPOSITIVO)
     // =====================================================================
 
-    document.getElementById('formOffline').addEventListener('submit', function(e) {
+    document.getElementById('formOffline').addEventListener('submit', async function(e) {
       e.preventDefault();
       
       const nombres = document.getElementById('off_nombres').value.trim().toUpperCase();
       const apellidos = document.getElementById('off_apellidos').value.trim().toUpperCase();
-      
-      // Construimos el objeto exacto que requiere Firebase, pero lo guardamos en RAM temporal
-      const registroLocal = {
-        id_local: 'off_' + Date.now(), // ID temporal único para la cola
-        nombre: `${nombres} ${apellidos}`, // Fusionamos para el Padrón principal
-        seccion: document.getElementById('off_seccion').value.trim().toUpperCase(),
-        casilla: document.getElementById('off_casilla').value.trim().toUpperCase(),
-        clave_elector: document.getElementById('off_clave').value.trim().toUpperCase(),
-        barrio: document.getElementById('off_barrio').value.trim().toUpperCase(),
-        // Valores por defecto implícitos en campo
-        municipio: "LAS ROSAS",
-        tipo_afiliacion: "SIMPATIZANTE",
-        nivel_simpatia: "NO VISITADO",
-        registrado_por: (auth.currentUser ? auth.currentUser.email : 'Modo Offline'),
-        origen: "App_Offline"
-      };
-
-      // Extraer la cola actual de la memoria interna del teléfono
-      let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
-      colaOffline.push(registroLocal);
-      
-      // Guardar de vuelta al celular
-      localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
-
-      // Limpiar formulario y dar feedback visual
-      this.reset();
-      document.getElementById('off_nombres').focus();
-      
-      // Refrescar la UI
-      renderizarColaOffline();
-      
-      // Alerta de éxito elegante sin interrumpir el flujo
       const btnGuardar = document.getElementById('btnGuardarOffline');
       const textOriginal = btnGuardar.innerHTML;
-      btnGuardar.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ¡Guardado en Celular!';
+
+      btnGuardar.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando...';
+      btnGuardar.disabled = true;
       lucide.createIcons();
-      setTimeout(() => {
-          btnGuardar.innerHTML = textOriginal;
-          lucide.createIcons();
-      }, 2000);
+
+      try {
+        // Construimos el objeto exacto que requiere Firebase
+        const registroLocal = {
+          id_local: 'off_' + Date.now(), 
+          nombre: `${nombres} ${apellidos}`, 
+          seccion: document.getElementById('off_seccion').value.trim().toUpperCase(),
+          casilla: document.getElementById('off_casilla').value.trim().toUpperCase(),
+          clave_elector: document.getElementById('off_clave').value.trim().toUpperCase(),
+          barrio: document.getElementById('off_barrio').value.trim().toUpperCase(),
+          municipio: "LAS ROSAS",
+          tipo_afiliacion: "SIMPATIZANTE",
+          nivel_simpatia: "NO VISITADO",
+          registrado_por: (auth.currentUser ? auth.currentUser.email : 'Modo Offline'),
+          origen: "App_Offline"
+        };
+
+        // Extraer y guardar
+        let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
+        colaOffline.push(registroLocal);
+        localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
+
+        this.reset();
+        document.getElementById('off_nombres').focus();
+        
+        renderizarColaOffline();
+
+        btnGuardar.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ¡Guardado en Celular!';
+        lucide.createIcons();
+        
+        setTimeout(() => {
+            btnGuardar.innerHTML = textOriginal;
+            btnGuardar.disabled = false;
+            lucide.createIcons();
+        }, 2000);
+      } catch (err) {
+        console.error("Error offline:", err);
+        btnGuardar.innerHTML = textOriginal;
+        btnGuardar.disabled = false;
+        lucide.createIcons();
+      }
     });
 
     window.renderizarColaOffline = function() {
@@ -9079,7 +9310,6 @@
       btnSincronizar.disabled = false;
       contenedor.innerHTML = '';
 
-      // Mostramos los más recientes arriba
       colaOffline.slice().reverse().forEach(reg => {
           contenedor.innerHTML += `
             <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between group hover:border-amber-300 transition-colors">
@@ -9101,8 +9331,8 @@
       lucide.createIcons();
     }
 
-    window.eliminarRegistroOffline = function(idLocal) {
-        if(confirm("¿Estás seguro de descartar este registro de la memoria local?")) {
+    window.eliminarRegistroOffline = async function(idLocal) {
+        if(await AppConfirm("Descartar Captura", "¿Estás seguro de eliminar este registro de la memoria local de tu dispositivo? No se ha subido a la nube.", "warning", "Sí, Descartar")) {
             let colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
             colaOffline = colaOffline.filter(r => r.id_local !== idLocal);
             localStorage.setItem('delta_offline_queue', JSON.stringify(colaOffline));
@@ -9114,7 +9344,6 @@
         const colaOffline = JSON.parse(localStorage.getItem('delta_offline_queue') || '[]');
         if (colaOffline.length === 0) return;
 
-        // Validar si el dispositivo tiene internet físico
         if (!navigator.onLine) {
             return AppAlert("Sin Conexión", "Tu dispositivo no detecta internet. Conéctate a una red WiFi o activa tus datos móviles para poder subir la información a la nube.", "warning");
         }
@@ -9127,44 +9356,48 @@
         lucide.createIcons();
 
         try {
-            // Empaquetar todo en un Batch atómico de Firestore
             let batch = db.batch();
             let operaciones = 0;
             
-            colaOffline.forEach(registro => {
+            for (let i = 0; i < colaOffline.length; i++) {
+                const registro = colaOffline[i];
                 const docRef = db.collection('simpatizantes').doc();
-                // Limpiamos el ID temporal usado para la lista local
+                
                 delete registro.id_local;
-                // Inyectamos la estampa de tiempo oficial del servidor de Google
                 registro.fecha_captura = firebase.firestore.FieldValue.serverTimestamp();
                 
                 batch.set(docRef, registro);
                 operaciones++;
-            });
 
-            await batch.commit();
+                // Prevención de Lotes Masivos (> 490 para evitar colapso de Firestore)
+                if (operaciones % 490 === 0) {
+                    await batch.commit();
+                    batch = db.batch();
+                }
+            }
 
-            // Si todo salió bien, vaciamos la cola local
+            if (operaciones % 490 !== 0) {
+                await batch.commit();
+            }
+
             localStorage.removeItem('delta_offline_queue');
             
-            // Registramos la auditoría
             if(typeof registrarAuditoria === 'function') {
                 registrarAuditoria('CAPTURA', `Sincronizó un lote OFFLINE de ${operaciones} registros`);
             }
 
-            // Refrescamos la UI
             renderizarColaOffline();
-            AppAlert("Sincronización Exitosa", `Se han subido exitosamente ${operaciones} registros a la base de datos oficial.`, "success");
+            await AppAlert("Sincronización Exitosa", `Se han subido exitosamente ${operaciones} registros a la base de datos oficial.`, "success");
 
         } catch (error) {
             console.error("Error al sincronizar lote:", error);
-            AppAlert("Error de Red", "La red parpadeó o falló la conexión con Firebase a mitad del proceso. Los datos siguen seguros en tu teléfono. Intenta nuevamente cuando tengas mejor señal.", "danger");
+            AppAlert("Error de Red", "La red parpadeó o falló la conexión con Firebase a mitad del proceso. Los datos siguen seguros en tu teléfono. Intenta nuevamente.", "danger");
         } finally {
             btn.innerHTML = textOriginal;
             btn.disabled = false;
             lucide.createIcons();
             
-            // Forzar una descarga limpia de Firebase para actualizar las tablas principales si es necesario
+            // Forzamos reseteo RAM
             window.registrosGlobalesMemoria = {};
             if(typeof leerRegistrosEnTiempoReal === 'function') leerRegistrosEnTiempoReal();
         }
