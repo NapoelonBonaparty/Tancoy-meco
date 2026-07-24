@@ -2175,7 +2175,9 @@
               <p class="text-[10px] text-slate-500">Centro de seguridad y rastreo</p>
             </div>
           </div>
-          <button onclick="cerrarPerfilSeguridad()" class="p-1.5 hover:bg-slate-200 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+          <div class="flex items-center gap-2">
+            <div id="ms_btn_suspender_container"></div> <button onclick="cerrarPerfilSeguridad()" class="p-1.5 hover:bg-slate-200 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+          </div>
         </div>
 
         <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50">
@@ -2191,6 +2193,8 @@
                     <h4 id="ms_nombre_display" class="text-lg font-black text-slate-800 tracking-tight leading-none mb-1">--</h4>
                 <p id="ms_email_display" class="text-xs font-bold text-slate-400">--</p>
                 <span id="ms_rol_display" class="mt-4 px-4 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">--</span>
+                
+                <div id="ms_btn_suspender_container" class="w-full mt-6 pt-5 border-t border-slate-100"></div>
               </div>
               
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -2741,12 +2745,25 @@
       const loader = document.getElementById('globalLoader');
 
       if (user) {
-        // CANDADO DE SEGURIDAD INTERNO: Expulsión inmediata de dispositivos si la cuenta fue borrada de Firestore
+        // CANDADO DE SEGURIDAD INTERNO: Expulsión inmediata si la cuenta fue borrada o SUSPENDIDA
         const snapshotValidar = await db.collection('usuarios_acceso').doc(user.email).get();
-        if (!snapshotValidar.exists) {
+        
+        if (!snapshotValidar.exists || snapshotValidar.data().estatus === 'suspendido') {
             detenerLatidoPresencia();
-            auth.signOut();
-            return;
+            await auth.signOut();
+            
+            // Nos aseguramos de mantenerlos en la pantalla de login y mostrar error
+            if (loader) loader.classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+            
+            const errorBox = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            if(errorBox && errorText) {
+                errorText.textContent = "Acceso denegado. Tu cuenta está suspendida.";
+                errorBox.classList.remove('hidden');
+            }
+            return; // 🚫 Cortamos la ejecución aquí, NUNCA verán el dashboard
         }
 
         document.getElementById('loginScreen').classList.add('hidden');
@@ -6080,7 +6097,6 @@
                   <button onclick="editarUsuarioAcceso('${doc.id}', '${data.nombre}', '${data.rol}', '${permisosStr}', '${data.foto_url || ''}', '${secStr}')" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors font-bold text-[10px] uppercase shadow-sm" title="Editar Permisos">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
                   </button>
-                  ${btnToggleEstatus}
                   <button onclick="eliminarUsuarioAcceso('${doc.id}')" class="flex items-center justify-center w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 rounded-lg transition-colors shadow-sm" title="Borrar Usuario Permanente">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
@@ -6273,7 +6289,10 @@
             ? `<img src="${data.foto_url}" class="w-full h-full object-cover">` 
             : `<i data-lucide="user-check" class="w-6 h-6 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>`;
 
-          let isOnline = data.estado_conexion === 'online';
+          const isSuspendido = data.estatus === 'suspendido';
+
+          // --- ALGORITMO MATEMÁTICO DE VALIDACIÓN DE PRESENCIA REALTIME ---
+          let isOnline = data.estado_conexion === 'online' && !isSuspendido;
           const ahoraMs = Date.now();
           const limiteToleranciaMs = 45000;
           
@@ -6286,24 +6305,31 @@
               isOnline = false;
           }
           
-          const dotColor = isOnline ? 'bg-emerald-500' : 'bg-slate-300';
-          const dotTitle = isOnline ? 'Conectado ahora' : 'Desconectado';
+          const dotColor = isSuspendido ? 'bg-red-500' : (isOnline ? 'bg-emerald-500' : 'bg-slate-300');
+          const dotTitle = isSuspendido ? 'Cuenta Suspendida' : (isOnline ? 'Conectado ahora' : 'Desconectado');
           const fechaUltima = data.ultimo_acceso ? data.ultimo_acceso.toDate().toLocaleDateString('es-MX', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Sin registro';
 
+          // Estilos condicionales para cuentas suspendidas
+          const cardBg = isSuspendido ? 'bg-red-50/40 border-red-200' : 'bg-[#fcfcfb] border-slate-200 hover:shadow-md';
+          const titleColor = isSuspendido ? 'text-red-800 line-through opacity-70' : 'text-slate-800 group-hover:text-indigo-600';
+          const roleBadge = isSuspendido 
+              ? `<span class="px-3 py-1 rounded bg-red-100 text-red-700 text-[10px] font-black uppercase tracking-wide border border-red-200 shadow-sm"><i data-lucide="ban" class="w-3 h-3 inline mr-1"></i>Suspendido</span>`
+              : `<span class="px-3 py-1 rounded bg-white text-[10px] font-bold uppercase tracking-wide border shadow-sm ${roleColor}">${rol}</span>`;
+
           grid.innerHTML += `
-            <div class="bg-[#fcfcfb] rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col relative group">
+            <div class="rounded-2xl p-5 border shadow-sm transition-all flex flex-col relative group ${cardBg}">
               <div class="flex items-center gap-4 mb-5 cursor-pointer" onclick="abrirPerfilSeguridad('${email}')" title="Ver Auditoría del Usuario">
-                <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-4 border-white shadow-sm group-hover:scale-105 transition-transform">
+                <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-4 border-white shadow-sm ${!isSuspendido ? 'group-hover:scale-105' : ''} transition-transform">
                   ${miniaturaUsuario}
                 </div>
                 <div class="flex-1 min-w-0">
-                  <h4 class="text-sm font-black text-slate-800 truncate group-hover:text-indigo-600 transition-colors">${nombre}</h4>
+                  <h4 class="text-sm font-black truncate transition-colors ${titleColor}">${nombre}</h4>
                   <p class="text-[11px] font-bold text-blue-500 truncate mt-0.5">@${email.split('@')[0]}</p>
                 </div>
               </div>
               
               <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
-                <span class="px-3 py-1 rounded bg-white text-[10px] font-bold uppercase tracking-wide border shadow-sm ${roleColor}">${rol}</span>
+                ${roleBadge}
                 
                 <div class="flex items-center gap-2">
                   <button onclick="abrirPerfilSeguridad('${email}')" class="p-1.5 text-orange-400 hover:bg-orange-50 rounded transition-colors" title="Auditar Usuario">
@@ -6314,7 +6340,7 @@
                   </button>
                   <div class="flex flex-col items-end ml-2">
                     <div class="w-3 h-3 rounded-full ${dotColor} shadow-sm" title="${dotTitle}"></div>
-                    ${!isOnline ? `<span class="text-[8px] text-slate-400 font-bold mt-1 tracking-wider whitespace-nowrap">${fechaUltima}</span>` : ''}
+                    ${!isOnline && !isSuspendido ? `<span class="text-[8px] text-slate-400 font-bold mt-1 tracking-wider whitespace-nowrap">${fechaUltima}</span>` : ''}
                   </div>
                 </div>
               </div>
@@ -6348,6 +6374,15 @@
           document.getElementById('ms_nombre_display').textContent = ud.nombre || 'Sin Nombre';
           document.getElementById('ms_rol_display').textContent = ud.rol || 'USUARIO';
           
+          // 🔥 Inyectar botón de Suspensión debajo del rol
+          const isSuspendido = ud.estatus === 'suspendido';
+          const btnContainer = document.getElementById('ms_btn_suspender_container');
+          if (btnContainer) {
+              btnContainer.innerHTML = isSuspendido 
+                  ? `<button onclick="toggleEstatusUsuario('${email}', 'activo', '${ud.nombre}'); cerrarPerfilSeguridad();" class="w-full flex justify-center items-center gap-2 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl transition-colors shadow-sm text-xs font-black uppercase tracking-wider"><i data-lucide="play-circle" class="w-4 h-4"></i> Reactivar Cuenta</button>`
+                  : `<button onclick="toggleEstatusUsuario('${email}', 'suspendido', '${ud.nombre}'); cerrarPerfilSeguridad();" class="w-full flex justify-center items-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl transition-colors shadow-sm text-xs font-black uppercase tracking-wider"><i data-lucide="user-minus" class="w-4 h-4"></i> Suspender Acceso</button>`;
+          }
+
           // Renderizado dinámico de la fotografía del usuario en el panel de auditoría
           const msFotoContainer = document.getElementById('ms_foto_container');
           if (msFotoContainer) {
